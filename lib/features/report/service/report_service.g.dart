@@ -10,8 +10,10 @@ part of 'report_service.dart';
 
 class _ReportService implements ReportService {
   _ReportService(
-    this._dio) {
-    baseUrl ??= 'https://mgnclinic-api.unionais.org/api/v1/';
+    this._dio, {
+    this.baseUrl,
+  }) {
+    baseUrl ??= 'https://mdrspsfy25-api.unionais.org/api/v1/';
   }
 
   final Dio _dio;

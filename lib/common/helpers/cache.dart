@@ -1,11 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-const tokenName = 'MGN-Clinic-Secret-Token';
-const userName = 'MGN-Clinic-User-Name';
-const userCode = 'MGN-Clinic-User-Code';
-const userTownship = 'MGN-Clinic-User-Township';
-const showSignature = 'MGN-Clinic-User-showSignature';
-const app = 'MGN-Clinic-app';
+const tokenName = 'SPS-FY24-Secret-Token';
+const userName = 'SPS-FY24-User-Name';
+const userProject = 'SPS-FY24-User-Project';
+const userTownship = 'SPS-FY24-User-Township';
+const showSignature = 'SPS-FY24-User-showSignature';
+const app = 'SPS-FY24-app';
 
 class Cache {
   static saveToken(String token) async {
@@ -18,9 +18,9 @@ class Cache {
     await prefs.setString(userName, username);
   }
 
-  static saveUserCode(String code) async {
+  static saveUserProject(String project) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(userCode, code);
+    await prefs.setString(userProject, project);
   }
 
   static saveUserTownship(String township) async {
@@ -42,9 +42,9 @@ class Cache {
     return prefsUserName;
   }
 
-  static Future<String?> getUserCode() async {
+  static Future<String?> getUserProject() async {
     final prefs = await SharedPreferences.getInstance();
-    String? prefsUserName = prefs.getString(userCode);
+    String? prefsUserName = prefs.getString(userProject);
 
     return prefsUserName;
   }
@@ -66,9 +66,9 @@ class Cache {
     await prefs.setString(userName, '');
   }
 
-  static deleteUserCode() async {
+  static deleteUserProject() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(userCode, '');
+    await prefs.setString(userProject, '');
   }
 
   static deleteShowSignature() async {
@@ -77,7 +77,9 @@ class Cache {
   }
 
   static deleteAll() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    deleteToken();
+    deleteUserName();
+    deleteUserProject();
+    deleteShowSignature();
   }
 }

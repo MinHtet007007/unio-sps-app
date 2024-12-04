@@ -1,12 +1,12 @@
 class User {
   String name;
   int id;
-  String code;
+  String email;
   String township;
   User({
     required this.name,
     required this.id,
-    required this.code,
+    required this.email,
     required this.township,
   });
 
@@ -14,7 +14,7 @@ class User {
     return User(
       name: json['name'] ?? '',
       id: json['id'] ?? 0,
-      code: json['code'] ?? '',
+      email: json['email'] ?? '',
       township: json['township'] ?? '',
     );
   }
@@ -23,7 +23,7 @@ class User {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['name'] = name;
     data['id'] = id;
-    data['code'] = code;
+    data['email'] = email;
     data['township'] = township;
     return data;
   }

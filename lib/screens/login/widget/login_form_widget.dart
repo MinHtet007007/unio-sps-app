@@ -92,14 +92,14 @@ class _LoginFormState extends State<LoginForm> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      labelText: "Code",
+                      labelText: "Email",
                       prefixIcon: const Icon(Icons.code),
                     ),
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
                     validator: (val) {
                       if (val!.isEmpty) {
-                        return "Code is required";
+                        return "Email is required";
                       }
                       return null;
                     },

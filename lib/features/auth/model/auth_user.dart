@@ -1,8 +1,11 @@
+
 class AuthUser {
   String name;
   int? id;
-  String code;
-  String township;
+  int? townshipId;
+  int? projectId;
+  String? township;
+  String? project;
   String? tokenType;
   String? accessToken;
   int? expiresIn;
@@ -10,8 +13,10 @@ class AuthUser {
   AuthUser({
     required this.name,
      this.id,
-    required this.code,
-    required this.township,
+    this.townshipId,
+    this.projectId,
+    this.township,
+    this.project,
     this.tokenType,
     this.accessToken,
     this.expiresIn,
@@ -21,23 +26,14 @@ class AuthUser {
     return AuthUser(
       name: json['name'] ?? '',
       id: json['id'] ?? 0,
-      code: json['code'] ?? '',
-      township: json['township'] ?? '',
+      townshipId: json['township'] != null ? json['township']['id'] : 0,
+      projectId: json['project'] != null ? json['project']['id'] : 0,
+      project: json['project'] != null ? json['project']['name'] : '',
+      township: json['township'] != null ? json['township']['name'] : '',
       tokenType: json['token_type'] ?? '',
       accessToken: json['access_token'] ?? '',
       expiresIn: json['expires_in'] ?? 0,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['name'] = name;
-    data['id'] = id;
-    data['code'] = code;
-    data['township'] = township;
-    data['token_type'] = tokenType;
-    data['access_token'] = accessToken;
-    data['expires_in'] = expiresIn;
-    return data;
-  }
 }

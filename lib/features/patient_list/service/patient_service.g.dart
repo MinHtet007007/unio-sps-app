@@ -13,7 +13,7 @@ class _PatientService implements PatientService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://mgnclinic-api.unionais.org/api/v1/';
+    baseUrl ??= 'https://mdrspsfy25-api.unionais.org/api/v1/';
   }
 
   final Dio _dio;

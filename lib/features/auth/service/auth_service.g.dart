@@ -13,7 +13,7 @@ class _AuthService implements AuthService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://mgnclinic-api.unionais.org/api/v1/';
+    baseUrl ??= 'https://mdrspsfy25-api.unionais.org/api/v1/';
   }
 
   final Dio _dio;
@@ -35,7 +35,7 @@ class _AuthService implements AuthService {
     )
             .compose(
               _dio.options,
-              'volunteer-login',
+              'app-login',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -65,7 +65,7 @@ class _AuthService implements AuthService {
     )
             .compose(
               _dio.options,
-              'volunteer-me',
+              'field-officer-me',
               queryParameters: queryParameters,
               data: _data,
             )

@@ -15,9 +15,6 @@ class AuthProvider extends Notifier<AuthUserState> {
   }
 
   late final Dio _dio = ref.read(dioProvider);
-  bool isAuthenticated() {
-    return state is AuthUserSuccessState;
-  }
 
   void login(String code, String password) async {
     try {
@@ -25,7 +22,7 @@ class AuthProvider extends Notifier<AuthUserState> {
 
       AuthService authService = AuthService(_dio);
       final response = await authService.login(
-        LoginRequest(code: code, password: password),
+        LoginRequest(email: code, password: password),
       );
 
       final authUser = response.data;
@@ -34,8 +31,12 @@ class AuthProvider extends Notifier<AuthUserState> {
         await Cache.saveToken(authUser.accessToken as String);
       }
       await Cache.saveUserName(authUser.name);
-      await Cache.saveUserCode(authUser.code);
-      await Cache.saveUserTownship(authUser.township);
+      if (authUser.township!.isNotEmpty) {
+        await Cache.saveUserTownship(authUser.township ?? '');
+      }
+      if (authUser.project!.isNotEmpty) {
+        await Cache.saveUserProject(authUser.project ?? '');
+      }
 
       state = AuthUserSuccessState(authUser);
     } on DioException catch (dioError) {
@@ -64,15 +65,12 @@ class AuthProvider extends Notifier<AuthUserState> {
         return;
       }
       final name = await Cache.getUserName();
-      final code = await Cache.getUserCode();
       final township = await Cache.getUserTownship();
-      if (name == null || code == null || township == null) {
+      if (name == null || township == null) {
         state = AuthMeFailedState();
       }
-      state = AuthUserSuccessState(AuthUser(
-          name: name as String,
-          code: code as String,
-          township: township as String));
+      state = AuthUserSuccessState(
+          AuthUser(name: name as String, township: township as String));
       return;
       // }
       // AuthService authService = AuthService(_dio);

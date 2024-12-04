@@ -56,13 +56,13 @@ class SettingScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 15),
                       CustomLabelWidget(
-                        text: userState.code,
+                        text: userState.project ?? '',
                         style:
                             const TextStyle(fontSize: 18, color: Colors.white),
                       ),
                       const SizedBox(height: 15),
                       CustomLabelWidget(
-                        text: userState.township,
+                        text: userState.township ?? '',
                         style:
                             const TextStyle(fontSize: 18, color: Colors.white),
                       ),
