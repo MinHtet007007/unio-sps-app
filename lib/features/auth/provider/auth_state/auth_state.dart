@@ -1,4 +1,4 @@
-import 'package:sps/features/auth/data/model/auth_user.dart';
+import 'package:sps/features/auth/model/auth_user.dart';
 
 sealed class AuthUserState {}
 

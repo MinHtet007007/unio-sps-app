@@ -1,8 +1,8 @@
 import 'package:sps/common/helpers/cache.dart';
 import 'package:sps/common/provider/dio/dio_provider.dart';
-import 'package:sps/features/auth/data/model/auth_user.dart';
-import 'package:sps/features/auth/data/model/login_request.dart';
-import 'package:sps/features/auth/data/service/auth_service.dart';
+import 'package:sps/features/auth/model/auth_user.dart';
+import 'package:sps/features/auth/model/login_request.dart';
+import 'package:sps/features/auth/service/auth_service.dart';
 import 'package:sps/features/auth/provider/auth_state/auth_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';

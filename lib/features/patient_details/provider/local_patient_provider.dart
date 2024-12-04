@@ -3,17 +3,16 @@ import 'package:sps/features/patient_details/provider/local_patient_state/local_
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LocalPatientProvider extends Notifier<LocalPatientState> {
+class LocalPatientProvider extends StateNotifier<LocalPatientState> {
   LocalPatientState localPatientState = LocalPatientLoadingState();
-  @override
-  build() {
-    return localPatientState;
-  }
+  LocalDatabase localDatabase;
+
+  LocalPatientProvider(this.localDatabase) : super(LocalPatientLoadingState());
 
   void fetchPatient(int id) async {
     try {
       state = LocalPatientLoadingState();
-      final database = await DatabaseProvider().database;
+      final database = await localDatabase.database;
 
       final patientDao = database.patientDao;
       final Patient? patient = await patientDao.findLocalPatientById(id);
@@ -30,5 +29,5 @@ class LocalPatientProvider extends Notifier<LocalPatientState> {
 }
 
 final localPatientProvider =
-    NotifierProvider<LocalPatientProvider, LocalPatientState>(
-        () => LocalPatientProvider());
+    StateNotifierProvider<LocalPatientProvider, LocalPatientState>(
+        (ref) => LocalPatientProvider(ref.read(localDatabaseProvider)));

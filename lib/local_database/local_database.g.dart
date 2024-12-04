@@ -74,8 +74,6 @@ class _$AppDatabase extends AppDatabase {
 
   PatientDao? _patientDaoInstance;
 
-  CounselingDao? _counselingDaoInstance;
-
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -99,8 +97,6 @@ class _$AppDatabase extends AppDatabase {
       onCreate: (database, version) async {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `unionTemporaryCode` TEXT, `treatmentRegimen` TEXT, `tbType` TEXT, `patientId` INTEGER NOT NULL, `volunteerId` INTEGER NOT NULL, `dotsStartDate` TEXT, `dotsEndDate` TEXT, `treatmentOutcome` TEXT, `treatmentOutcomeDate` TEXT, `dotsPatientType` TEXT, `actualTreatmentStartDate` TEXT, `type` TEXT, `remark` TEXT)');
-        await database.execute(
-            'CREATE TABLE IF NOT EXISTS `counselings` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `patientId` INTEGER NOT NULL, `phase` TEXT NOT NULL, `type` TEXT NOT NULL, `date` TEXT NOT NULL, `isSynced` INTEGER NOT NULL, FOREIGN KEY (`patientId`) REFERENCES `patients` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -111,11 +107,6 @@ class _$AppDatabase extends AppDatabase {
   @override
   PatientDao get patientDao {
     return _patientDaoInstance ??= _$PatientDao(database, changeListener);
-  }
-
-  @override
-  CounselingDao get counselingDao {
-    return _counselingDaoInstance ??= _$CounselingDao(database, changeListener);
   }
 }
 
@@ -212,128 +203,10 @@ class _$PatientDao extends PatientDao {
     await _patientInsertionAdapter.insertList(
         patients, OnConflictStrategy.replace);
   }
-}
-
-class _$CounselingDao extends CounselingDao {
-  _$CounselingDao(
-    this.database,
-    this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database),
-        _counselingInsertionAdapter = InsertionAdapter(
-            database,
-            'counselings',
-            (Counseling item) => <String, Object?>{
-                  'id': item.id,
-                  'patientId': item.patientId,
-                  'phase': item.phase,
-                  'type': item.type,
-                  'date': item.date,
-                  'isSynced': item.isSynced ? 1 : 0
-                }),
-        _counselingUpdateAdapter = UpdateAdapter(
-            database,
-            'counselings',
-            ['id'],
-            (Counseling item) => <String, Object?>{
-                  'id': item.id,
-                  'patientId': item.patientId,
-                  'phase': item.phase,
-                  'type': item.type,
-                  'date': item.date,
-                  'isSynced': item.isSynced ? 1 : 0
-                }),
-        _counselingDeletionAdapter = DeletionAdapter(
-            database,
-            'counselings',
-            ['id'],
-            (Counseling item) => <String, Object?>{
-                  'id': item.id,
-                  'patientId': item.patientId,
-                  'phase': item.phase,
-                  'type': item.type,
-                  'date': item.date,
-                  'isSynced': item.isSynced ? 1 : 0
-                });
-
-  final sqflite.DatabaseExecutor database;
-
-  final StreamController<String> changeListener;
-
-  final QueryAdapter _queryAdapter;
-
-  final InsertionAdapter<Counseling> _counselingInsertionAdapter;
-
-  final UpdateAdapter<Counseling> _counselingUpdateAdapter;
-
-  final DeletionAdapter<Counseling> _counselingDeletionAdapter;
 
   @override
-  Future<List<Counseling>> findAll(int patientId) async {
-    return _queryAdapter.queryList(
-        'SELECT * FROM counselings where patientId = ?1 ORDER BY isSynced, date DESC',
-        mapper: (Map<String, Object?> row) => Counseling(row['patientId'] as int, row['phase'] as String, row['type'] as String, row['date'] as String, (row['isSynced'] as int) != 0, id: row['id'] as int?),
-        arguments: [patientId]);
-  }
-
-  @override
-  Future<List<Counseling>> findNotSyncedCounselings(int patientId) async {
-    return _queryAdapter.queryList(
-        'SELECT * FROM counselings where patientId = ?1 AND isSynced = 0',
-        mapper: (Map<String, Object?> row) => Counseling(
-            row['patientId'] as int,
-            row['phase'] as String,
-            row['type'] as String,
-            row['date'] as String,
-            (row['isSynced'] as int) != 0,
-            id: row['id'] as int?),
-        arguments: [patientId]);
-  }
-
-  @override
-  Future<int?> getNotSyncedCounselingsCount() async {
-    return _queryAdapter.query(
-        'SELECT COUNT(*) FROM counselings where isSynced = 0',
-        mapper: (Map<String, Object?> row) => row.values.first as int);
-  }
-
-  @override
-  Future<Counseling?> findCounselingById(int id) async {
-    return _queryAdapter.query('SELECT * FROM counselings WHERE id = ?1',
-        mapper: (Map<String, Object?> row) => Counseling(
-            row['patientId'] as int,
-            row['phase'] as String,
-            row['type'] as String,
-            row['date'] as String,
-            (row['isSynced'] as int) != 0,
-            id: row['id'] as int?),
-        arguments: [id]);
-  }
-
-  @override
-  Future<void> deleteAll() async {
-    await _queryAdapter.queryNoReturn('DELETE FROM counselings');
-  }
-
-  @override
-  Future<int> addCounseling(Counseling data) {
-    return _counselingInsertionAdapter.insertAndReturnId(
-        data, OnConflictStrategy.abort);
-  }
-
-  @override
-  Future<void> insertAll(List<Counseling> data) async {
-    await _counselingInsertionAdapter.insertList(
-        data, OnConflictStrategy.replace);
-  }
-
-  @override
-  Future<int> updateCounseling(Counseling data) {
-    return _counselingUpdateAdapter.updateAndReturnChangedRows(
-        data, OnConflictStrategy.abort);
-  }
-
-  @override
-  Future<int> deleteCounseling(Counseling data) {
-    return _counselingDeletionAdapter.deleteAndReturnChangedRows(data);
+  Future<int> insertLocalPatient(Patient patient) {
+    return _patientInsertionAdapter.insertAndReturnId(
+        patient, OnConflictStrategy.replace);
   }
 }

@@ -1,6 +1,6 @@
 // entity/patient.dart
 
-import 'package:sps/common/model/remote_patient.dart';
+import 'package:sps/features/patient_list/model/remote_patient.dart';
 import 'package:sps/local_database/tables/local_database_tables.dart';
 import 'package:floor/floor.dart';
 
