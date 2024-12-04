@@ -28,14 +28,7 @@ class AuthProvider extends Notifier<AuthUserState> {
         LoginRequest(code: code, password: password),
       );
 
-      if (response == null) {
-        throw Exception('Login response is null');
-      }
-
       final authUser = response.data;
-      if (authUser == null) {
-        throw Exception('AuthUser is null');
-      }
 
       if (authUser.accessToken != null) {
         await Cache.saveToken(authUser.accessToken as String);
@@ -45,7 +38,7 @@ class AuthProvider extends Notifier<AuthUserState> {
       await Cache.saveUserTownship(authUser.township);
 
       state = AuthUserSuccessState(authUser);
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       final errorMessage = dioError.response?.data['data']['message'] ??
           'Error occurred while logging in';
       state = AuthUserFailedState(errorMessage);

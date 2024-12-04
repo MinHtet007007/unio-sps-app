@@ -37,7 +37,7 @@ class _CustomDateInputWithValidationState
       context: context,
       initialDate: DateTime.now(),
       firstDate: widget.date != null
-          ? DateTime.parse(widget.date!)
+          ? DateTime.parse(widget.date)
           : firstDateOfLastMonth,
       lastDate: widget.date != null ? DateTime.now() : DateTime(2101),
     );

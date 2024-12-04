@@ -1,6 +1,5 @@
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
-import 'package:sps/common/widgets/loading_widget.dart';
 import 'package:sps/features/settings/provider/font_provider.dart';
 import 'package:sps/features/settings/provider/state/font_state.dart';
 import 'package:sps/features/settings/ui/widget/font_change_widget.dart';

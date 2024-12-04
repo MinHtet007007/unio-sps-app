@@ -1,4 +1,4 @@
-import 'package:sps/common/api_interceptors/apiToken_interceptor.dart';
+import 'package:sps/common/api_interceptors/api_token_interceptor.dart';
 import 'package:sps/common/api_interceptors/auth_check_interceptor.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';

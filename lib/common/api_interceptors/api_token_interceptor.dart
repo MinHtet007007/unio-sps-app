@@ -1,6 +1,6 @@
-import 'package:sps/common/helpers/cache.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:sps/common/helpers/cache.dart';
 
 class ApitokenInterceptor extends Interceptor {
   @override

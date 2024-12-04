@@ -1,5 +1,4 @@
 import 'package:sps/common/constants/api_constant.dart';
-import 'package:sps/common/provider/dio/dio_provider.dart';
 import 'package:sps/features/report/model/remote_report_result.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
