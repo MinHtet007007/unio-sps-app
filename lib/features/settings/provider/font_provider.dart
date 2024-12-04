@@ -1,6 +1,5 @@
 import 'package:sps/features/settings/provider/state/font_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:rabbit_converter/rabbit_converter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const defaultFont = 1;

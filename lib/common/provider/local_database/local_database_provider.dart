@@ -1,13 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/local_database/local_database.dart';
 import 'package:sps/local_database/tables/local_database_tables.dart';
 
-class DatabaseProvider {
-  static final DatabaseProvider _instance = DatabaseProvider._internal();
+class LocalDatabase {
+  static final LocalDatabase _instance = LocalDatabase._internal();
   static AppDatabase? _database;
 
-  DatabaseProvider._internal();
+  LocalDatabase._internal();
 
-  factory DatabaseProvider() {
+  factory LocalDatabase() {
     return _instance;
   }
 
@@ -25,3 +26,7 @@ class DatabaseProvider {
     return database;
   }
 }
+
+final localDatabaseProvider = Provider<LocalDatabase>((ref) {
+  return LocalDatabase();
+});

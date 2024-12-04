@@ -16,9 +16,9 @@ class CustomSubmitButton extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
+            backgroundColor: WidgetStateProperty.all<Color>(Colors.red),
+            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                 const RoundedRectangleBorder(
                     borderRadius: BorderRadius.zero,
                     side: BorderSide(color: Colors.red)))),

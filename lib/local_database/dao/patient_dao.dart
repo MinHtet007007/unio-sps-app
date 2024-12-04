@@ -1,4 +1,3 @@
-// dao/person_dao.dart
 
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/tables/local_database_tables.dart';
@@ -14,6 +13,9 @@ abstract class PatientDao {
 
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertLocalPatients(List<Patient> patients);
+
+  @Insert(onConflict: OnConflictStrategy.replace)
+  Future<int> insertLocalPatient(Patient patient);
 
   @Query('DELETE FROM ${LocalDataBase.patient_table}')
   Future<void> deleteAllLocalPatients();

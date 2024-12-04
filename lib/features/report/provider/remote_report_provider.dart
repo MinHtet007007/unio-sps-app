@@ -1,5 +1,5 @@
 import 'package:sps/common/provider/dio/dio_provider.dart';
-import 'package:sps/features/report/data/service/report_service.dart';
+import 'package:sps/features/report/service/report_service.dart';
 import 'package:sps/features/report/provider/remote_report_state/remote_report_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';

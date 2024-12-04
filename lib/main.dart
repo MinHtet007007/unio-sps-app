@@ -24,7 +24,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
-    _router = GoRouter(routes: RouteList.routeList);
+    _router = GoRouter(routes: RouteList.routeList, initialLocation: RouteName.splash);
 
     // Call getMe to check if the user is already authenticated
     WidgetsBinding.instance.addPostFrameCallback((_) {

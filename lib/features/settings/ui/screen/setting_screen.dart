@@ -1,6 +1,6 @@
 import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
-import 'package:sps/common/provider/user/user_provider.dart';
+import 'package:sps/features/user/provider/user_provider.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:sps/features/auth/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -56,13 +56,13 @@ class SettingScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 15),
                       CustomLabelWidget(
-                        text: userState!.code,
+                        text: userState.code,
                         style:
                             const TextStyle(fontSize: 18, color: Colors.white),
                       ),
                       const SizedBox(height: 15),
                       CustomLabelWidget(
-                        text: userState!.township,
+                        text: userState.township,
                         style:
                             const TextStyle(fontSize: 18, color: Colors.white),
                       ),

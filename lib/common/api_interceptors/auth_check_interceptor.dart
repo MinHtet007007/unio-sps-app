@@ -18,7 +18,7 @@ class AuthCheckInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     // Check for 401 status code in case of errors
     if (err.response?.statusCode == 401) {
       // Log out the user by updating the provider state

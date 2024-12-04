@@ -1,4 +1,4 @@
-import 'package:sps/features/report/data/model/remote_report_result.dart';
+import 'package:sps/features/report/model/remote_report_result.dart';
 
 sealed class RemoteReportState {}
 
