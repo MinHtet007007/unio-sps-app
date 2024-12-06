@@ -5,6 +5,7 @@ class CustomTextInput extends StatefulWidget {
   final String labelText;
   final String? type;
   final bool isRequired;
+  final bool readOnly;
 
   const CustomTextInput({
     required this.inputController,
@@ -12,6 +13,7 @@ class CustomTextInput extends StatefulWidget {
     this.isRequired = false,
     this.type,
     Key? key,
+    this.readOnly = false,
   }) : super(key: key);
 
   @override
@@ -25,6 +27,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: TextFormField(
+        readOnly: widget.readOnly,
         maxLines: widget.type == 'textarea' ? 5 : 1,
         controller: widget.inputController,
         decoration: InputDecoration(

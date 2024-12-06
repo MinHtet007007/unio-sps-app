@@ -13,7 +13,7 @@ class PatientListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
           title: CustomLabelWidget(
-            text: "လူနာစာရင်း",
+            text: "Patient list",
             style: const TextStyle(fontSize: 16, color: Colors.white),
           ),
           backgroundColor: ColorTheme.primary,

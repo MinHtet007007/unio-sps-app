@@ -13,7 +13,7 @@ class PatientDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: CustomLabelWidget(
-          text: "လူနာ အချက်အလက်",
+          text: "Patient Details",
           style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
         backgroundColor: ColorTheme.primary,

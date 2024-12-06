@@ -30,6 +30,7 @@ class PatientDetailsWidget extends StatelessWidget {
                     // final phaseData = PhaseData(phase: phase);
                     // await context.push('${RouteName.patientCounselings}/${patient.id}',
                     //     extra: phaseData);
+                    context.push('${RouteName.packageCreate}/${patient.id}');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: ColorTheme.primary,
