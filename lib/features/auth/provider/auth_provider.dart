@@ -26,7 +26,6 @@ class AuthProvider extends Notifier<AuthUserState> {
       );
 
       final authUser = response.data;
-
       if (authUser.accessToken != null) {
         await Cache.saveToken(authUser.accessToken as String);
       }
@@ -66,11 +65,11 @@ class AuthProvider extends Notifier<AuthUserState> {
       }
       final name = await Cache.getUserName();
       final township = await Cache.getUserTownship();
-      if (name == null || township == null) {
+      if (name == null) {
         state = AuthMeFailedState();
       }
       state = AuthUserSuccessState(
-          AuthUser(name: name as String, township: township as String));
+          AuthUser(name: name as String, township: township ?? ''));
       return;
       // }
       // AuthService authService = AuthService(_dio);

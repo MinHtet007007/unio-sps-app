@@ -74,6 +74,12 @@ class _$AppDatabase extends AppDatabase {
 
   PatientDao? _patientDaoInstance;
 
+  SupportMonthDao? _supportMonthDaoInstance;
+
+  ReceivePackageDao? _receivePackageDaoInstance;
+
+  PatientPackageDao? _patientPackageDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -96,7 +102,13 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `phone` TEXT NOT NULL, `address` TEXT NOT NULL, `unionTemporaryCode` TEXT, `treatmentRegimen` TEXT, `tbType` TEXT, `patientId` INTEGER NOT NULL, `volunteerId` INTEGER NOT NULL, `dotsStartDate` TEXT, `dotsEndDate` TEXT, `treatmentOutcome` TEXT, `treatmentOutcomeDate` TEXT, `dotsPatientType` TEXT, `actualTreatmentStartDate` TEXT, `type` TEXT, `remark` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` INTEGER, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `toStatus` TEXT NOT NULL, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` INTEGER, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` INTEGER, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` REAL, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `patient_support_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientSupportMonthId` INTEGER NOT NULL, `remotePatientPackageId` INTEGER NOT NULL, `amount` INTEGER NOT NULL, `patientPackageName` TEXT NOT NULL, `reimbursementMonth` INTEGER NOT NULL, `reimbursementMonthYear` TEXT NOT NULL)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `packageName` TEXT NOT NULL, `eligibleAmount` REAL NOT NULL, `updatedEligibleAmount` REAL, `remainingAmount` REAL NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -108,6 +120,24 @@ class _$AppDatabase extends AppDatabase {
   PatientDao get patientDao {
     return _patientDaoInstance ??= _$PatientDao(database, changeListener);
   }
+
+  @override
+  SupportMonthDao get supportMonthDao {
+    return _supportMonthDaoInstance ??=
+        _$SupportMonthDao(database, changeListener);
+  }
+
+  @override
+  ReceivePackageDao get receivePackageDao {
+    return _receivePackageDaoInstance ??=
+        _$ReceivePackageDao(database, changeListener);
+  }
+
+  @override
+  PatientPackageDao get patientPackageDao {
+    return _patientPackageDaoInstance ??=
+        _$PatientPackageDao(database, changeListener);
+  }
 }
 
 class _$PatientDao extends PatientDao {
@@ -115,27 +145,58 @@ class _$PatientDao extends PatientDao {
     this.database,
     this.changeListener,
   )   : _queryAdapter = QueryAdapter(database),
-        _patientInsertionAdapter = InsertionAdapter(
+        _patientEntityInsertionAdapter = InsertionAdapter(
             database,
             'patients',
-            (Patient item) => <String, Object?>{
+            (PatientEntity item) => <String, Object?>{
                   'id': item.id,
+                  'remoteId': item.remoteId,
+                  'year': item.year,
+                  'spsStartDate': item.spsStartDate,
+                  'townshipId': item.townshipId,
+                  'rrCode': item.rrCode,
+                  'drtbCode': item.drtbCode,
+                  'spCode': item.spCode,
+                  'uniqueId': item.uniqueId,
                   'name': item.name,
-                  'phone': item.phone,
-                  'address': item.address,
-                  'unionTemporaryCode': item.unionTemporaryCode,
+                  'age': item.age,
+                  'sex': item.sex,
+                  'diedBeforeTreatmentEnrollment':
+                      item.diedBeforeTreatmentEnrollment == null
+                          ? null
+                          : (item.diedBeforeTreatmentEnrollment! ? 1 : 0),
+                  'treatmentStartDate': item.treatmentStartDate,
                   'treatmentRegimen': item.treatmentRegimen,
-                  'tbType': item.tbType,
-                  'patientId': item.patientId,
-                  'volunteerId': item.volunteerId,
-                  'dotsStartDate': item.dotsStartDate,
-                  'dotsEndDate': item.dotsEndDate,
-                  'treatmentOutcome': item.treatmentOutcome,
-                  'treatmentOutcomeDate': item.treatmentOutcomeDate,
-                  'dotsPatientType': item.dotsPatientType,
-                  'actualTreatmentStartDate': item.actualTreatmentStartDate,
-                  'type': item.type,
-                  'remark': item.remark
+                  'treatmentRegimenOther': item.treatmentRegimenOther,
+                  'patientAddress': item.patientAddress,
+                  'patientPhoneNo': item.patientPhoneNo,
+                  'contactInfo': item.contactInfo,
+                  'contactPhoneNo': item.contactPhoneNo,
+                  'primaryLanguage': item.primaryLanguage,
+                  'secondaryLanguage': item.secondaryLanguage,
+                  'height': item.height,
+                  'weight': item.weight,
+                  'bmi': item.bmi,
+                  'toStatus': item.toStatus,
+                  'toYear': item.toYear,
+                  'toDate': item.toDate,
+                  'toRrCode': item.toRrCode,
+                  'toDrtbCode': item.toDrtbCode,
+                  'toUniqueId': item.toUniqueId,
+                  'toTownshipId': item.toTownshipId,
+                  'outcome': item.outcome,
+                  'remark': item.remark,
+                  'treatmentFinished': item.treatmentFinished == null
+                      ? null
+                      : (item.treatmentFinished! ? 1 : 0),
+                  'treatmentFinishedDate': item.treatmentFinishedDate,
+                  'outcomeDate': item.outcomeDate,
+                  'isReported': item.isReported == null
+                      ? null
+                      : (item.isReported! ? 1 : 0),
+                  'reportPeriod': item.reportPeriod,
+                  'currentTownshipId': item.currentTownshipId,
+                  'isSynced': item.isSynced ? 1 : 0
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -144,52 +205,114 @@ class _$PatientDao extends PatientDao {
 
   final QueryAdapter _queryAdapter;
 
-  final InsertionAdapter<Patient> _patientInsertionAdapter;
+  final InsertionAdapter<PatientEntity> _patientEntityInsertionAdapter;
 
   @override
-  Future<List<Patient>> findAllLocalPatients() async {
+  Future<List<PatientEntity>> findAllLocalPatients() async {
     return _queryAdapter.queryList('SELECT * FROM patients',
-        mapper: (Map<String, Object?> row) => Patient(
-            row['name'] as String,
-            row['phone'] as String,
-            row['address'] as String,
-            row['unionTemporaryCode'] as String?,
-            row['treatmentRegimen'] as String?,
-            row['tbType'] as String?,
-            row['patientId'] as int,
-            row['volunteerId'] as int,
-            row['dotsStartDate'] as String?,
-            row['dotsEndDate'] as String?,
-            row['treatmentOutcome'] as String?,
-            row['treatmentOutcomeDate'] as String?,
-            row['dotsPatientType'] as String?,
-            row['actualTreatmentStartDate'] as String?,
-            row['type'] as String?,
-            row['remark'] as String?,
-            id: row['id'] as int?));
+        mapper: (Map<String, Object?> row) => PatientEntity(
+            id: row['id'] as int?,
+            year: row['year'] as String,
+            remoteId: row['remoteId'] as int?,
+            spsStartDate: row['spsStartDate'] as String?,
+            townshipId: row['townshipId'] as int,
+            rrCode: row['rrCode'] as String?,
+            drtbCode: row['drtbCode'] as String,
+            spCode: row['spCode'] as String,
+            uniqueId: row['uniqueId'] as String,
+            name: row['name'] as String,
+            age: row['age'] as int,
+            sex: row['sex'] as String,
+            diedBeforeTreatmentEnrollment:
+                row['diedBeforeTreatmentEnrollment'] == null
+                    ? null
+                    : (row['diedBeforeTreatmentEnrollment'] as int) != 0,
+            treatmentStartDate: row['treatmentStartDate'] as String?,
+            treatmentRegimen: row['treatmentRegimen'] as String,
+            treatmentRegimenOther: row['treatmentRegimenOther'] as String?,
+            patientAddress: row['patientAddress'] as String,
+            patientPhoneNo: row['patientPhoneNo'] as String,
+            contactInfo: row['contactInfo'] as String,
+            contactPhoneNo: row['contactPhoneNo'] as String,
+            primaryLanguage: row['primaryLanguage'] as String,
+            secondaryLanguage: row['secondaryLanguage'] as String?,
+            height: row['height'] as double,
+            weight: row['weight'] as double,
+            bmi: row['bmi'] as double,
+            toStatus: row['toStatus'] as String,
+            toYear: row['toYear'] as int?,
+            toDate: row['toDate'] as String?,
+            toRrCode: row['toRrCode'] as String?,
+            toDrtbCode: row['toDrtbCode'] as String?,
+            toUniqueId: row['toUniqueId'] as String?,
+            toTownshipId: row['toTownshipId'] as int?,
+            outcome: row['outcome'] as String?,
+            remark: row['remark'] as String?,
+            treatmentFinished: row['treatmentFinished'] == null
+                ? null
+                : (row['treatmentFinished'] as int) != 0,
+            treatmentFinishedDate: row['treatmentFinishedDate'] as String?,
+            outcomeDate: row['outcomeDate'] as String?,
+            isReported: row['isReported'] == null
+                ? null
+                : (row['isReported'] as int) != 0,
+            reportPeriod: row['reportPeriod'] as String?,
+            currentTownshipId: row['currentTownshipId'] as int,
+            isSynced: (row['isSynced'] as int) != 0));
   }
 
   @override
-  Future<Patient?> findLocalPatientById(int id) async {
+  Future<PatientEntity?> findLocalPatientById(int id) async {
     return _queryAdapter.query('SELECT * FROM patients WHERE id = ?1',
-        mapper: (Map<String, Object?> row) => Patient(
-            row['name'] as String,
-            row['phone'] as String,
-            row['address'] as String,
-            row['unionTemporaryCode'] as String?,
-            row['treatmentRegimen'] as String?,
-            row['tbType'] as String?,
-            row['patientId'] as int,
-            row['volunteerId'] as int,
-            row['dotsStartDate'] as String?,
-            row['dotsEndDate'] as String?,
-            row['treatmentOutcome'] as String?,
-            row['treatmentOutcomeDate'] as String?,
-            row['dotsPatientType'] as String?,
-            row['actualTreatmentStartDate'] as String?,
-            row['type'] as String?,
-            row['remark'] as String?,
-            id: row['id'] as int?),
+        mapper: (Map<String, Object?> row) => PatientEntity(
+            id: row['id'] as int?,
+            year: row['year'] as String,
+            remoteId: row['remoteId'] as int?,
+            spsStartDate: row['spsStartDate'] as String?,
+            townshipId: row['townshipId'] as int,
+            rrCode: row['rrCode'] as String?,
+            drtbCode: row['drtbCode'] as String,
+            spCode: row['spCode'] as String,
+            uniqueId: row['uniqueId'] as String,
+            name: row['name'] as String,
+            age: row['age'] as int,
+            sex: row['sex'] as String,
+            diedBeforeTreatmentEnrollment:
+                row['diedBeforeTreatmentEnrollment'] == null
+                    ? null
+                    : (row['diedBeforeTreatmentEnrollment'] as int) != 0,
+            treatmentStartDate: row['treatmentStartDate'] as String?,
+            treatmentRegimen: row['treatmentRegimen'] as String,
+            treatmentRegimenOther: row['treatmentRegimenOther'] as String?,
+            patientAddress: row['patientAddress'] as String,
+            patientPhoneNo: row['patientPhoneNo'] as String,
+            contactInfo: row['contactInfo'] as String,
+            contactPhoneNo: row['contactPhoneNo'] as String,
+            primaryLanguage: row['primaryLanguage'] as String,
+            secondaryLanguage: row['secondaryLanguage'] as String?,
+            height: row['height'] as double,
+            weight: row['weight'] as double,
+            bmi: row['bmi'] as double,
+            toStatus: row['toStatus'] as String,
+            toYear: row['toYear'] as int?,
+            toDate: row['toDate'] as String?,
+            toRrCode: row['toRrCode'] as String?,
+            toDrtbCode: row['toDrtbCode'] as String?,
+            toUniqueId: row['toUniqueId'] as String?,
+            toTownshipId: row['toTownshipId'] as int?,
+            outcome: row['outcome'] as String?,
+            remark: row['remark'] as String?,
+            treatmentFinished: row['treatmentFinished'] == null
+                ? null
+                : (row['treatmentFinished'] as int) != 0,
+            treatmentFinishedDate: row['treatmentFinishedDate'] as String?,
+            outcomeDate: row['outcomeDate'] as String?,
+            isReported: row['isReported'] == null
+                ? null
+                : (row['isReported'] as int) != 0,
+            reportPeriod: row['reportPeriod'] as String?,
+            currentTownshipId: row['currentTownshipId'] as int,
+            isSynced: (row['isSynced'] as int) != 0),
         arguments: [id]);
   }
 
@@ -199,14 +322,366 @@ class _$PatientDao extends PatientDao {
   }
 
   @override
-  Future<void> insertLocalPatients(List<Patient> patients) async {
-    await _patientInsertionAdapter.insertList(
+  Future<void> insertMany(List<PatientEntity> patients) async {
+    await _patientEntityInsertionAdapter.insertList(
         patients, OnConflictStrategy.replace);
   }
 
   @override
-  Future<int> insertLocalPatient(Patient patient) {
-    return _patientInsertionAdapter.insertAndReturnId(
+  Future<int> insertLocalPatient(PatientEntity patient) {
+    return _patientEntityInsertionAdapter.insertAndReturnId(
         patient, OnConflictStrategy.replace);
+  }
+}
+
+class _$SupportMonthDao extends SupportMonthDao {
+  _$SupportMonthDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _supportMonthEntityInsertionAdapter = InsertionAdapter(
+            database,
+            'patient_support_months',
+            (SupportMonthEntity item) => <String, Object?>{
+                  'id': item.id,
+                  'remoteId': item.remoteId,
+                  'localPatientId': item.localPatientId,
+                  'remotePatientId': item.remotePatientId,
+                  'patientName': item.patientName,
+                  'townshipId': item.townshipId,
+                  'date': item.date,
+                  'month': item.month,
+                  'monthYear': item.monthYear,
+                  'height': item.height,
+                  'weight': item.weight,
+                  'bmi': item.bmi,
+                  'planPackages': item.planPackages,
+                  'receivePackageStatus': item.receivePackageStatus,
+                  'reimbursementStatus': item.reimbursementStatus,
+                  'amount': item.amount,
+                  'remark': item.remark,
+                  'isSynced': item.isSynced ? 1 : 0
+                }),
+        _supportMonthEntityUpdateAdapter = UpdateAdapter(
+            database,
+            'patient_support_months',
+            ['id'],
+            (SupportMonthEntity item) => <String, Object?>{
+                  'id': item.id,
+                  'remoteId': item.remoteId,
+                  'localPatientId': item.localPatientId,
+                  'remotePatientId': item.remotePatientId,
+                  'patientName': item.patientName,
+                  'townshipId': item.townshipId,
+                  'date': item.date,
+                  'month': item.month,
+                  'monthYear': item.monthYear,
+                  'height': item.height,
+                  'weight': item.weight,
+                  'bmi': item.bmi,
+                  'planPackages': item.planPackages,
+                  'receivePackageStatus': item.receivePackageStatus,
+                  'reimbursementStatus': item.reimbursementStatus,
+                  'amount': item.amount,
+                  'remark': item.remark,
+                  'isSynced': item.isSynced ? 1 : 0
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<SupportMonthEntity>
+      _supportMonthEntityInsertionAdapter;
+
+  final UpdateAdapter<SupportMonthEntity> _supportMonthEntityUpdateAdapter;
+
+  @override
+  Future<List<SupportMonthEntity>> getAllSupportMonths() async {
+    return _queryAdapter.queryList('SELECT * FROM patient_support_months',
+        mapper: (Map<String, Object?> row) => SupportMonthEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            localPatientId: row['localPatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int,
+            patientName: row['patientName'] as String,
+            townshipId: row['townshipId'] as int,
+            date: row['date'] as String,
+            month: row['month'] as int,
+            monthYear: row['monthYear'] as String,
+            height: row['height'] as double,
+            weight: row['weight'] as double,
+            bmi: row['bmi'] as double,
+            planPackages: row['planPackages'] as String,
+            receivePackageStatus: row['receivePackageStatus'] as String,
+            reimbursementStatus: row['reimbursementStatus'] as String,
+            amount: row['amount'] as double?,
+            remark: row['remark'] as String?,
+            isSynced: (row['isSynced'] as int) != 0));
+  }
+
+  @override
+  Future<List<SupportMonthEntity>> getSupportMonthsByLocalPatientId(
+      int localPatientId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_support_months WHERE localPatientId = ?1',
+        mapper: (Map<String, Object?> row) => SupportMonthEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            localPatientId: row['localPatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int,
+            patientName: row['patientName'] as String,
+            townshipId: row['townshipId'] as int,
+            date: row['date'] as String,
+            month: row['month'] as int,
+            monthYear: row['monthYear'] as String,
+            height: row['height'] as double,
+            weight: row['weight'] as double,
+            bmi: row['bmi'] as double,
+            planPackages: row['planPackages'] as String,
+            receivePackageStatus: row['receivePackageStatus'] as String,
+            reimbursementStatus: row['reimbursementStatus'] as String,
+            amount: row['amount'] as double?,
+            remark: row['remark'] as String?,
+            isSynced: (row['isSynced'] as int) != 0),
+        arguments: [localPatientId]);
+  }
+
+  @override
+  Future<List<SupportMonthEntity>> getSupportMonthsByTownshipId(
+      int townshipId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_support_months WHERE townshipId = ?1',
+        mapper: (Map<String, Object?> row) => SupportMonthEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            localPatientId: row['localPatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int,
+            patientName: row['patientName'] as String,
+            townshipId: row['townshipId'] as int,
+            date: row['date'] as String,
+            month: row['month'] as int,
+            monthYear: row['monthYear'] as String,
+            height: row['height'] as double,
+            weight: row['weight'] as double,
+            bmi: row['bmi'] as double,
+            planPackages: row['planPackages'] as String,
+            receivePackageStatus: row['receivePackageStatus'] as String,
+            reimbursementStatus: row['reimbursementStatus'] as String,
+            amount: row['amount'] as double?,
+            remark: row['remark'] as String?,
+            isSynced: (row['isSynced'] as int) != 0),
+        arguments: [townshipId]);
+  }
+
+  @override
+  Future<SupportMonthEntity?> getSupportMonthById(int id) async {
+    return _queryAdapter.query(
+        'SELECT * FROM patient_support_months WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => SupportMonthEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            localPatientId: row['localPatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int,
+            patientName: row['patientName'] as String,
+            townshipId: row['townshipId'] as int,
+            date: row['date'] as String,
+            month: row['month'] as int,
+            monthYear: row['monthYear'] as String,
+            height: row['height'] as double,
+            weight: row['weight'] as double,
+            bmi: row['bmi'] as double,
+            planPackages: row['planPackages'] as String,
+            receivePackageStatus: row['receivePackageStatus'] as String,
+            reimbursementStatus: row['reimbursementStatus'] as String,
+            amount: row['amount'] as double?,
+            remark: row['remark'] as String?,
+            isSynced: (row['isSynced'] as int) != 0),
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> deleteSupportMonthById(int id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_support_months WHERE id = ?1',
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> deleteSupportMonthsByPatientId(int patientId) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_support_months WHERE patientId = ?1',
+        arguments: [patientId]);
+  }
+
+  @override
+  Future<int> insertSupportMonth(SupportMonthEntity supportMonth) {
+    return _supportMonthEntityInsertionAdapter.insertAndReturnId(
+        supportMonth, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMany(List<SupportMonthEntity> supportMonths) async {
+    await _supportMonthEntityInsertionAdapter.insertList(
+        supportMonths, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> updateSupportMonth(SupportMonthEntity supportMonth) async {
+    await _supportMonthEntityUpdateAdapter.update(
+        supportMonth, OnConflictStrategy.replace);
+  }
+}
+
+class _$ReceivePackageDao extends ReceivePackageDao {
+  _$ReceivePackageDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _receivePackageEntityInsertionAdapter = InsertionAdapter(
+            database,
+            'patient_support_packages',
+            (ReceivePackageEntity item) => <String, Object?>{
+                  'id': item.id,
+                  'remoteId': item.remoteId,
+                  'localPatientSupportMonthId': item.localPatientSupportMonthId,
+                  'remotePatientPackageId': item.remotePatientPackageId,
+                  'amount': item.amount,
+                  'patientPackageName': item.patientPackageName,
+                  'reimbursementMonth': item.reimbursementMonth,
+                  'reimbursementMonthYear': item.reimbursementMonthYear
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<ReceivePackageEntity>
+      _receivePackageEntityInsertionAdapter;
+
+  @override
+  Future<List<ReceivePackageEntity>> getAllReceivePackages() async {
+    return _queryAdapter.queryList('SELECT * FROM patient_support_packages',
+        mapper: (Map<String, Object?> row) => ReceivePackageEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            amount: row['amount'] as int,
+            localPatientSupportMonthId:
+                row['localPatientSupportMonthId'] as int,
+            remotePatientPackageId: row['remotePatientPackageId'] as int,
+            patientPackageName: row['patientPackageName'] as String,
+            reimbursementMonth: row['reimbursementMonth'] as int,
+            reimbursementMonthYear: row['reimbursementMonthYear'] as String));
+  }
+
+  @override
+  Future<void> deleteReceivePackage(int id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_support_packages WHERE id = ?1',
+        arguments: [id]);
+  }
+
+  @override
+  Future<List<ReceivePackageEntity>> getReceivePackagesBySupportMonth(
+      int supportMonthId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_support_packages WHERE patientSupportMonthId = ?1',
+        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int, reimbursementMonthYear: row['reimbursementMonthYear'] as String),
+        arguments: [supportMonthId]);
+  }
+
+  @override
+  Future<void> insertReceivePackage(ReceivePackageEntity receivePackage) async {
+    await _receivePackageEntityInsertionAdapter.insert(
+        receivePackage, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMany(List<ReceivePackageEntity> receivePackages) async {
+    await _receivePackageEntityInsertionAdapter.insertList(
+        receivePackages, OnConflictStrategy.replace);
+  }
+}
+
+class _$PatientPackageDao extends PatientPackageDao {
+  _$PatientPackageDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _patientPackageEntityInsertionAdapter = InsertionAdapter(
+            database,
+            'patient_packages',
+            (PatientPackageEntity item) => <String, Object?>{
+                  'id': item.id,
+                  'remoteId': item.remoteId,
+                  'localPatientId': item.localPatientId,
+                  'remotePatientId': item.remotePatientId,
+                  'packageName': item.packageName,
+                  'eligibleAmount': item.eligibleAmount,
+                  'updatedEligibleAmount': item.updatedEligibleAmount,
+                  'remainingAmount': item.remainingAmount
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<PatientPackageEntity>
+      _patientPackageEntityInsertionAdapter;
+
+  @override
+  Future<List<PatientPackageEntity>> getAllPatientPackages() async {
+    return _queryAdapter.queryList('SELECT * FROM patient_packages',
+        mapper: (Map<String, Object?> row) => PatientPackageEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            localPatientId: row['localPatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int,
+            packageName: row['packageName'] as String,
+            eligibleAmount: row['eligibleAmount'] as double,
+            updatedEligibleAmount: row['updatedEligibleAmount'] as double?,
+            remainingAmount: row['remainingAmount'] as double));
+  }
+
+  @override
+  Future<List<PatientPackageEntity>> getPatientPackagesByPatientId(
+      int patientId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_packages WHERE patientId = ?1',
+        mapper: (Map<String, Object?> row) => PatientPackageEntity(
+            id: row['id'] as int?,
+            remoteId: row['remoteId'] as int?,
+            localPatientId: row['localPatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int,
+            packageName: row['packageName'] as String,
+            eligibleAmount: row['eligibleAmount'] as double,
+            updatedEligibleAmount: row['updatedEligibleAmount'] as double?,
+            remainingAmount: row['remainingAmount'] as double),
+        arguments: [patientId]);
+  }
+
+  @override
+  Future<void> deletePatientPackage(int id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_packages WHERE id = ?1',
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> insertPatientPackage(PatientPackageEntity patientPackage) async {
+    await _patientPackageEntityInsertionAdapter.insert(
+        patientPackage, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertMany(List<PatientPackageEntity> patientPackages) async {
+    await _patientPackageEntityInsertionAdapter.insertList(
+        patientPackages, OnConflictStrategy.replace);
   }
 }

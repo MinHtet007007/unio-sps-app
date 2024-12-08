@@ -6,11 +6,19 @@ const userProject = 'SPS-FY24-User-Project';
 const userTownship = 'SPS-FY24-User-Township';
 const showSignature = 'SPS-FY24-User-showSignature';
 const app = 'SPS-FY24-app';
+const String lastSyncedTimeKey = 'last_synced_time';
 
 class Cache {
   static saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(tokenName, token);
+  }
+
+  // Save the current time as the last synced time
+  static Future<void> saveLastSyncedTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now().toIso8601String();
+    await prefs.setString(lastSyncedTimeKey, now);
   }
 
   static saveUserName(String username) async {
@@ -33,6 +41,14 @@ class Cache {
     String? prefsToken = prefs.getString(tokenName);
 
     return prefsToken;
+  }
+
+    // Retrieve the last synced time
+  static Future<DateTime?> getLastSyncedTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastSynced = prefs.getString(lastSyncedTimeKey);
+    if (lastSynced == null) return null;
+    return DateTime.parse(lastSynced);
   }
 
   static Future<String?> getUserName() async {
@@ -76,10 +92,16 @@ class Cache {
     await prefs.setString(showSignature, '');
   }
 
+  static deleteLastSyncedTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(lastSyncedTimeKey, '');
+  }
+
   static deleteAll() async {
     deleteToken();
     deleteUserName();
     deleteUserProject();
     deleteShowSignature();
+    deleteLastSyncedTime();
   }
 }

@@ -13,7 +13,7 @@ class _PatientService implements PatientService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://mdrspsfy25-api.unionais.org/api/v1/';
+    baseUrl ??= 'https://205e-103-231-95-45.ngrok-free.app/api/v1/';
   }
 
   final Dio _dio;
@@ -21,9 +21,13 @@ class _PatientService implements PatientService {
   String? baseUrl;
 
   @override
-  Future<RemotePatientResult> fetchRemotePatients() async {
+  Future<RemotePatientResult> fetchRemotePatients(
+      DateTime? lastSyncedTime) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'last_synced_time': lastSyncedTime?.toIso8601String()
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
@@ -34,7 +38,7 @@ class _PatientService implements PatientService {
     )
             .compose(
               _dio.options,
-              'app-dots-patients',
+              'app/patients/sync-all',
               queryParameters: queryParameters,
               data: _data,
             )

@@ -1,47 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
-import 'package:sps/common/widgets/sync_button.dart';
-import 'package:sps/local_database/entity/patient_entity.dart';
+import 'package:sps/common/widgets/loading_widget.dart';
+import 'package:sps/common/widgets/refresh_when_failed_widget.dart';
+import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
+import 'package:sps/features/patient_list/provider/local_patients_state/local_patients_state.dart';
 import 'package:sps/screens/patients_list/widget/list_view.dart';
 
-class PatientListScreen extends StatelessWidget {
+class PatientListScreen extends ConsumerStatefulWidget {
   const PatientListScreen({super.key});
 
   @override
+  ConsumerState<PatientListScreen> createState() => _PatientListScreenState();
+}
+
+class _PatientListScreenState extends ConsumerState<PatientListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchPatients();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _fetchPatients() async {
+    await Future.delayed(Duration.zero);
+
+    final patientNotifier = ref.read(localPatientsProvider.notifier);
+    patientNotifier.fetchPatients();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final localState = ref.watch(localPatientsProvider);
+
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
           title: CustomLabelWidget(
-            text: "Patient list",
+            text: "လူနာစာရင်း",
             style: const TextStyle(fontSize: 16, color: Colors.white),
           ),
           backgroundColor: ColorTheme.primary,
-          actions: [
-            SyncButton(isLoading: false, onPressed: () {}),
-          ]),
-      body: CustomListView(
-        patients: [
-          Patient(
-              "John Doe",
-              "123456789",
-              "123 Elm Street, Springfield",
-              "UN123",
-              "Regimen A",
-              "Pulmonary",
-              1,
-              101,
-              "2024-01-01",
-              "2024-06-30",
-              "Completed",
-              "2024-07-01",
-              "New",
-              "2024-01-01",
-              "Type A",
-              "No remarks",
-              id: 1),
-        ],
-      ),
-    );
+        ),
+        body: _patientListWidget(localState));
+  }
+
+  Widget _patientListWidget(LocalPatientsState state) {
+    return _buildWidgetBasedOnState(state);
+  }
+
+  Widget _buildWidgetBasedOnState(LocalPatientsState state) {
+    switch (state) {
+      case LocalPatientsFailedState():
+        return RefreshWhenFailedWidget(
+          refresh: _fetchPatients,
+          errorMessage: state.errorMessage,
+        );
+      case LocalPatientsLoadingState():
+        return const LoadingWidget();
+      case LocalPatientsSuccessState():
+        return CustomListView(patients: state.localPatients);
+    }
   }
 }

@@ -5,7 +5,7 @@ sealed class LocalPatientsState {}
 class LocalPatientsLoadingState extends LocalPatientsState {}
 
 class LocalPatientsSuccessState extends LocalPatientsState {
-  final List<Patient> localPatients;
+  final List<PatientEntity> localPatients;
   LocalPatientsSuccessState(this.localPatients);
 }
 
