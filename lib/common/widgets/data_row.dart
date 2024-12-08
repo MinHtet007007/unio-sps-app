@@ -19,6 +19,9 @@ Padding dataRow(String label, String data) {
             ),
           ),
         ),
+        const SizedBox(
+          width: 10,
+        ),
         Flexible(
           child: CustomLabelWidget(
             text: data,

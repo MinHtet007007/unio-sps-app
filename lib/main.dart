@@ -35,7 +35,8 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     ref.listen<AuthUserState>(authProvider, (previous, next) {
-      if (next is AuthUserSuccessState) {
+      //next is AuthUserSuccessState
+      if (true) {
         _router.go(RouteName.home);
       } else if (next is AuthMeLoadingState) {
         _router.go(RouteName.splash);
