@@ -5,12 +5,14 @@ class CustomDateInputWithValidation extends StatefulWidget {
   final TextEditingController dateController;
   final String labelText;
   final String date;
+  final bool isMonthYear;
 
   const CustomDateInputWithValidation({
     Key? key,
     required this.dateController,
     required this.labelText,
     required this.date,
+    this.isMonthYear = false,
   }) : super(key: key);
 
   @override
@@ -42,10 +44,16 @@ class _CustomDateInputWithValidationState
       lastDate: widget.date != null ? DateTime.now() : DateTime(2101),
     );
     if (pickedDate != null) {
-      setState(() {
-        widget.dateController.text =
-            DateFormat('yyyy-MM-dd').format(pickedDate);
-      });
+      if (widget.isMonthYear) {
+        setState(() {
+          widget.dateController.text = DateFormat('yyyy-MM').format(pickedDate);
+        });
+      } else {
+        setState(() {
+          widget.dateController.text =
+              DateFormat('yyyy-MM-dd').format(pickedDate);
+        });
+      }
     }
   }
 
@@ -55,6 +63,7 @@ class _CustomDateInputWithValidationState
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: TextFormField(
+        onTap: pickDate,
         controller: widget.dateController,
         readOnly: true,
         decoration: InputDecoration(
@@ -65,10 +74,7 @@ class _CustomDateInputWithValidationState
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          prefixIcon: IconButton(
-            onPressed: pickDate,
-            icon: const Icon(Icons.calendar_month_rounded),
-          ),
+          prefixIcon: const Icon(Icons.calendar_month_rounded),
         ),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
