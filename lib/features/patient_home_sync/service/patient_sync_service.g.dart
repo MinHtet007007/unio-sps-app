@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'report_service.dart';
+part of 'patient_sync_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'report_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
-class _ReportService implements ReportService {
-  _ReportService(
+class _PatientSyncService implements PatientSyncService {
+  _PatientSyncService(
     this._dio, {
     this.baseUrl,
   }) {
@@ -21,29 +21,20 @@ class _ReportService implements ReportService {
   String? baseUrl;
 
   @override
-  Future<RemoteReportResult> getReport({
-    String? month,
-    String? year,
-    String? name,
-  }) async {
+  Future<RemotePatientResponse> fetchRemotePatients() async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'month': month,
-      r'year': year,
-      r'name': name,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _result = await _dio
-        .fetch<Map<String, dynamic>>(_setStreamType<RemoteReportResult>(Options(
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<RemotePatientResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              'app-report',
+              'app/patients/sync-all',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -52,7 +43,7 @@ class _ReportService implements ReportService {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = RemoteReportResult.fromJson(_result.data!);
+    final value = RemotePatientResponse.fromJson(_result.data!);
     return value;
   }
 

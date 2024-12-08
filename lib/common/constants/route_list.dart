@@ -1,9 +1,9 @@
+import 'package:sps/screens/home/home_screen.dart';
 import 'package:sps/screens/login/login_screen.dart';
 import 'package:sps/screens/notes/note_screen.dart';
 import 'package:sps/screens/report/report_screen.dart';
 import 'package:sps/features/settings/ui/screen/font_change_screen.dart';
 import 'package:sps/features/settings/ui/screen/setting_screen.dart';
-import 'package:sps/screens/home/home_screen.dart';
 import 'package:sps/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
 

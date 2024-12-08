@@ -15,7 +15,7 @@ class LocalPatientProvider extends StateNotifier<LocalPatientState> {
       final database = await localDatabase.database;
 
       final patientDao = database.patientDao;
-      final Patient? patient = await patientDao.findLocalPatientById(id);
+      final PatientEntity? patient = await patientDao.findLocalPatientById(id);
       if (patient != null) {
         state = LocalPatientSuccessState(patient);
         return;

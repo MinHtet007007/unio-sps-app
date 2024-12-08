@@ -10,7 +10,7 @@ class LocalNewPatientProvider extends StateNotifier<LocalNewPatientState> {
 
   LocalNewPatientProvider(this.localDatabase)
       : super(LocalNewPatientFormState());
-  void addPatient(Patient formData) async {
+  void addPatient(PatientEntity formData) async {
     try {
       state = LocalNewPatientLoadingState();
       final database = await localDatabase.database;

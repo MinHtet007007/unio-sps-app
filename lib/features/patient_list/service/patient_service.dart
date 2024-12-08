@@ -1,5 +1,5 @@
 import 'package:sps/common/constants/api_constant.dart';
-import 'package:sps/features/patient_list/model/remote_patient.dart';
+import 'package:sps/features/patient_list/model/remote_patient_result.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
 
