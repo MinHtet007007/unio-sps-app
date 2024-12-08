@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/data_row.dart';
+import 'package:sps/local_database/entity/support_month_entity.dart';
 
 class MonthDetail extends StatelessWidget {
-  const MonthDetail({
+  SupportMonthEntity supportMonth;
+  MonthDetail({
     super.key,
+    required this.supportMonth,
   });
 
   @override
@@ -22,11 +25,8 @@ class MonthDetail extends StatelessWidget {
           borderRadius: BorderRadius.zero,
           side: BorderSide(color: Colors.transparent),
         ),
-        title: const Text(
-          'Month 0 (Pyin Oo Lwin)',
-          style: TextStyle(
-              // color: Colors.white, // Customize title text color
-              ),
+        title: Text(
+          '${supportMonth.month}',
         ),
         children: [
           Padding(

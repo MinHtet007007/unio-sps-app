@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sps/screens/patients_list/widget/list_item.dart';
 
 class CustomListView extends StatelessWidget {
-  final List<Patient>? patients;
+  final List<PatientEntity>? patients;
 
   const CustomListView({
     this.patients,
@@ -16,11 +16,11 @@ class CustomListView extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         itemCount: patients?.length,
         itemBuilder: (BuildContext context, int index) {
-          Patient patient = patients![index];
+          PatientEntity patient = patients![index];
           return CustomItem(
             id: patient.id as int,
             name: patient.name,
-            unionTempCode: patient.unionTemporaryCode as String,
+            unionTempCode: patient.toDrtbCode ?? '',
           );
         });
   }

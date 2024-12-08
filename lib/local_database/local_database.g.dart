@@ -423,10 +423,10 @@ class _$SupportMonthDao extends SupportMonthDao {
   }
 
   @override
-  Future<List<SupportMonthEntity>> getSupportMonthsByPatientId(
-      int patientId) async {
+  Future<List<SupportMonthEntity>> getSupportMonthsByLocalPatientId(
+      int localPatientId) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM patient_support_months WHERE patientId = ?1',
+        'SELECT * FROM patient_support_months WHERE localPatientId = ?1',
         mapper: (Map<String, Object?> row) => SupportMonthEntity(
             id: row['id'] as int?,
             remoteId: row['remoteId'] as int?,
@@ -446,7 +446,7 @@ class _$SupportMonthDao extends SupportMonthDao {
             amount: row['amount'] as double?,
             remark: row['remark'] as String?,
             isSynced: (row['isSynced'] as int) != 0),
-        arguments: [patientId]);
+        arguments: [localPatientId]);
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sps/common/helpers/cache.dart';
 import 'package:sps/common/provider/dio/dio_provider.dart';
 
 import 'package:sps/common/provider/local_database/local_database_provider.dart';
@@ -17,14 +18,16 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
     try {
       state = HomePatientsSyncLoadingState();
       final patientService = PatientService(_dio);
-      final response = await patientService.fetchRemotePatients();
+      final lastSyncedTime = await Cache.getLastSyncedTime();
+
+      final response = await patientService.fetchRemotePatients(lastSyncedTime);
       if (response.data.isNotEmpty) {
         final database = await localDatabase.database;
 
         for (var patient in response.data) {
           await database.syncPatient(patient);
         }
-
+        await Cache.saveLastSyncedTime();
         state = HomePatientsSyncSuccessState();
         return;
       } else {

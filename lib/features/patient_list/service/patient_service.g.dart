@@ -21,9 +21,13 @@ class _PatientService implements PatientService {
   String? baseUrl;
 
   @override
-  Future<RemotePatientResult> fetchRemotePatients() async {
+  Future<RemotePatientResult> fetchRemotePatients(
+      DateTime? lastSyncedTime) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'last_synced_time': lastSyncedTime?.toIso8601String()
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(

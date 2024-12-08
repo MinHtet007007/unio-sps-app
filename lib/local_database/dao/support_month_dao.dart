@@ -9,8 +9,8 @@ abstract class SupportMonthDao {
   Future<List<SupportMonthEntity>> getAllSupportMonths();
 
   /// Retrieve support months by patient ID
-  @Query('SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE patientId = :patientId')
-  Future<List<SupportMonthEntity>> getSupportMonthsByPatientId(int patientId);
+  @Query('SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE localPatientId = :localPatientId')
+  Future<List<SupportMonthEntity>> getSupportMonthsByLocalPatientId(int localPatientId);
 
   /// Retrieve support months by township ID
   @Query('SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE townshipId = :townshipId')

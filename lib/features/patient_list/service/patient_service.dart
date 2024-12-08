@@ -10,5 +10,7 @@ abstract class PatientService {
   factory PatientService(Dio dio) => _PatientService(dio);
 
   @GET(ApiConst.patientEndPoint)
-  Future<RemotePatientResult> fetchRemotePatients();
+  Future<RemotePatientResult> fetchRemotePatients(
+    @Query('last_synced_time') DateTime? lastSyncedTime,
+  );
 }
