@@ -18,9 +18,8 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
     try {
       state = HomePatientsSyncLoadingState();
       final patientService = PatientService(_dio);
-      await Cache.deleteLastSyncedTime();
       final lastSyncedTime = await Cache.getLastSyncedTime();
-      
+
       final response = await patientService.fetchRemotePatients(lastSyncedTime);
       if (response.data.isNotEmpty) {
         final database = await localDatabase.database;
@@ -35,8 +34,10 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
         state = HomePatientsSyncFailedState('There is no patients');
       }
       return;
-    } catch (error) {
+    } catch (error, stackTrace) {
       print(error);
+      print("StackTrace: $stackTrace");
+
       state = HomePatientsSyncFailedState(error.toString());
     }
   }

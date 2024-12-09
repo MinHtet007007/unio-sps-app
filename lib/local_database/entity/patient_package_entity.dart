@@ -10,9 +10,9 @@ class PatientPackageEntity {
   final int localPatientId;
   final int remotePatientId;
   final String packageName;
-  final double eligibleAmount;
-  final double? updatedEligibleAmount;
-  final double remainingAmount;
+  final int eligibleAmount;
+  final int? updatedEligibleAmount;
+  final int remainingAmount;
 
   PatientPackageEntity({
     this.id,

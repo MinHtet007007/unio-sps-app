@@ -102,13 +102,13 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `toStatus` TEXT NOT NULL, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT NOT NULL, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` REAL, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` INTEGER, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patient_support_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientSupportMonthId` INTEGER NOT NULL, `remotePatientPackageId` INTEGER NOT NULL, `amount` INTEGER NOT NULL, `patientPackageName` TEXT NOT NULL, `reimbursementMonth` INTEGER NOT NULL, `reimbursementMonthYear` TEXT NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patient_support_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientSupportMonthId` INTEGER NOT NULL, `remotePatientPackageId` INTEGER NOT NULL, `amount` INTEGER NOT NULL, `patientPackageName` TEXT NOT NULL, `reimbursementMonth` INTEGER, `reimbursementMonthYear` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `packageName` TEXT NOT NULL, `eligibleAmount` REAL NOT NULL, `updatedEligibleAmount` REAL, `remainingAmount` REAL NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `packageName` TEXT NOT NULL, `eligibleAmount` INTEGER NOT NULL, `updatedEligibleAmount` INTEGER, `remainingAmount` INTEGER NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -228,9 +228,9 @@ class _$PatientDao extends PatientDao {
             contactPhoneNo: row['contactPhoneNo'] as String,
             primaryLanguage: row['primaryLanguage'] as String,
             secondaryLanguage: row['secondaryLanguage'] as String?,
-            height: row['height'] as double,
-            weight: row['weight'] as double,
-            bmi: row['bmi'] as double,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
             toStatus: row['toStatus'] as String,
             toYear: row['toYear'] as int?,
             toDate: row['toDate'] as String?,
@@ -276,9 +276,9 @@ class _$PatientDao extends PatientDao {
             contactPhoneNo: row['contactPhoneNo'] as String,
             primaryLanguage: row['primaryLanguage'] as String,
             secondaryLanguage: row['secondaryLanguage'] as String?,
-            height: row['height'] as double,
-            weight: row['weight'] as double,
-            bmi: row['bmi'] as double,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
             toStatus: row['toStatus'] as String,
             toYear: row['toYear'] as int?,
             toDate: row['toDate'] as String?,
@@ -393,13 +393,13 @@ class _$SupportMonthDao extends SupportMonthDao {
             date: row['date'] as String,
             month: row['month'] as int,
             monthYear: row['monthYear'] as String,
-            height: row['height'] as double,
-            weight: row['weight'] as double,
-            bmi: row['bmi'] as double,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
             planPackages: row['planPackages'] as String,
             receivePackageStatus: row['receivePackageStatus'] as String,
             reimbursementStatus: row['reimbursementStatus'] as String,
-            amount: row['amount'] as double?,
+            amount: row['amount'] as int?,
             remark: row['remark'] as String?,
             isSynced: (row['isSynced'] as int) != 0));
   }
@@ -419,13 +419,13 @@ class _$SupportMonthDao extends SupportMonthDao {
             date: row['date'] as String,
             month: row['month'] as int,
             monthYear: row['monthYear'] as String,
-            height: row['height'] as double,
-            weight: row['weight'] as double,
-            bmi: row['bmi'] as double,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
             planPackages: row['planPackages'] as String,
             receivePackageStatus: row['receivePackageStatus'] as String,
             reimbursementStatus: row['reimbursementStatus'] as String,
-            amount: row['amount'] as double?,
+            amount: row['amount'] as int?,
             remark: row['remark'] as String?,
             isSynced: (row['isSynced'] as int) != 0),
         arguments: [localPatientId]);
@@ -446,13 +446,13 @@ class _$SupportMonthDao extends SupportMonthDao {
             date: row['date'] as String,
             month: row['month'] as int,
             monthYear: row['monthYear'] as String,
-            height: row['height'] as double,
-            weight: row['weight'] as double,
-            bmi: row['bmi'] as double,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
             planPackages: row['planPackages'] as String,
             receivePackageStatus: row['receivePackageStatus'] as String,
             reimbursementStatus: row['reimbursementStatus'] as String,
-            amount: row['amount'] as double?,
+            amount: row['amount'] as int?,
             remark: row['remark'] as String?,
             isSynced: (row['isSynced'] as int) != 0),
         arguments: [townshipId]);
@@ -472,13 +472,13 @@ class _$SupportMonthDao extends SupportMonthDao {
             date: row['date'] as String,
             month: row['month'] as int,
             monthYear: row['monthYear'] as String,
-            height: row['height'] as double,
-            weight: row['weight'] as double,
-            bmi: row['bmi'] as double,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
             planPackages: row['planPackages'] as String,
             receivePackageStatus: row['receivePackageStatus'] as String,
             reimbursementStatus: row['reimbursementStatus'] as String,
-            amount: row['amount'] as double?,
+            amount: row['amount'] as int?,
             remark: row['remark'] as String?,
             isSynced: (row['isSynced'] as int) != 0),
         arguments: [id]);
@@ -556,8 +556,8 @@ class _$ReceivePackageDao extends ReceivePackageDao {
                 row['localPatientSupportMonthId'] as int,
             remotePatientPackageId: row['remotePatientPackageId'] as int,
             patientPackageName: row['patientPackageName'] as String,
-            reimbursementMonth: row['reimbursementMonth'] as int,
-            reimbursementMonthYear: row['reimbursementMonthYear'] as String));
+            reimbursementMonth: row['reimbursementMonth'] as int?,
+            reimbursementMonthYear: row['reimbursementMonthYear'] as String?));
   }
 
   @override
@@ -572,7 +572,7 @@ class _$ReceivePackageDao extends ReceivePackageDao {
       int supportMonthId) async {
     return _queryAdapter.queryList(
         'SELECT * FROM patient_support_packages WHERE patientSupportMonthId = ?1',
-        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int, reimbursementMonthYear: row['reimbursementMonthYear'] as String),
+        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
         arguments: [supportMonthId]);
   }
 
@@ -626,9 +626,9 @@ class _$PatientPackageDao extends PatientPackageDao {
             localPatientId: row['localPatientId'] as int,
             remotePatientId: row['remotePatientId'] as int,
             packageName: row['packageName'] as String,
-            eligibleAmount: row['eligibleAmount'] as double,
-            updatedEligibleAmount: row['updatedEligibleAmount'] as double?,
-            remainingAmount: row['remainingAmount'] as double));
+            eligibleAmount: row['eligibleAmount'] as int,
+            updatedEligibleAmount: row['updatedEligibleAmount'] as int?,
+            remainingAmount: row['remainingAmount'] as int));
   }
 
   @override
@@ -642,9 +642,9 @@ class _$PatientPackageDao extends PatientPackageDao {
             localPatientId: row['localPatientId'] as int,
             remotePatientId: row['remotePatientId'] as int,
             packageName: row['packageName'] as String,
-            eligibleAmount: row['eligibleAmount'] as double,
-            updatedEligibleAmount: row['updatedEligibleAmount'] as double?,
-            remainingAmount: row['remainingAmount'] as double),
+            eligibleAmount: row['eligibleAmount'] as int,
+            updatedEligibleAmount: row['updatedEligibleAmount'] as int?,
+            remainingAmount: row['remainingAmount'] as int),
         arguments: [patientId]);
   }
 

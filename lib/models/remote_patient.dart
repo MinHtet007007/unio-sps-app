@@ -24,9 +24,9 @@ class Patient {
   final String contactPhoneNo;
   final String primaryLanguage;
   final String? secondaryLanguage;
-  final double height;
-  final double weight;
-  final double bmi;
+  final int height;
+  final int weight;
+  final int bmi;
   final String toStatus;
   final int? toYear;
   final String? toDate;
@@ -114,9 +114,9 @@ class Patient {
       contactPhoneNo: json['contact_phone_no'],
       primaryLanguage: json['primary_language'],
       secondaryLanguage: json['secondary_language'],
-      height: json['height'].toDouble(),
-      weight: json['weight'].toDouble(),
-      bmi: json['BMI'].toDouble(),
+      height: json['height'],
+      weight: json['weight'],
+      bmi: json['BMI'],
       toStatus: json['TO_status'],
       toYear: json['TO_year'],
       toDate: json['TO_date'],

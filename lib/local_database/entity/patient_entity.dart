@@ -27,9 +27,9 @@ class PatientEntity {
   final String contactPhoneNo;
   final String primaryLanguage;
   final String? secondaryLanguage;
-  final double height;
-  final double weight;
-  final double bmi;
+  final int height;
+  final int weight;
+  final int bmi;
   final String toStatus;
   final int? toYear;
   final String? toDate;

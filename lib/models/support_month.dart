@@ -3,6 +3,7 @@ import 'package:sps/models/remote_township.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'support_month.g.dart';
+
 @JsonSerializable()
 class SupportMonth {
   final int id;
@@ -13,18 +14,17 @@ class SupportMonth {
   final String date;
   final int month;
   final String monthYear;
-  final double height;
-  final double weight;
-  final double bmi;
+  final int height;
+  final int weight;
+  final int bmi;
   final String planPackages;
   final String receivePackageStatus;
   final List<SupportPackage> receivePackages;
   final String reimbursementStatus;
   final int? reimbursementMonth;
   final String? reimbursementMonthYear;
-  final double? amount;
+  final int? amount;
   final String? remark;
-  final int status;
 
   SupportMonth({
     required this.id,
@@ -46,34 +46,37 @@ class SupportMonth {
     this.reimbursementMonthYear,
     this.amount,
     this.remark,
-    required this.status,
   });
 
   factory SupportMonth.fromJson(Map<String, dynamic> json) {
     return SupportMonth(
-      id: json['id'],
-      patientId: json['patient_id'],
-      patientName: json['patient']['name'],
-      townshipId: json['township_id'],
-      township: Township.fromJson(json['township']),
-      date: json['date'],
-      month: json['month'],
-      monthYear: json['month_year'],
-      height: json['height'].toDouble(),
-      weight: json['weight'].toDouble(),
-      bmi: json['BMI'].toDouble(),
-      planPackages: json['plan_packages'],
-      receivePackageStatus: json['receive_package_status'],
-      receivePackages: (json['receive_packages'] as List)
-          .map((e) => SupportPackage.fromJson(e))
+      id: json['id'] as int,
+      patientId: json['patient_id'] as int,
+      patientName: json['patient']['name'] as String,
+      townshipId: json['township_id'] as int,
+      township: Township.fromJson(json['township'] as Map<String, dynamic>),
+      date: json['date'] as String,
+      month: int.parse(json['month']),
+      monthYear: json['month_year'] as String,
+      height: json['height'] as int,
+      weight: json['weight'] as int,
+      bmi: json['BMI'] as int,
+      planPackages: json['plan_packages'] as String,
+      receivePackageStatus: json['receive_package_status'] as String,
+      receivePackages: (json['receive_packages'] as List<dynamic>)
+          .map((e) => SupportPackage.fromJson(e as Map<String, dynamic>))
           .toList(),
-      reimbursementStatus: json['reimbursement_status'],
-      reimbursementMonth: json['reimbursement_month'],
-      reimbursementMonthYear: json['reimbursement_month_year'],
-      amount: json['amount']?.toDouble(),
-      remark: json['remark'],
-      status: json['status'],
+      reimbursementStatus: '${json['reimbursement_status']}',
+      reimbursementMonth: json['reimbursement_month'] != null
+          ? (json['reimbursement_month'] is String
+              ? int.parse(json['reimbursement_month'])
+              : json['reimbursement_month'] as int)
+          : null,
+      reimbursementMonthYear: json['reimbursement_month_year'] as String?,
+      amount: json['amount'] as int?,
+      remark: json['remark'] as String?,
     );
   }
+
   Map<String, dynamic> toJson() => _$SupportMonthToJson(this);
 }
