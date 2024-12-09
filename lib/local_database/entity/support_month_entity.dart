@@ -14,13 +14,13 @@ class SupportMonthEntity {
   final String date;
   final int month;
   final String monthYear;
-  final double height;
-  final double weight;
-  final double bmi;
+  final int height;
+  final int weight;
+  final int bmi;
   final String planPackages;
   final String receivePackageStatus;
   final String reimbursementStatus;
-  final double? amount;
+  final int? amount;
   final String? remark;
   final bool isSynced;
 

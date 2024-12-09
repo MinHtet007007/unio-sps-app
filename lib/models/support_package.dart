@@ -1,12 +1,11 @@
 class SupportPackage {
   final int id;
   final int amount;
-  final int patientSupportMonthId; // Foreign key referencing SupportMonth
-  final int patientPackageId; // ID of the package
-  final String patientPackageName; // Name of the package
-  final int reimbursementMonth; // Month of reimbursement as an integer
-  final String
-      reimbursementMonthYear; // Year and month of reimbursement as a string (e.g., "2024-01")
+  final int patientSupportMonthId;
+  final int patientPackageId;
+  final String patientPackageName;
+  final int? reimbursementMonth;
+  final String? reimbursementMonthYear;
 
   SupportPackage({
     required this.id,
@@ -21,13 +20,23 @@ class SupportPackage {
   /// Factory constructor to create an instance of `SupportPackage` from JSON
   factory SupportPackage.fromJson(Map<String, dynamic> json) {
     return SupportPackage(
-      id: json['id'],
-      amount: json['amount'],
-      patientSupportMonthId: json['patient_support_month_id'],
-      patientPackageId: json['patient_package_id'],
-      patientPackageName: json['patient_package_name'],
-      reimbursementMonth: int.parse(json['reimbursement_month']),
-      reimbursementMonthYear: json['reimbursement_month_year'],
+      id: json['id'] as int,
+      amount: json['amount'] is String
+          ? int.parse(json['amount'])
+          : json['amount'] as int,
+      patientSupportMonthId: json['patient_support_month_id'] is String
+          ? int.parse(json['patient_support_month_id'])
+          : json['patient_support_month_id'] as int,
+      patientPackageId: json['patient_package_id'] is String
+          ? int.parse(json['patient_package_id'])
+          : json['patient_package_id'] as int,
+      patientPackageName: json['patient_package_name'] as String,
+      reimbursementMonth: json['reimbursement_month'] != null
+          ? (json['reimbursement_month'] is String
+              ? int.parse(json['reimbursement_month'])
+              : json['reimbursement_month'] as int)
+          : null,
+      reimbursementMonthYear: json['reimbursement_month_year'] as String?,
     );
   }
 
@@ -39,7 +48,7 @@ class SupportPackage {
       'patient_support_month_id': patientSupportMonthId,
       'patient_package_id': patientPackageId,
       'patient_package_name': patientPackageName,
-      'reimbursement_month': reimbursementMonth.toString(),
+      'reimbursement_month': reimbursementMonth,
       'reimbursement_month_year': reimbursementMonthYear,
     };
   }
