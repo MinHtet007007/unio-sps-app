@@ -102,7 +102,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` INTEGER, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `toStatus` TEXT NOT NULL, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` INTEGER, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` INTEGER, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `toStatus` TEXT NOT NULL, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` REAL NOT NULL, `weight` REAL NOT NULL, `bmi` REAL NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` REAL, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
         await database.execute(
@@ -162,9 +162,7 @@ class _$PatientDao extends PatientDao {
                   'age': item.age,
                   'sex': item.sex,
                   'diedBeforeTreatmentEnrollment':
-                      item.diedBeforeTreatmentEnrollment == null
-                          ? null
-                          : (item.diedBeforeTreatmentEnrollment! ? 1 : 0),
+                      item.diedBeforeTreatmentEnrollment,
                   'treatmentStartDate': item.treatmentStartDate,
                   'treatmentRegimen': item.treatmentRegimen,
                   'treatmentRegimenOther': item.treatmentRegimenOther,
@@ -186,14 +184,10 @@ class _$PatientDao extends PatientDao {
                   'toTownshipId': item.toTownshipId,
                   'outcome': item.outcome,
                   'remark': item.remark,
-                  'treatmentFinished': item.treatmentFinished == null
-                      ? null
-                      : (item.treatmentFinished! ? 1 : 0),
+                  'treatmentFinished': item.treatmentFinished,
                   'treatmentFinishedDate': item.treatmentFinishedDate,
                   'outcomeDate': item.outcomeDate,
-                  'isReported': item.isReported == null
-                      ? null
-                      : (item.isReported! ? 1 : 0),
+                  'isReported': item.isReported,
                   'reportPeriod': item.reportPeriod,
                   'currentTownshipId': item.currentTownshipId,
                   'isSynced': item.isSynced ? 1 : 0
@@ -224,9 +218,7 @@ class _$PatientDao extends PatientDao {
             age: row['age'] as int,
             sex: row['sex'] as String,
             diedBeforeTreatmentEnrollment:
-                row['diedBeforeTreatmentEnrollment'] == null
-                    ? null
-                    : (row['diedBeforeTreatmentEnrollment'] as int) != 0,
+                row['diedBeforeTreatmentEnrollment'] as String?,
             treatmentStartDate: row['treatmentStartDate'] as String?,
             treatmentRegimen: row['treatmentRegimen'] as String,
             treatmentRegimenOther: row['treatmentRegimenOther'] as String?,
@@ -248,14 +240,10 @@ class _$PatientDao extends PatientDao {
             toTownshipId: row['toTownshipId'] as int?,
             outcome: row['outcome'] as String?,
             remark: row['remark'] as String?,
-            treatmentFinished: row['treatmentFinished'] == null
-                ? null
-                : (row['treatmentFinished'] as int) != 0,
+            treatmentFinished: row['treatmentFinished'] as String?,
             treatmentFinishedDate: row['treatmentFinishedDate'] as String?,
             outcomeDate: row['outcomeDate'] as String?,
-            isReported: row['isReported'] == null
-                ? null
-                : (row['isReported'] as int) != 0,
+            isReported: row['isReported'] as String?,
             reportPeriod: row['reportPeriod'] as String?,
             currentTownshipId: row['currentTownshipId'] as int,
             isSynced: (row['isSynced'] as int) != 0));
@@ -278,9 +266,7 @@ class _$PatientDao extends PatientDao {
             age: row['age'] as int,
             sex: row['sex'] as String,
             diedBeforeTreatmentEnrollment:
-                row['diedBeforeTreatmentEnrollment'] == null
-                    ? null
-                    : (row['diedBeforeTreatmentEnrollment'] as int) != 0,
+                row['diedBeforeTreatmentEnrollment'] as String?,
             treatmentStartDate: row['treatmentStartDate'] as String?,
             treatmentRegimen: row['treatmentRegimen'] as String,
             treatmentRegimenOther: row['treatmentRegimenOther'] as String?,
@@ -302,14 +288,10 @@ class _$PatientDao extends PatientDao {
             toTownshipId: row['toTownshipId'] as int?,
             outcome: row['outcome'] as String?,
             remark: row['remark'] as String?,
-            treatmentFinished: row['treatmentFinished'] == null
-                ? null
-                : (row['treatmentFinished'] as int) != 0,
+            treatmentFinished: row['treatmentFinished'] as String?,
             treatmentFinishedDate: row['treatmentFinishedDate'] as String?,
             outcomeDate: row['outcomeDate'] as String?,
-            isReported: row['isReported'] == null
-                ? null
-                : (row['isReported'] as int) != 0,
+            isReported: row['isReported'] as String?,
             reportPeriod: row['reportPeriod'] as String?,
             currentTownshipId: row['currentTownshipId'] as int,
             isSynced: (row['isSynced'] as int) != 0),

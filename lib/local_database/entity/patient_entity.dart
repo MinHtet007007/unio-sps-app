@@ -17,7 +17,7 @@ class PatientEntity {
   final String name;
   final int age;
   final String sex;
-  final bool? diedBeforeTreatmentEnrollment;
+  final String? diedBeforeTreatmentEnrollment;
   final String? treatmentStartDate;
   final String treatmentRegimen;
   final String? treatmentRegimenOther;
@@ -39,10 +39,10 @@ class PatientEntity {
   final int? toTownshipId;
   final String? outcome;
   final String? remark;
-  final bool? treatmentFinished;
+  final String? treatmentFinished;
   final String? treatmentFinishedDate;
   final String? outcomeDate;
-  final bool? isReported;
+  final String? isReported;
   final String? reportPeriod;
   final int currentTownshipId;
   final bool isSynced;

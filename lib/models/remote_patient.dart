@@ -14,7 +14,7 @@ class Patient {
   final String name;
   final int age;
   final String sex;
-  final bool? diedBeforeTreatmentEnrollment;
+  final String? diedBeforeTreatmentEnrollment;
   final String? treatmentStartDate;
   final String treatmentRegimen;
   final String? treatmentRegimenOther;
@@ -35,12 +35,12 @@ class Patient {
   final String? toUniqueId;
   final Township? toTownship;
   final List<Township> toTownships;
-  final bool? treatmentFinished;
+  final String? treatmentFinished;
   final String? treatmentFinishedDate;
   final String? outcomeDate;
   final String? outcome;
   final String? remark;
-  final bool? isReported;
+  final String? isReported;
   final String? reportPeriod;
   final Township currentTownship;
   final List<SupportMonth> supportMonths;

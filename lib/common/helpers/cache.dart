@@ -43,12 +43,23 @@ class Cache {
     return prefsToken;
   }
 
-    // Retrieve the last synced time
-  static Future<DateTime?> getLastSyncedTime() async {
+  // Retrieve the last synced time
+  static Future<DateTime> getLastSyncedTime() async {
     final prefs = await SharedPreferences.getInstance();
     final lastSynced = prefs.getString(lastSyncedTimeKey);
-    if (lastSynced == null) return null;
-    return DateTime.parse(lastSynced);
+
+    if (lastSynced == null) {
+      // Default to Unix epoch if no value is stored
+      return DateTime.fromMillisecondsSinceEpoch(0);
+    }
+
+    try {
+      // Attempt to parse the stored value
+      return DateTime.parse(lastSynced);
+    } catch (e) {
+      // Handle invalid format by returning Unix epoch
+      return DateTime.fromMillisecondsSinceEpoch(0);
+    }
   }
 
   static Future<String?> getUserName() async {
