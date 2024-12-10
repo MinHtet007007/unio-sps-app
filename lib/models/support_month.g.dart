@@ -15,9 +15,9 @@ SupportMonth _$SupportMonthFromJson(Map<String, dynamic> json) => SupportMonth(
       date: json['date'] as String,
       month: (json['month'] as num).toInt(),
       monthYear: json['monthYear'] as String,
-      height: (json['height'] as num).toDouble(),
-      weight: (json['weight'] as num).toDouble(),
-      bmi: (json['bmi'] as num).toDouble(),
+      height: (json['height'] as num).toInt(),
+      weight: (json['weight'] as num).toInt(),
+      bmi: (json['bmi'] as num).toInt(),
       planPackages: json['planPackages'] as String,
       receivePackageStatus: json['receivePackageStatus'] as String,
       receivePackages: (json['receivePackages'] as List<dynamic>)
@@ -26,9 +26,8 @@ SupportMonth _$SupportMonthFromJson(Map<String, dynamic> json) => SupportMonth(
       reimbursementStatus: json['reimbursementStatus'] as String,
       reimbursementMonth: (json['reimbursementMonth'] as num?)?.toInt(),
       reimbursementMonthYear: json['reimbursementMonthYear'] as String?,
-      amount: (json['amount'] as num?)?.toDouble(),
+      amount: (json['amount'] as num?)?.toInt(),
       remark: json['remark'] as String?,
-      status: (json['status'] as num).toInt(),
     );
 
 Map<String, dynamic> _$SupportMonthToJson(SupportMonth instance) =>
@@ -52,5 +51,4 @@ Map<String, dynamic> _$SupportMonthToJson(SupportMonth instance) =>
       'reimbursementMonthYear': instance.reimbursementMonthYear,
       'amount': instance.amount,
       'remark': instance.remark,
-      'status': instance.status,
     };

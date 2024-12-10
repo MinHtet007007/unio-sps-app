@@ -34,8 +34,10 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
         state = HomePatientsSyncFailedState('There is no patients');
       }
       return;
-    } catch (error) {
+    } catch (error, stackTrace) {
       print(error);
+      print("StackTrace: $stackTrace");
+
       state = HomePatientsSyncFailedState(error.toString());
     }
   }

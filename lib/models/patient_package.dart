@@ -2,9 +2,9 @@ class PatientPackage {
   final int id;
   final int patientId; // Foreign key referencing Patient
   final String packageName;
-  final double eligibleAmount;
-  final double? updatedEligibleAmount;
-  final double remainingAmount;
+  final int eligibleAmount;
+  final int? updatedEligibleAmount;
+  final int remainingAmount;
 
   PatientPackage({
     required this.id,
@@ -21,11 +21,11 @@ class PatientPackage {
       id: json['id'],
       patientId: json['patient_id'],
       packageName: json['package_name'],
-      eligibleAmount: double.parse(json['eligible_amount']),
+      eligibleAmount: int.parse(json['eligible_amount']),
       updatedEligibleAmount: json['updated_eligible_amount'] != null
-          ? double.parse(json['updated_eligible_amount'])
+          ? int.parse(json['updated_eligible_amount'])
           : null,
-      remainingAmount: json['remaining_amount'].toDouble(),
+      remainingAmount: json['remaining_amount'],
     );
   }
 

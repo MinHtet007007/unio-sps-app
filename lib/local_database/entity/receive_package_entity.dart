@@ -11,8 +11,8 @@ class ReceivePackageEntity {
   final int remotePatientPackageId;
   final int amount;
   final String patientPackageName; 
-  final int reimbursementMonth;
-  final String
+  final int? reimbursementMonth;
+  final String?
       reimbursementMonthYear; 
 
   ReceivePackageEntity({
