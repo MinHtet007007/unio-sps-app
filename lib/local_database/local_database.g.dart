@@ -106,7 +106,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` INTEGER, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patient_support_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientSupportMonthId` INTEGER NOT NULL, `remotePatientPackageId` INTEGER NOT NULL, `amount` INTEGER NOT NULL, `patientPackageName` TEXT NOT NULL, `reimbursementMonth` INTEGER, `reimbursementMonthYear` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `patient_support_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientSupportMonthId` INTEGER NOT NULL, `remotePatientPackageId` INTEGER, `localPatientPackageId` INTEGER, `amount` INTEGER NOT NULL, `patientPackageName` TEXT NOT NULL, `reimbursementMonth` INTEGER, `reimbursementMonthYear` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `packageName` TEXT NOT NULL, `eligibleAmount` INTEGER NOT NULL, `updatedEligibleAmount` INTEGER, `remainingAmount` INTEGER NOT NULL)');
 
@@ -299,7 +299,7 @@ class _$PatientDao extends PatientDao {
   }
 
   @override
-  Future<void> deleteAllLocalPatients() async {
+  Future<void> deleteAll() async {
     await _queryAdapter.queryNoReturn('DELETE FROM patients');
   }
 
@@ -499,6 +499,11 @@ class _$SupportMonthDao extends SupportMonthDao {
   }
 
   @override
+  Future<void> deleteAll() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM patient_support_months');
+  }
+
+  @override
   Future<int> insertSupportMonth(SupportMonthEntity supportMonth) {
     return _supportMonthEntityInsertionAdapter.insertAndReturnId(
         supportMonth, OnConflictStrategy.replace);
@@ -530,6 +535,7 @@ class _$ReceivePackageDao extends ReceivePackageDao {
                   'remoteId': item.remoteId,
                   'localPatientSupportMonthId': item.localPatientSupportMonthId,
                   'remotePatientPackageId': item.remotePatientPackageId,
+                  'localPatientPackageId': item.localPatientPackageId,
                   'amount': item.amount,
                   'patientPackageName': item.patientPackageName,
                   'reimbursementMonth': item.reimbursementMonth,
@@ -554,7 +560,8 @@ class _$ReceivePackageDao extends ReceivePackageDao {
             amount: row['amount'] as int,
             localPatientSupportMonthId:
                 row['localPatientSupportMonthId'] as int,
-            remotePatientPackageId: row['remotePatientPackageId'] as int,
+            remotePatientPackageId: row['remotePatientPackageId'] as int?,
+            localPatientPackageId: row['localPatientPackageId'] as int?,
             patientPackageName: row['patientPackageName'] as String,
             reimbursementMonth: row['reimbursementMonth'] as int?,
             reimbursementMonthYear: row['reimbursementMonthYear'] as String?));
@@ -572,8 +579,13 @@ class _$ReceivePackageDao extends ReceivePackageDao {
       int supportMonthId) async {
     return _queryAdapter.queryList(
         'SELECT * FROM patient_support_packages WHERE patientSupportMonthId = ?1',
-        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
+        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int?, localPatientPackageId: row['localPatientPackageId'] as int?, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
         arguments: [supportMonthId]);
+  }
+
+  @override
+  Future<void> deleteAll() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM patient_support_packages');
   }
 
   @override
@@ -653,6 +665,11 @@ class _$PatientPackageDao extends PatientPackageDao {
     await _queryAdapter.queryNoReturn(
         'DELETE FROM patient_packages WHERE id = ?1',
         arguments: [id]);
+  }
+
+  @override
+  Future<void> deleteAll() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM patient_packages');
   }
 
   @override

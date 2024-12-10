@@ -41,6 +41,41 @@ List<DropdownMenuItem<String>> get years {
   return years;
 }
 
+List<DropdownMenuItem<String>> get genders {
+  List<DropdownMenuItem<String>> genders = [
+    DropdownMenuItem(
+        value: "Male", child: CustomLabelWidget(style: style, text: "ကျား")),
+    DropdownMenuItem(
+        value: "Female", child: CustomLabelWidget(style: style, text: "မ")),
+  ];
+  return genders;
+}
+List<DropdownMenuItem<String>> get yesOrNoOptions {
+  List<DropdownMenuItem<String>> genders = [
+    DropdownMenuItem(
+        value: "Yes", child: CustomLabelWidget(style: style, text: "Yes")),
+    DropdownMenuItem(
+        value: "No", child: CustomLabelWidget(style: style, text: "No")),
+  ];
+  return genders;
+}
+List<DropdownMenuItem<String>> get treatmentRegimenOptions {
+  List<DropdownMenuItem<String>> treatmentRegimenOptions = [
+    DropdownMenuItem(
+        value: "IR - Initial Regimen",
+        child: CustomLabelWidget(style: style, text: "လူနာသစ်ကုထုံး")),
+    DropdownMenuItem(
+        value: "RR - Retreatment Regimen",
+        child: CustomLabelWidget(style: style, text: "ပြန်ကုလူနာကုထုံး")),
+    DropdownMenuItem(
+        value: "CR - Childhood Regimen",
+        child: CustomLabelWidget(style: style, text: "ကလေးကုထုံး")),
+    DropdownMenuItem(
+        value: "MR - Modified Regimen",
+        child: CustomLabelWidget(style: style, text: "မွမ်းမံကုထုံး")),
+  ];
+  return treatmentRegimenOptions;
+}
 List<DropdownMenuItem<String>> get months {
   List<DropdownMenuItem<String>> months = [
     DropdownMenuItem(

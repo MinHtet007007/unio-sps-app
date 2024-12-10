@@ -8,7 +8,8 @@ class ReceivePackageEntity {
   final int? id;
   final int? remoteId;
   final int localPatientSupportMonthId; 
-  final int remotePatientPackageId;
+  final int? remotePatientPackageId;
+  final int? localPatientPackageId;
   final int amount;
   final String patientPackageName; 
   final int? reimbursementMonth;
@@ -20,7 +21,8 @@ class ReceivePackageEntity {
     this.remoteId,
     required this.amount,
     required this.localPatientSupportMonthId,
-    required this.remotePatientPackageId,
+    this.remotePatientPackageId,
+    this.localPatientPackageId,
     required this.patientPackageName,
     required this.reimbursementMonth,
     required this.reimbursementMonthYear,

@@ -39,4 +39,8 @@ abstract class SupportMonthDao {
   /// Delete all support months for a specific patient
   @Query('DELETE FROM ${LocalDataBase.patient_support_month_table} WHERE patientId = :patientId')
   Future<void> deleteSupportMonthsByPatientId(int patientId);
+
+
+  @Query('DELETE FROM ${LocalDataBase.patient_support_month_table}')
+  Future<void> deleteAll();
 }

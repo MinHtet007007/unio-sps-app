@@ -11,6 +11,6 @@ abstract class PatientService {
 
   @GET(ApiConst.patientEndPoint)
   Future<RemotePatientResult> fetchRemotePatients(
-    @Query('last_synced_time') DateTime? lastSyncedTime,
+    // @Query('last_synced_time') DateTime? lastSyncedTime,
   );
 }

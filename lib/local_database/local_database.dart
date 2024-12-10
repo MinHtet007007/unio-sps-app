@@ -25,45 +25,14 @@ abstract class AppDatabase extends FloorDatabase {
   SupportMonthDao get supportMonthDao;
   ReceivePackageDao get receivePackageDao;
   PatientPackageDao get patientPackageDao;
-
-  // @transaction
-  // Future<void> insertAllData(
-  //   List<PatientEntity> patients,
-  //   List<SupportMonthEntity> supportMonths,
-  //   List<ReceivePackageEntity> receivePackages,
-  //   List<PatientPackageEntity> patientPackages,
-  // ) async {
-  //   await patientDao.insertMany(patients);
-  //   await supportMonthDao.insertMany(supportMonths);
-  //   await receivePackageDao.insertMany(receivePackages);
-  //   await patientPackageDao.insertMany(patientPackages);
-  // }
-
-  // @transaction
-  // Future<void> _insertPatientWithRelatedData(
-  //   PatientEntity patient,
-  //   List<SupportMonthEntity> patientSupportMonths,
-  //   List<ReceivePackageEntity> patientReceivePackages,
-  //   List<PatientPackageEntity> patientPackages,
-  // ) async {
-  //   // Insert the patient and get its ID
-  //   final int patientId = await patientDao.insertLocalPatient(patient);
-
-  //   // Update related entities with the new patient ID
-  //   final updatedSupportMonths = patientSupportMonths
-  //       .map((sm) => sm.copyWith(patientId: patientId))
-  //       .toList();
-  //   final updatedReceivePackages = patientReceivePackages
-  //       .map((rp) => rp.copyWith(patientId: patientId))
-  //       .toList();
-  //   final updatedPatientPackages =
-  //       patientPackages.map((pp) => pp.copyWith(patientId: patientId)).toList();
-
-  //   // Insert related data
-  //   await supportMonthDao.insertMany(updatedSupportMonths);
-  //   await receivePackageDao.insertMany(updatedReceivePackages);
-  //   await patientPackageDao.insertMany(updatedPatientPackages);
-  // }
+  
+  @transaction
+  Future<void> resetDatabase() async {
+    patientDao.deleteAll();
+    patientPackageDao.deleteAll();
+    supportMonthDao.deleteAll();
+    receivePackageDao.deleteAll();
+  }
 
   @transaction
   Future<void> syncPatient(Patient remotePatient) async {

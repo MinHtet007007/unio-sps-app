@@ -1,6 +1,7 @@
 import 'package:sps/screens/home/home_screen.dart';
 import 'package:sps/screens/add_new_package/add_new_package_screen.dart';
 import 'package:sps/screens/login/login_screen.dart';
+import 'package:sps/screens/new_patient/new_patient_screen.dart';
 import 'package:sps/screens/notes/note_screen.dart';
 import 'package:sps/screens/patient_detail/patient_detail_screen.dart';
 import 'package:sps/screens/patients_list/patient_list_screen.dart';
@@ -44,6 +45,10 @@ class RouteList {
       path: RouteName.patient,
       builder: (context, state) => const PatientListScreen(),
     ),
+     GoRoute(
+      path: RouteName.patientCreate,
+      builder: (context, state) => const NewPatientScreen(),
+    ),
     GoRoute(
       path: '${RouteName.patientDetail}/:id',
       builder: (context, state) {
@@ -71,5 +76,6 @@ class RouteName {
   static const String note = '/note';
   static const String patient = '/patient';
   static const String patientDetail = '/patient';
+  static const String patientCreate = '/patient-create';
   static const String packageCreate = '/package-create';
 }

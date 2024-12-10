@@ -10,3 +10,8 @@ flutter pub run build_runner build --delete-conflicting-outputs
 # support months create and sync 
 
 
+# field officer login flow 
+
+when change township, 
+login again 
+reset all data 
