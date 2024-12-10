@@ -86,6 +86,11 @@ class _HomeState extends ConsumerState<Home> {
                         isLoading:
                             homeSyncNotifier is HomePatientsSyncLoadingState,
                         onPressed: _fetchRemotePatients),
+                    TextButton(
+                        onPressed: () {
+                          context.push('${RouteName.packageCreate}/1');
+                        },
+                        child: Text('go add new package')),
                     CardButton(
                       color: ColorTheme.primary,
                       press: () {
