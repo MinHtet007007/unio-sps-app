@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:sps/common/widgets/form/custom_date_input_with_validation.dart';
@@ -6,16 +7,19 @@ import 'package:sps/common/widgets/form/custom_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_multi_select_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
+import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
+import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
 
-class AddNewPackageScreen extends StatefulWidget {
+class AddNewPackageScreen extends ConsumerStatefulWidget {
   final int patientId;
   const AddNewPackageScreen({super.key, required this.patientId});
 
   @override
-  State<AddNewPackageScreen> createState() => _AddNewPackageScreenState();
+  ConsumerState<AddNewPackageScreen> createState() =>
+      _AddNewPackageScreenState();
 }
 
-class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
+class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _monthYearController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
@@ -34,8 +38,24 @@ class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
   ];
   List<String> _selectedOptions = [];
 
+  void _fetchPatient() async {
+    await Future.delayed(Duration.zero);
+
+    final patientNotifier = ref.read(localPatientProvider.notifier);
+    patientNotifier.fetchPatient(widget.patientId);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchPatient();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final localState = ref.watch(localPatientProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: CustomLabelWidget(
@@ -51,6 +71,9 @@ class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
             key: _formKey,
             child: Column(
               children: [
+                Text(localState is LocalPatientSuccessState
+                    ? localState.localPatient.name
+                    : "fail"),
                 Column(
                   children: [
                     const Padding(
@@ -624,6 +647,14 @@ class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
                                   TableCellVerticalAlignment.middle,
                               child: Padding(
                                 padding: EdgeInsets.all(8.0),
+                                child: Text('Given Amount'),
+                              ),
+                            ),
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
                                 child: Text('Month Year'),
                               ),
                             ),
@@ -660,6 +691,12 @@ class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
                             const TableCell(
                               child: Padding(
                                 padding: EdgeInsets.all(8.0),
+                                child: Text('7888787'),
+                              ),
+                            ),
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
                                 child: Text('2024-10'),
                               ),
                             ),
@@ -691,6 +728,12 @@ class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
                               child: Padding(
                                 padding: EdgeInsets.all(8.0),
                                 child: Text('Package 7'),
+                              ),
+                            ),
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('7888787'),
                               ),
                             ),
                             const TableCell(
@@ -866,6 +909,192 @@ class _AddNewPackageScreenState extends State<AddNewPackageScreen> {
                           labelText: "Enter Given Amount",
                           type: "number",
                         )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CustomSubmitButton(buttonText: "Add", onSubmit: () {}),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Table(
+                      border: TableBorder.all(),
+                      children: [
+                        const TableRow(
+                          children: [
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('No'),
+                              ),
+                            ),
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('Packages'),
+                              ),
+                            ),
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('Given Amount'),
+                              ),
+                            ),
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('Delete'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('1'),
+                              ),
+                            ),
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('Package 7'),
+                              ),
+                            ),
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('7888787'),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {},
+                                  )),
+                            ),
+                          ],
+                        ),
+                        TableRow(
+                          children: [
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('1'),
+                              ),
+                            ),
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('Package 7'),
+                              ),
+                            ),
+                            const TableCell(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text('7888787'),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {},
+                                  )),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const Column(
+                      children: [
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Grand Total',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Card(
+                          elevation: 5,
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "32920",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Remark',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                        CustomTextInput(
+                          inputController: _heightController,
+                          labelText: "Enter remark",
+                          type: "textarea",
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        CustomSubmitButton(
+                            buttonText: "Save",
+                            onSubmit: () {
+                              debugPrint(_dateController.text);
+                            }),
+                        const SizedBox(
+                          height: 20,
+                        ),
                       ],
                     ),
                   ],
