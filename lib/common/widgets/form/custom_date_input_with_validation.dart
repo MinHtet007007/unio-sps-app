@@ -6,6 +6,8 @@ class CustomDateInputWithValidation extends StatefulWidget {
   final String labelText;
   final String date;
   final bool isMonthYear;
+  final DateTime? maxDate;
+  final void Function(DateTime)? onDateChanged;
 
   const CustomDateInputWithValidation({
     Key? key,
@@ -13,6 +15,8 @@ class CustomDateInputWithValidation extends StatefulWidget {
     required this.labelText,
     required this.date,
     this.isMonthYear = false,
+    this.maxDate,
+    this.onDateChanged,
   }) : super(key: key);
 
   @override
@@ -35,25 +39,31 @@ class _CustomDateInputWithValidationState
   }
 
   void pickDate() async {
+    DateTime currentDate = DateTime.now();
+    DateTime lastDate =
+        widget.maxDate != null && widget.maxDate!.isBefore(currentDate)
+            ? widget.maxDate!
+            : currentDate;
+    DateTime initialDate =
+        DateTime.now().isAfter(lastDate) ? lastDate : DateTime.now();
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: widget.date != null
+      initialDate: initialDate,
+      firstDate: widget.date.isNotEmpty
           ? DateTime.parse(widget.date)
           : firstDateOfLastMonth,
-      lastDate: widget.date != null ? DateTime.now() : DateTime(2101),
+      lastDate: lastDate,
     );
     if (pickedDate != null) {
-      if (widget.isMonthYear) {
-        setState(() {
-          widget.dateController.text = DateFormat('yyyy-MM').format(pickedDate);
-        });
-      } else {
-        setState(() {
-          widget.dateController.text =
-              DateFormat('yyyy-MM-dd').format(pickedDate);
-        });
-      }
+      setState(() {
+        widget.dateController.text = widget.isMonthYear
+            ? DateFormat('yyyy-MM').format(pickedDate)
+            : DateFormat('yyyy-MM-dd').format(pickedDate);
+
+        if (widget.onDateChanged != null) {
+          widget.onDateChanged!(pickedDate);
+        }
+      });
     }
   }
 

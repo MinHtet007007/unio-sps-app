@@ -84,3 +84,62 @@ List<DropdownMenuItem<String>> get months {
   ];
   return months;
 }
+
+List<DropdownMenuItem<String>> get supportMonths {
+  List<DropdownMenuItem<String>> supportMonths = [
+    DropdownMenuItem(
+        value: "-1",
+        child: CustomLabelWidget(style: style, text: "Pre-enroll Month")),
+    DropdownMenuItem(
+        value: "0", child: CustomLabelWidget(style: style, text: "Month 0")),
+    DropdownMenuItem(
+        value: "1", child: CustomLabelWidget(style: style, text: "Month 1")),
+    DropdownMenuItem(
+        value: "2", child: CustomLabelWidget(style: style, text: "Month 2")),
+    DropdownMenuItem(
+        value: "3", child: CustomLabelWidget(style: style, text: "Month 3")),
+    DropdownMenuItem(
+        value: "4", child: CustomLabelWidget(style: style, text: "Month 4")),
+    DropdownMenuItem(
+        value: "5", child: CustomLabelWidget(style: style, text: "Month 5")),
+    DropdownMenuItem(
+        value: "6", child: CustomLabelWidget(style: style, text: "Month 6")),
+    DropdownMenuItem(
+        value: "7", child: CustomLabelWidget(style: style, text: "Month 7")),
+    DropdownMenuItem(
+        value: "8", child: CustomLabelWidget(style: style, text: "Month 8")),
+    DropdownMenuItem(
+        value: "9", child: CustomLabelWidget(style: style, text: "Month 9")),
+    DropdownMenuItem(
+        value: "10", child: CustomLabelWidget(style: style, text: "Month 10")),
+    DropdownMenuItem(
+        value: "11", child: CustomLabelWidget(style: style, text: "Month 11")),
+    DropdownMenuItem(
+        value: "12", child: CustomLabelWidget(style: style, text: "Month 12")),
+    DropdownMenuItem(
+        value: "13", child: CustomLabelWidget(style: style, text: "Month 13")),
+    DropdownMenuItem(
+        value: "14", child: CustomLabelWidget(style: style, text: "Month 14")),
+    DropdownMenuItem(
+        value: "15", child: CustomLabelWidget(style: style, text: "Month 15")),
+    DropdownMenuItem(
+        value: "16", child: CustomLabelWidget(style: style, text: "Month 16")),
+    DropdownMenuItem(
+        value: "17", child: CustomLabelWidget(style: style, text: "Month 17")),
+    DropdownMenuItem(
+        value: "18", child: CustomLabelWidget(style: style, text: "Month 18")),
+    DropdownMenuItem(
+        value: "19", child: CustomLabelWidget(style: style, text: "Month 19")),
+    DropdownMenuItem(
+        value: "20", child: CustomLabelWidget(style: style, text: "Month 20")),
+    DropdownMenuItem(
+        value: "21", child: CustomLabelWidget(style: style, text: "Month 21")),
+    DropdownMenuItem(
+        value: "22", child: CustomLabelWidget(style: style, text: "Month 22")),
+    DropdownMenuItem(
+        value: "23", child: CustomLabelWidget(style: style, text: "Month 23")),
+    DropdownMenuItem(
+        value: "24", child: CustomLabelWidget(style: style, text: "Month 24")),
+  ];
+  return supportMonths;
+}
