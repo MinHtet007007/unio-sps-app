@@ -38,25 +38,25 @@ class MonthDetail extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          // var phase = getCounselingPhase(patient.dotsStartDate as String,
-                          //     patient.treatmentRegimen as String);
-                          // final phaseData = PhaseData(phase: phase);
-                          // await context.push('${RouteName.patientCounselings}/${patient.id}',
-                          //     extra: phaseData);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorTheme.black,
-                        ),
-                        child: const Text(
-                          'Edit Package',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
+                      // ElevatedButton(
+                      //   onPressed: () async {
+                      //     // var phase = getCounselingPhase(patient.dotsStartDate as String,
+                      //     //     patient.treatmentRegimen as String);
+                      //     // final phaseData = PhaseData(phase: phase);
+                      //     // await context.push('${RouteName.patientCounselings}/${patient.id}',
+                      //     //     extra: phaseData);
+                      //   },
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: ColorTheme.black,
+                      //   ),
+                      //   child: const Text(
+                      //     'Edit Package',
+                      //     style: TextStyle(color: Colors.white),
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   width: 10,
+                      // ),
                       ElevatedButton(
                         onPressed: () async {
                           // var phase = getCounselingPhase(patient.dotsStartDate as String,
