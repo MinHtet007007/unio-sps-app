@@ -20,7 +20,7 @@ class CustomListView extends StatelessWidget {
           return CustomItem(
             id: patient.id as int,
             name: patient.name,
-            unionTempCode: patient.toDrtbCode ?? '',
+            code: patient.rrCode ?? patient.drtbCode,
           );
         });
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sps/common/constants/form_options.dart';
 import 'package:sps/common/constants/theme.dart';
+import 'package:sps/common/widgets/bmi.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:sps/common/widgets/custom_text.dart';
 import 'package:sps/common/widgets/form/custom_date_input.dart';
@@ -12,9 +13,15 @@ import 'package:sps/local_database/entity/patient_entity.dart';
 
 class NewPatientForm extends StatefulWidget {
   final PatientEntity? data;
-  final void Function()? submit;
+  Future<void> Function (Map<String, dynamic> formData) onSubmit;
 
-  const NewPatientForm({super.key,required this.submit, this.data});
+  List<DropdownMenuItem<String>> townshipOptions;
+
+  NewPatientForm(
+      {super.key,
+      required this.onSubmit,
+      this.data,
+      required this.townshipOptions});
   @override
   State<NewPatientForm> createState() => _NewPatientFormState();
 }
@@ -24,7 +31,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
   String? selectedSex;
   String? selectedTownship;
   String? selectedDiedBeforeTreatmentEnrollment;
-  String? selectedRegimentType;
+  String? selectedTreatmentRegimen;
 
   // Controllers
   final Map<String, TextEditingController> controllers = {
@@ -34,7 +41,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
     'address': TextEditingController(),
     'rrCode': TextEditingController(),
     'drtbCode': TextEditingController(),
-    'spCode': TextEditingController(),
+    'spsStartDate': TextEditingController(),
     'treatmentStartDate': TextEditingController(),
     'treatmentRegimenOther': TextEditingController(),
     'contactInfo': TextEditingController(),
@@ -77,10 +84,50 @@ class _NewPatientFormState extends State<NewPatientForm> {
 
     //   selectedTypeOfTBDependingOnBACStatus =
     //       data.type_of_TB_depending_on_bac_status;
-    //   selectedRegimentType = data.regimen_type;
+    //   selectedTreatmentRegimen = data.regimen_type;
     //   phoneController.text = data.phone;
     // }
     super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controllers['rrCode']!.addListener(_updateState);
+    controllers['drtbCode']!.addListener(_updateState);
+  }
+
+  void _updateState() {
+    setState(() {}); // Trigger a rebuild when either controller changes
+  }
+
+  void onSave() {
+    if (_formKey.currentState!.validate()) {
+      // Collect the dropdown-selected values
+      final Map<String, dynamic> selectedValues = {
+        'year': selectedYear,
+        'sex': selectedSex,
+        'townshipId': selectedTownship,
+        'diedBeforeTreatmentEnrollment': selectedDiedBeforeTreatmentEnrollment,
+        'treatmentRegimen': selectedTreatmentRegimen,
+      };
+
+      // Collect the input field values
+      final Map<String, String> inputValues =
+          controllers.map((key, controller) {
+        return MapEntry(key, controller.text.trim());
+      });
+
+      // Combine the data
+      final Map<String, dynamic> formData = {
+        ...selectedValues,
+        ...inputValues,
+      };
+
+      // Example: Save or print the collected data
+      print('Form Data: $formData');
+      widget.onSubmit(formData);
+    }
   }
 
   @override
@@ -117,38 +164,47 @@ class _NewPatientFormState extends State<NewPatientForm> {
                           }),
                         ),
                         const SizedBox(height: 10),
-                        // CustomDropDown(
-                        //   title: 'မြို့နယ်',
-                        //   items: townships,
-                        //   selectedData: selectedTownship,
-                        //   hintText: 'မြို့နယ်',
-                        //   onChanged: ((value) {
-                        //     setState(() {
-                        //       selectedTownship = value;
-                        //     });
-                        //   }),
-                        // ),
+                        CustomDropDown(
+                          title: 'မြို့နယ်',
+                          items: widget.townshipOptions,
+                          selectedData: selectedTownship,
+                          hintText: 'မြို့နယ်',
+                          onChanged: ((value) {
+                            setState(() {
+                              selectedTownship = value;
+                            });
+                          }),
+                        ),
+                        CustomDateInput(
+                          dateController: controllers['spsStartDate']
+                              as TextEditingController,
+                          labelText: 'SPS start date',
+                        ),
                         const SizedBox(height: 10),
                         CustomTextInput(
-                            inputController:
-                                controllers['rrCode'] as TextEditingController,
-                            labelText: 'RR code'),
+                          inputController:
+                              controllers['rrCode'] as TextEditingController,
+                          labelText: 'RR code',
+                          isRequired: controllers['drtbCode']!.text.isEmpty,
+                        ),
                         const SizedBox(height: 10),
                         CustomTextInput(
                             inputController: controllers['drtbCode']
                                 as TextEditingController,
-                            labelText: 'DRTB code'),
+                            labelText: 'DRTB code',
+                            isRequired: controllers['rrCode']!.text.isEmpty),
                         const SizedBox(height: 10),
-                        CustomTextInput(
-                            inputController:
-                                controllers['spCode'] as TextEditingController,
-                            labelText: 'SP code'),
+                        // CustomTextInput(
+                        //     inputController:
+                        //         controllers['spCode'] as TextEditingController,
+                        //     labelText: 'SP code'),
                         const SizedBox(height: 10),
                         CustomTextInput(
                             inputController:
                                 controllers['name'] as TextEditingController,
                             labelText: 'နာမည်',
-                            type: 'text'),
+                            type: 'text',
+                            isRequired: true),
                         const SizedBox(
                           height: 10,
                         ),
@@ -206,21 +262,21 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         CustomDropDown(
                           title: 'ကုထုံးအမျိုးအစား',
                           items: treatmentRegimenOptions,
-                          selectedData: selectedRegimentType,
+                          selectedData: selectedTreatmentRegimen,
                           hintText: 'ကုထုံးအမျိုးအစား',
                           onChanged: ((value) {
                             setState(() {
-                              selectedRegimentType = value;
+                              selectedTreatmentRegimen = value;
                             });
                           }),
                         ),
                         const SizedBox(height: 10),
-                        if (selectedRegimentType == 'Others')
+                        if (selectedTreatmentRegimen == treatmentRegimenOther)
                           CustomTextInput(
                               inputController:
                                   controllers['treatmentRegimenOther']
                                       as TextEditingController,
-                              labelText: 'Other',
+                              labelText: 'Treatment Regimen Other',
                               type: 'text'),
                         const SizedBox(
                           height: 10,
@@ -229,7 +285,8 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             inputController:
                                 controllers['address'] as TextEditingController,
                             labelText: 'လိပ်စာ',
-                            type: 'text'),
+                            type: 'text',
+                            isRequired: true),
                         const SizedBox(
                           height: 10,
                         ),
@@ -256,7 +313,8 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             inputController: controllers['contactInfo']
                                 as TextEditingController,
                             labelText: 'Contact Info',
-                            type: 'text'),
+                            type: 'text',
+                            isRequired: true),
                         const SizedBox(
                           height: 10,
                         ),
@@ -283,7 +341,8 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             inputController: controllers['primaryLanguage']
                                 as TextEditingController,
                             labelText: 'Primary language',
-                            type: 'text'),
+                            type: 'text',
+                            isRequired: true),
                         const SizedBox(
                           height: 10,
                         ),
@@ -299,7 +358,8 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             inputController:
                                 controllers['height'] as TextEditingController,
                             labelText: 'Height',
-                            type: 'number'),
+                            type: 'number',
+                            isRequired: true),
                         const SizedBox(
                           height: 10,
                         ),
@@ -307,23 +367,22 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             inputController:
                                 controllers['weight'] as TextEditingController,
                             labelText: 'Weight',
-                            type: 'text'),
+                            type: 'number',
+                            isRequired: true),
                         const SizedBox(
                           height: 10,
                         ),
-                        CustomTextInput(
-                            inputController:
-                                controllers['bmi'] as TextEditingController,
-                            labelText: 'BMI',
-                            type: 'text'),
+
+                        BMI(
+                          heightController: controllers['height']!,
+                          weightController: controllers['weight']!,
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
                         CustomSubmitButton(
-                          buttonText: widget.data != null
-                              ? 'ပြင်မည်'
-                              : 'Save',
-                          onSubmit: widget.submit,
+                          buttonText: widget.data != null ? 'ပြင်မည်' : 'Save',
+                          onSubmit: onSave,
                         ),
                         const SizedBox(
                           height: 20,

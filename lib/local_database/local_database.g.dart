@@ -80,6 +80,8 @@ class _$AppDatabase extends AppDatabase {
 
   PatientPackageDao? _patientPackageDaoInstance;
 
+  UserTownshipDao? _userTownshipDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -102,13 +104,15 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT NOT NULL, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` INTEGER, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_support_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientSupportMonthId` INTEGER NOT NULL, `remotePatientPackageId` INTEGER, `localPatientPackageId` INTEGER, `amount` INTEGER NOT NULL, `patientPackageName` TEXT NOT NULL, `reimbursementMonth` INTEGER, `reimbursementMonthYear` TEXT)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `packageName` TEXT NOT NULL, `eligibleAmount` INTEGER NOT NULL, `updatedEligibleAmount` INTEGER, `remainingAmount` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER, `packageName` TEXT NOT NULL, `eligibleAmount` INTEGER NOT NULL, `updatedEligibleAmount` INTEGER, `remainingAmount` INTEGER NOT NULL)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `user_townships` (`id` INTEGER, `name` TEXT NOT NULL, `abbreviation` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -137,6 +141,12 @@ class _$AppDatabase extends AppDatabase {
   PatientPackageDao get patientPackageDao {
     return _patientPackageDaoInstance ??=
         _$PatientPackageDao(database, changeListener);
+  }
+
+  @override
+  UserTownshipDao get userTownshipDao {
+    return _userTownshipDaoInstance ??=
+        _$UserTownshipDao(database, changeListener);
   }
 }
 
@@ -213,7 +223,7 @@ class _$PatientDao extends PatientDao {
             rrCode: row['rrCode'] as String?,
             drtbCode: row['drtbCode'] as String,
             spCode: row['spCode'] as String,
-            uniqueId: row['uniqueId'] as String,
+            uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
             age: row['age'] as int,
             sex: row['sex'] as String,
@@ -231,7 +241,7 @@ class _$PatientDao extends PatientDao {
             height: row['height'] as int,
             weight: row['weight'] as int,
             bmi: row['bmi'] as int,
-            toStatus: row['toStatus'] as String,
+            toStatus: row['toStatus'] as String?,
             toYear: row['toYear'] as int?,
             toDate: row['toDate'] as String?,
             toRrCode: row['toRrCode'] as String?,
@@ -261,7 +271,7 @@ class _$PatientDao extends PatientDao {
             rrCode: row['rrCode'] as String?,
             drtbCode: row['drtbCode'] as String,
             spCode: row['spCode'] as String,
-            uniqueId: row['uniqueId'] as String,
+            uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
             age: row['age'] as int,
             sex: row['sex'] as String,
@@ -279,7 +289,7 @@ class _$PatientDao extends PatientDao {
             height: row['height'] as int,
             weight: row['weight'] as int,
             bmi: row['bmi'] as int,
-            toStatus: row['toStatus'] as String,
+            toStatus: row['toStatus'] as String?,
             toYear: row['toYear'] as int?,
             toDate: row['toDate'] as String?,
             toRrCode: row['toRrCode'] as String?,
@@ -636,7 +646,7 @@ class _$PatientPackageDao extends PatientPackageDao {
             id: row['id'] as int?,
             remoteId: row['remoteId'] as int?,
             localPatientId: row['localPatientId'] as int,
-            remotePatientId: row['remotePatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int?,
             packageName: row['packageName'] as String,
             eligibleAmount: row['eligibleAmount'] as int,
             updatedEligibleAmount: row['updatedEligibleAmount'] as int?,
@@ -652,7 +662,7 @@ class _$PatientPackageDao extends PatientPackageDao {
             id: row['id'] as int?,
             remoteId: row['remoteId'] as int?,
             localPatientId: row['localPatientId'] as int,
-            remotePatientId: row['remotePatientId'] as int,
+            remotePatientId: row['remotePatientId'] as int?,
             packageName: row['packageName'] as String,
             eligibleAmount: row['eligibleAmount'] as int,
             updatedEligibleAmount: row['updatedEligibleAmount'] as int?,
@@ -682,5 +692,57 @@ class _$PatientPackageDao extends PatientPackageDao {
   Future<void> insertMany(List<PatientPackageEntity> patientPackages) async {
     await _patientPackageEntityInsertionAdapter.insertList(
         patientPackages, OnConflictStrategy.replace);
+  }
+}
+
+class _$UserTownshipDao extends UserTownshipDao {
+  _$UserTownshipDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _userTownshipEntityInsertionAdapter = InsertionAdapter(
+            database,
+            'user_townships',
+            (UserTownshipEntity item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'abbreviation': item.abbreviation
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<UserTownshipEntity>
+      _userTownshipEntityInsertionAdapter;
+
+  @override
+  Future<List<UserTownshipEntity>> getAllUserTownships() async {
+    return _queryAdapter.queryList('SELECT * FROM user_townships',
+        mapper: (Map<String, Object?> row) => UserTownshipEntity(
+            id: row['id'] as int?,
+            name: row['name'] as String,
+            abbreviation: row['abbreviation'] as String));
+  }
+
+  @override
+  Future<void> deleteAllUserTownships() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM user_townships');
+  }
+
+  @override
+  Future<void> insertUserTownshipEntity(
+      UserTownshipEntity userTownshipEntity) async {
+    await _userTownshipEntityInsertionAdapter.insert(
+        userTownshipEntity, OnConflictStrategy.replace);
+  }
+
+  @override
+  Future<void> insertAllUserTownships(
+      List<UserTownshipEntity> userTownshipEntity) async {
+    await _userTownshipEntityInsertionAdapter.insertList(
+        userTownshipEntity, OnConflictStrategy.replace);
   }
 }

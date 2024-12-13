@@ -4,11 +4,13 @@ import 'package:sps/local_database/dao/patient_dao.dart';
 import 'package:sps/local_database/dao/patient_package_dao.dart';
 import 'package:sps/local_database/dao/receive_package_dao.dart';
 import 'package:sps/local_database/dao/support_month_dao.dart';
+import 'package:sps/local_database/dao/user_township_dao.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:floor/floor.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
+import 'package:sps/local_database/entity/user_township_entity.dart';
 import 'package:sps/models/remote_patient.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
@@ -18,13 +20,15 @@ part 'local_database.g.dart'; // the generated code will be there
   PatientEntity,
   SupportMonthEntity,
   ReceivePackageEntity,
-  PatientPackageEntity
+  PatientPackageEntity,
+  UserTownshipEntity
 ])
 abstract class AppDatabase extends FloorDatabase {
   PatientDao get patientDao;
   SupportMonthDao get supportMonthDao;
   ReceivePackageDao get receivePackageDao;
   PatientPackageDao get patientPackageDao;
+  UserTownshipDao get userTownshipDao;
   
   @transaction
   Future<void> resetDatabase() async {

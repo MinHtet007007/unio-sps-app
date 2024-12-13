@@ -1,8 +1,8 @@
 import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
+import 'package:sps/features/auth/provider/auth_provider.dart';
 import 'package:sps/features/user/provider/user_provider.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
-import 'package:sps/features/auth/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,7 +12,7 @@ class SettingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userState = ref.read(userProvider);
+    final userState = ref.watch(userProvider);
     final authStateProvider = ref.read(authProvider.notifier);
     return Scaffold(
       appBar: AppBar(
@@ -55,14 +55,19 @@ class SettingScreen extends ConsumerWidget {
                             color: Colors.white),
                       ),
                       const SizedBox(height: 15),
-                      CustomLabelWidget(
-                        text: userState.project ?? '',
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.white),
-                      ),
+                      // CustomLabelWidget(
+                      //   text: userState.project ?? '',
+                      //   style:
+                      //       const TextStyle(fontSize: 18, color: Colors.white),
+                      // ),
                       const SizedBox(height: 15),
                       CustomLabelWidget(
-                        text: userState.township ?? '',
+                        text: userState.townships != null &&
+                                userState.townships!.isNotEmpty
+                            ? userState.townships!
+                                .map((township) => township.name)
+                                .join(', ')
+                            : 'No townships available',
                         style:
                             const TextStyle(fontSize: 18, color: Colors.white),
                       ),

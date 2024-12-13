@@ -19,60 +19,60 @@ class PatientDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              context.push(
-                                  '${RouteName.packageCreate}/${patient.id}');
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorTheme.primary,
-                            ),
-                            child: const Text(
-                              'Add New Package',
-                              style: TextStyle(color: Colors.white),
-                            ),
+    print(patient.patientPhoneNo);
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            context.push(
+                                '${RouteName.packageCreate}/${patient.id}');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorTheme.primary,
                           ),
-                        ],
-                      ),
+                          child: const Text(
+                            'Add New Package',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
-                    dataRow('အမည်', patient.name),
-                    dataRow('လိပ်စာ', patient.patientAddress),
-                    dataRow('ဖုန်းနံပါတ်', patient.patientPhoneNo),
-                    dataRow('Union တီဘီကုဒ်', patient.drtbCode ?? ''),
-                    dataRow('Tx regimen', patient.treatmentRegimen ?? ''),
-                    dataRow('ဆေးစသောက်သည့်နေ့စွဲ',
-                        patient.treatmentStartDate ?? ''),
-                    dataRow('မှတ်ချက်', patient.remark ?? ''),
-                  ],
-                ),
+                  ),
+                  dataRow('အမည်', patient.name),
+                  dataRow('လိပ်စာ', patient.patientAddress),
+                  dataRow('ဖုန်းနံပါတ်', patient.patientPhoneNo),
+                  dataRow('RR code', patient.rrCode ?? ''),
+                  dataRow('DRTB code', patient.drtbCode ?? ''),
+                  dataRow('SP code', patient.spCode ?? ''),
+                  dataRow(
+                      'ဆေးစသောက်သည့်နေ့စွဲ', patient.treatmentStartDate ?? ''),
+                ],
               ),
             ),
           ),
-          // ListView takes remaining space and allows scrolling
-          Expanded(
-            child: ListView.builder(
-              itemCount: supportMonths?.length ?? 0,
-              itemBuilder: (context, index) {
-                return MonthDetail(supportMonth: supportMonths![index]);
-              },
-            ),
+        ),
+        // ListView takes remaining space and allows scrolling
+        Expanded(
+          child: ListView.builder(
+            itemCount: supportMonths?.length ?? 0,
+            itemBuilder: (context, index) {
+              return MonthDetail(supportMonth: supportMonths![index]);
+            },
           ),
-        ],
-      
+        ),
+      ],
     );
   }
 }

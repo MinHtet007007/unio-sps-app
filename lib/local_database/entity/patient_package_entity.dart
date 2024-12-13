@@ -8,7 +8,7 @@ class PatientPackageEntity {
   final int? id;
   final int? remoteId;
   final int localPatientId;
-  final int remotePatientId;
+  final int? remotePatientId;
   final String packageName;
   final int eligibleAmount;
   final int? updatedEligibleAmount;
@@ -18,7 +18,7 @@ class PatientPackageEntity {
     this.id,
     this.remoteId,
     required this.localPatientId,
-    required this.remotePatientId,
+    this.remotePatientId,
     required this.packageName,
     required this.eligibleAmount,
     this.updatedEligibleAmount,

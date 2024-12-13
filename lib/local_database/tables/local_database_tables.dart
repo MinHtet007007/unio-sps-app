@@ -5,4 +5,5 @@ class LocalDataBase {
   static const String patient_support_package_table =
       'patient_support_packages';
   static const String patient_package_table = 'patient_packages';
+  static const String user_township_table = 'user_townships';
 }

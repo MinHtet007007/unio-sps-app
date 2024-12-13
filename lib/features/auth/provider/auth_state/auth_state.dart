@@ -1,11 +1,12 @@
 import 'package:sps/features/auth/model/auth_user.dart';
+import 'package:sps/features/user/model/user.dart';
 
 sealed class AuthUserState {}
 
 class AuthUserLoadingState extends AuthUserState {}
 
 class AuthUserSuccessState extends AuthUserState {
-  final AuthUser authUser;
+  final User authUser;
   AuthUserSuccessState(this.authUser);
 }
 
