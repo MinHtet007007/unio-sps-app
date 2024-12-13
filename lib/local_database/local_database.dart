@@ -4,11 +4,13 @@ import 'package:sps/local_database/dao/patient_dao.dart';
 import 'package:sps/local_database/dao/patient_package_dao.dart';
 import 'package:sps/local_database/dao/receive_package_dao.dart';
 import 'package:sps/local_database/dao/support_month_dao.dart';
+import 'package:sps/local_database/dao/user_township_dao.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:floor/floor.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
+import 'package:sps/local_database/entity/user_township_entity.dart';
 import 'package:sps/models/remote_patient.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
@@ -18,52 +20,23 @@ part 'local_database.g.dart'; // the generated code will be there
   PatientEntity,
   SupportMonthEntity,
   ReceivePackageEntity,
-  PatientPackageEntity
+  PatientPackageEntity,
+  UserTownshipEntity
 ])
 abstract class AppDatabase extends FloorDatabase {
   PatientDao get patientDao;
   SupportMonthDao get supportMonthDao;
   ReceivePackageDao get receivePackageDao;
   PatientPackageDao get patientPackageDao;
-
-  // @transaction
-  // Future<void> insertAllData(
-  //   List<PatientEntity> patients,
-  //   List<SupportMonthEntity> supportMonths,
-  //   List<ReceivePackageEntity> receivePackages,
-  //   List<PatientPackageEntity> patientPackages,
-  // ) async {
-  //   await patientDao.insertMany(patients);
-  //   await supportMonthDao.insertMany(supportMonths);
-  //   await receivePackageDao.insertMany(receivePackages);
-  //   await patientPackageDao.insertMany(patientPackages);
-  // }
-
-  // @transaction
-  // Future<void> _insertPatientWithRelatedData(
-  //   PatientEntity patient,
-  //   List<SupportMonthEntity> patientSupportMonths,
-  //   List<ReceivePackageEntity> patientReceivePackages,
-  //   List<PatientPackageEntity> patientPackages,
-  // ) async {
-  //   // Insert the patient and get its ID
-  //   final int patientId = await patientDao.insertLocalPatient(patient);
-
-  //   // Update related entities with the new patient ID
-  //   final updatedSupportMonths = patientSupportMonths
-  //       .map((sm) => sm.copyWith(patientId: patientId))
-  //       .toList();
-  //   final updatedReceivePackages = patientReceivePackages
-  //       .map((rp) => rp.copyWith(patientId: patientId))
-  //       .toList();
-  //   final updatedPatientPackages =
-  //       patientPackages.map((pp) => pp.copyWith(patientId: patientId)).toList();
-
-  //   // Insert related data
-  //   await supportMonthDao.insertMany(updatedSupportMonths);
-  //   await receivePackageDao.insertMany(updatedReceivePackages);
-  //   await patientPackageDao.insertMany(updatedPatientPackages);
-  // }
+  UserTownshipDao get userTownshipDao;
+  
+  @transaction
+  Future<void> resetDatabase() async {
+    patientDao.deleteAll();
+    patientPackageDao.deleteAll();
+    supportMonthDao.deleteAll();
+    receivePackageDao.deleteAll();
+  }
 
   @transaction
   Future<void> syncPatient(Patient remotePatient) async {

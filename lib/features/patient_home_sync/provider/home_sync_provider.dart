@@ -18,9 +18,9 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
     try {
       state = HomePatientsSyncLoadingState();
       final patientService = PatientService(_dio);
-      final lastSyncedTime = await Cache.getLastSyncedTime();
+      // final lastSyncedTime = await Cache.getLastSyncedTime();
 
-      final response = await patientService.fetchRemotePatients(lastSyncedTime);
+      final response = await patientService.fetchRemotePatients();
       if (response.data.isNotEmpty) {
         final database = await localDatabase.database;
 

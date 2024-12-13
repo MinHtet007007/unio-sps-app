@@ -16,6 +16,8 @@ abstract class PatientPackageDao {
 
   @Query('DELETE FROM ${LocalDataBase.patient_package_table} WHERE id = :id')
   Future<void> deletePatientPackage(int id);
+    @Query('DELETE FROM ${LocalDataBase.patient_package_table}')
+  Future<void> deleteAll();
 
     /// Insert multiple support months
   @Insert(onConflict: OnConflictStrategy.replace)

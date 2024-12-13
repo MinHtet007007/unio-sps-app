@@ -22,5 +22,5 @@ abstract class PatientDao {
   Future<int> insertLocalPatient(PatientEntity patient);
 
   @Query('DELETE FROM ${LocalDataBase.patient_table}')
-  Future<void> deleteAllLocalPatients();
+  Future<void> deleteAll();
 }

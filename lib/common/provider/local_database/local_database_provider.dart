@@ -25,6 +25,12 @@ class LocalDatabase {
         await $FloorAppDatabase.databaseBuilder(LocalDataBase.dataBase).build();
     return database;
   }
+
+  Future<void> closeDatabase() async {
+    final db = await database;
+    await db.close();
+    _database = null;
+  }
 }
 
 final localDatabaseProvider = Provider<LocalDatabase>((ref) {

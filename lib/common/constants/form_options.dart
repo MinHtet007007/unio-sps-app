@@ -1,5 +1,6 @@
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:sps/local_database/entity/user_township_entity.dart';
 
 const TextStyle style = TextStyle(fontSize: 14);
 
@@ -41,6 +42,62 @@ List<DropdownMenuItem<String>> get years {
   return years;
 }
 
+List<DropdownMenuItem<String>> get genders {
+  List<DropdownMenuItem<String>> genders = [
+    DropdownMenuItem(
+        value: "Male", child: CustomLabelWidget(style: style, text: "ကျား")),
+    DropdownMenuItem(
+        value: "Female", child: CustomLabelWidget(style: style, text: "မ")),
+  ];
+  return genders;
+}
+
+List<DropdownMenuItem<String>> get yesOrNoOptions {
+  List<DropdownMenuItem<String>> genders = [
+    DropdownMenuItem(
+        value: "Yes", child: CustomLabelWidget(style: style, text: "Yes")),
+    DropdownMenuItem(
+        value: "No", child: CustomLabelWidget(style: style, text: "No")),
+  ];
+  return genders;
+}
+
+List<DropdownMenuItem<String>> get treatmentRegimenOptions {
+  List<DropdownMenuItem<String>> treatmentRegimenOptions = [
+    DropdownMenuItem(
+        value: "1. LTR",
+        child: CustomLabelWidget(style: style, text: "1. LTR")),
+    DropdownMenuItem(
+        value: "2. OSSTR",
+        child: CustomLabelWidget(style: style, text: "2. OSSTR")),
+    DropdownMenuItem(
+        value: "3. OLTR",
+        child: CustomLabelWidget(style: style, text: "3. OLTR")),
+    DropdownMenuItem(
+        value: "4. BPal",
+        child: CustomLabelWidget(style: style, text: "4. BPal")),
+    DropdownMenuItem(
+        value: "5. BPalM",
+        child: CustomLabelWidget(style: style, text: "5. BPalM")),
+    DropdownMenuItem(
+        value: "6. Individualized MDR",
+        child: CustomLabelWidget(style: style, text: "6. Individualized MDR")),
+    DropdownMenuItem(
+        value: "7. Individualized Pre-XDR",
+        child:
+            CustomLabelWidget(style: style, text: "7. Individualized Pre-XDR")),
+    DropdownMenuItem(
+        value: "8. XDR",
+        child: CustomLabelWidget(style: style, text: "8. XDR")),
+    DropdownMenuItem(
+        value: "9. Other",
+        child: CustomLabelWidget(style: style, text: "9. Other")),
+  ];
+
+  return treatmentRegimenOptions;
+}
+
+const treatmentRegimenOther = "9. Other";
 List<DropdownMenuItem<String>> get months {
   List<DropdownMenuItem<String>> months = [
     DropdownMenuItem(
@@ -83,6 +140,16 @@ List<DropdownMenuItem<String>> get months {
     //     child: CustomLabelWidget(style: style, text: "စတုတ္ထနှစ်ဝက်")),
   ];
   return months;
+}
+
+List<DropdownMenuItem<String>> convertTownshipsToDropdownOptions(
+    List<UserTownshipEntity> townships) {
+  return townships
+      .map((township) => DropdownMenuItem(
+            value: '${township.id}',
+            child: CustomLabelWidget(style: style, text: township.name),
+          ))
+      .toList();
 }
 
 List<DropdownMenuItem<String>> get supportMonths {

@@ -1,20 +1,19 @@
 import 'package:sps/common/helpers/cache.dart';
 import 'package:sps/common/provider/dio/dio_provider.dart';
-import 'package:sps/features/auth/model/auth_user.dart';
+import 'package:sps/common/provider/local_database/local_database_provider.dart';
 import 'package:sps/features/auth/model/login_request.dart';
 import 'package:sps/features/auth/service/auth_service.dart';
 import 'package:sps/features/auth/provider/auth_state/auth_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:sps/features/user/model/user.dart';
+import 'package:sps/local_database/entity/user_township_entity.dart';
 
-class AuthProvider extends Notifier<AuthUserState> {
-  AuthUserState authUserState = AuthLoginForm();
-  @override
-  build() {
-    return authUserState;
-  }
+class AuthProvider extends StateNotifier<AuthUserState> {
+  LocalDatabase localDatabase;
+  final Dio _dio;
 
-  late final Dio _dio = ref.read(dioProvider);
+  AuthProvider(this.localDatabase, this._dio) : super(AuthLoginForm());
 
   void login(String code, String password) async {
     try {
@@ -30,14 +29,23 @@ class AuthProvider extends Notifier<AuthUserState> {
         await Cache.saveToken(authUser.accessToken as String);
       }
       await Cache.saveUserName(authUser.name);
-      if (authUser.township!.isNotEmpty) {
-        await Cache.saveUserTownship(authUser.township ?? '');
+      late List<UserTownshipEntity> userTownshipEntities;
+      final database = await localDatabase.database;
+
+      if (authUser.townships!.isNotEmpty) {
+        userTownshipEntities = authUser.townships!
+            .map((package) =>
+                UserTownshipEntity.mapTownshipToUserTownshipEntity(package))
+            .toList();
+        database.userTownshipDao.insertAllUserTownships(userTownshipEntities);
       }
       if (authUser.project!.isNotEmpty) {
         await Cache.saveUserProject(authUser.project ?? '');
       }
 
-      state = AuthUserSuccessState(authUser);
+      final townships = await database.userTownshipDao.getAllUserTownships();
+      state =
+          AuthUserSuccessState(User(name: authUser.name, townships: townships));
     } on DioException catch (dioError) {
       final errorMessage = dioError.response?.data['data']['message'] ??
           'Error occurred while logging in';
@@ -48,45 +56,39 @@ class AuthProvider extends Notifier<AuthUserState> {
   }
 
   void logout() async {
-    state = AuthLoginForm();
+    state = AuthMeLoadingState();
     await Cache.deleteAll();
+    final database = await localDatabase.database;
+    await database.resetDatabase();
+    await localDatabase.closeDatabase();
+    state = AuthLoginForm();
   }
 
   void getMe() async {
     try {
       state = AuthMeLoadingState();
-      // Check network connectivity
-      // bool online = await ConnectionChecker.isConnected();
-      // if (online == false) {
       final storedToken = await Cache.getToken();
       if (storedToken == null) {
         state = AuthMeFailedState();
         return;
       }
       final name = await Cache.getUserName();
-      final township = await Cache.getUserTownship();
+      final database = await localDatabase.database;
+
+      List<UserTownshipEntity> townships =
+          await database.userTownshipDao.getAllUserTownships();
+
       if (name == null) {
         state = AuthMeFailedState();
       }
       state = AuthUserSuccessState(
-          AuthUser(name: name as String, township: township ?? ''));
+          User(name: name as String, townships: townships));
       return;
-      // }
-      // AuthService authService = AuthService(_dio);
-      // final response = await authService.me();
-
-      // final authUser = AuthUser(
-      //   name: response.data.name,
-      //   id: response.data.id,
-      //   code: response.data.code,
-      //   township: response.data.township,
-      // );
-      // state = AuthUserSuccessState(authUser);
     } catch (error) {
       state = AuthMeFailedState();
     }
   }
 }
 
-final authProvider =
-    NotifierProvider<AuthProvider, AuthUserState>(() => AuthProvider());
+final authProvider = StateNotifierProvider<AuthProvider, AuthUserState>((ref) =>
+    AuthProvider(ref.read(localDatabaseProvider), ref.read(dioProvider)));

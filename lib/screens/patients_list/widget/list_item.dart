@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 class CustomItem extends StatelessWidget {
   final int id;
   final String name;
-  final String unionTempCode;
+  final String code;
   const CustomItem(
       {Key? key,
       required this.id,
       required this.name,
-      required this.unionTempCode})
+      required this.code})
       : super(key: key);
 
   @override
@@ -24,7 +24,7 @@ class CustomItem extends StatelessWidget {
           elevation: 2,
           child: ListTile(
             trailing: const Icon(Icons.arrow_forward),
-            title: CustomLabelWidget(text: '$name ($unionTempCode)'),
+            title: CustomLabelWidget(text: '$name ($code)'),
           )),
     );
   }
