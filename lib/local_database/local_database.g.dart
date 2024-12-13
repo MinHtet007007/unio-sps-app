@@ -657,7 +657,7 @@ class _$PatientPackageDao extends PatientPackageDao {
   Future<List<PatientPackageEntity>> getPatientPackagesByPatientId(
       int patientId) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM patient_packages WHERE patientId = ?1',
+        'SELECT * FROM patient_packages WHERE localPatientId = ?1',
         mapper: (Map<String, Object?> row) => PatientPackageEntity(
             id: row['id'] as int?,
             remoteId: row['remoteId'] as int?,

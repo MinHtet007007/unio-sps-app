@@ -19,8 +19,8 @@ class CustomSubmitButton extends StatelessWidget {
             foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
             backgroundColor: WidgetStateProperty.all<Color>(Colors.red),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+                RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
                     side: BorderSide(color: Colors.red)))),
         onPressed: onSubmit,
         child: CustomLabelWidget(

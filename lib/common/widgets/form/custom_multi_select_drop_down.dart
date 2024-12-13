@@ -31,7 +31,9 @@ class _CustomMultiSelectDropdownState extends State<CustomMultiSelectDropdown> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _showMultiSelectDialog(context),
+      onTap: () {
+        _showMultiSelectDialog(context);
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

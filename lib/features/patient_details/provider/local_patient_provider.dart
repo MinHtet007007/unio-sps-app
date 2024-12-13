@@ -2,6 +2,7 @@ import 'package:sps/common/provider/local_database/local_database_provider.dart'
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
 
 class LocalPatientProvider extends StateNotifier<LocalPatientState> {
@@ -17,11 +18,15 @@ class LocalPatientProvider extends StateNotifier<LocalPatientState> {
 
       final patientDao = database.patientDao;
       final supportMonthDao = database.supportMonthDao;
+      final patientPackageDao = database.patientPackageDao;
       final PatientEntity? patient = await patientDao.findLocalPatientById(id);
       final List<SupportMonthEntity> supportMonths =
           await supportMonthDao.getSupportMonthsByLocalPatientId(id);
+      final List<PatientPackageEntity> patientPackages =
+          await patientPackageDao.getPatientPackagesByPatientId(id);
       if (patient != null) {
-        state = LocalPatientSuccessState(patient, supportMonths);
+        state =
+            LocalPatientSuccessState(patient, supportMonths, patientPackages);
         return;
       }
       state = LocalPatientFailedState('Patient Not Found');
