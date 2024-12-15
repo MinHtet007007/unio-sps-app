@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/common/widgets/sync_button.dart';
+import 'package:sps/features/local_patients_sync/provider/local_patients_sync_provider.dart';
 import 'package:sps/features/patient_home_sync/provider/home_sync_provider.dart';
 import 'package:sps/features/patient_home_sync/provider/home_sync_state.dart';
+import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -25,8 +27,9 @@ class _HomeState extends ConsumerState<Home> {
   void _fetchRemotePatients() async {
     await Future.delayed(Duration.zero);
 
-    final homeSyncNotifier = ref.read(homePatientSyncProvider.notifier);
-    await homeSyncNotifier.insertRemotePatients();
+    // final homeSyncNotifier = ref.read(homePatientSyncProvider.notifier);
+    // await homeSyncNotifier.insertRemotePatients();
+    ref.read(localPatientsSyncProvider.notifier).syncLocalPatients();
   }
 
   @override

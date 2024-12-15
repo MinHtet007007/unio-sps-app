@@ -1,8 +1,13 @@
 import 'package:floor/floor.dart';
 import 'package:sps/local_database/tables/local_database_tables.dart';
 import 'package:sps/models/support_package.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'receive_package_entity.g.dart';
+
 
 @Entity(tableName: LocalDataBase.patient_support_package_table)
+@JsonSerializable()
 class ReceivePackageEntity {
   @PrimaryKey(autoGenerate: true)
   final int? id;
@@ -40,4 +45,9 @@ class ReceivePackageEntity {
       reimbursementMonthYear: remoteReceivePackage.reimbursementMonthYear,
     );
   }
+
+    factory ReceivePackageEntity.fromJson(Map<String, dynamic> json) =>
+      _$ReceivePackageEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ReceivePackageEntityToJson(this);
 }

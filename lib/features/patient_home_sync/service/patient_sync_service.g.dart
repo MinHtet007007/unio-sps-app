@@ -13,7 +13,7 @@ class _PatientSyncService implements PatientSyncService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://mdrspsfy25-api.unionais.org/api/v1/';
+    baseUrl ??= 'https://205e-103-231-95-45.ngrok-free.app/api/v1/';
   }
 
   final Dio _dio;
@@ -34,7 +34,7 @@ class _PatientSyncService implements PatientSyncService {
     )
             .compose(
               _dio.options,
-              'app/patients/sync-all',
+              'app/patients',
               queryParameters: queryParameters,
               data: _data,
             )

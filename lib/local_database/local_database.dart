@@ -1,4 +1,3 @@
-// required package imports
 import 'dart:async';
 import 'package:sps/local_database/dao/patient_dao.dart';
 import 'package:sps/local_database/dao/patient_package_dao.dart';
@@ -29,7 +28,7 @@ abstract class AppDatabase extends FloorDatabase {
   ReceivePackageDao get receivePackageDao;
   PatientPackageDao get patientPackageDao;
   UserTownshipDao get userTownshipDao;
-  
+
   @transaction
   Future<void> resetDatabase() async {
     patientDao.deleteAll();

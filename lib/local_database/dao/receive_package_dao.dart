@@ -10,16 +10,16 @@ abstract class ReceivePackageDao {
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertReceivePackage(ReceivePackageEntity receivePackage);
 
-  @Query('DELETE FROM ${LocalDataBase.patient_support_package_table} WHERE id = :id')
+  @Query(
+      'DELETE FROM ${LocalDataBase.patient_support_package_table} WHERE id = :id')
   Future<void> deleteReceivePackage(int id);
 
   @Query(
-      'SELECT * FROM ${LocalDataBase.patient_support_package_table} WHERE patientSupportMonthId = :supportMonthId')
+      'SELECT * FROM ${LocalDataBase.patient_support_package_table} WHERE localPatientSupportMonthId = :supportMonthId')
   Future<List<ReceivePackageEntity>> getReceivePackagesBySupportMonth(
       int supportMonthId);
 
-
-        /// Insert multiple support months
+  /// Insert multiple support months
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMany(List<ReceivePackageEntity> receivePackages);
 

@@ -27,7 +27,7 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
         for (var patient in response.data) {
           await database.syncPatient(patient);
         }
-        await Cache.saveLastSyncedTime();
+        // await Cache.saveLastSyncedTime();
         state = HomePatientsSyncSuccessState();
         return;
       } else {

@@ -260,6 +260,54 @@ class _$PatientDao extends PatientDao {
   }
 
   @override
+  Future<List<PatientEntity>> findUnsyncedPatients() async {
+    return _queryAdapter.queryList('SELECT * FROM patients WHERE isSynced = 0',
+        mapper: (Map<String, Object?> row) => PatientEntity(
+            id: row['id'] as int?,
+            year: row['year'] as String,
+            remoteId: row['remoteId'] as int?,
+            spsStartDate: row['spsStartDate'] as String?,
+            townshipId: row['townshipId'] as int,
+            rrCode: row['rrCode'] as String?,
+            drtbCode: row['drtbCode'] as String,
+            spCode: row['spCode'] as String,
+            uniqueId: row['uniqueId'] as String?,
+            name: row['name'] as String,
+            age: row['age'] as int,
+            sex: row['sex'] as String,
+            diedBeforeTreatmentEnrollment:
+                row['diedBeforeTreatmentEnrollment'] as String?,
+            treatmentStartDate: row['treatmentStartDate'] as String?,
+            treatmentRegimen: row['treatmentRegimen'] as String,
+            treatmentRegimenOther: row['treatmentRegimenOther'] as String?,
+            patientAddress: row['patientAddress'] as String,
+            patientPhoneNo: row['patientPhoneNo'] as String,
+            contactInfo: row['contactInfo'] as String,
+            contactPhoneNo: row['contactPhoneNo'] as String,
+            primaryLanguage: row['primaryLanguage'] as String,
+            secondaryLanguage: row['secondaryLanguage'] as String?,
+            height: row['height'] as int,
+            weight: row['weight'] as int,
+            bmi: row['bmi'] as int,
+            toStatus: row['toStatus'] as String?,
+            toYear: row['toYear'] as int?,
+            toDate: row['toDate'] as String?,
+            toRrCode: row['toRrCode'] as String?,
+            toDrtbCode: row['toDrtbCode'] as String?,
+            toUniqueId: row['toUniqueId'] as String?,
+            toTownshipId: row['toTownshipId'] as int?,
+            outcome: row['outcome'] as String?,
+            remark: row['remark'] as String?,
+            treatmentFinished: row['treatmentFinished'] as String?,
+            treatmentFinishedDate: row['treatmentFinishedDate'] as String?,
+            outcomeDate: row['outcomeDate'] as String?,
+            isReported: row['isReported'] as String?,
+            reportPeriod: row['reportPeriod'] as String?,
+            currentTownshipId: row['currentTownshipId'] as int,
+            isSynced: (row['isSynced'] as int) != 0));
+  }
+
+  @override
   Future<PatientEntity?> findLocalPatientById(int id) async {
     return _queryAdapter.query('SELECT * FROM patients WHERE id = ?1',
         mapper: (Map<String, Object?> row) => PatientEntity(
@@ -588,7 +636,7 @@ class _$ReceivePackageDao extends ReceivePackageDao {
   Future<List<ReceivePackageEntity>> getReceivePackagesBySupportMonth(
       int supportMonthId) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM patient_support_packages WHERE patientSupportMonthId = ?1',
+        'SELECT * FROM patient_support_packages WHERE localPatientSupportMonthId = ?1',
         mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int?, localPatientPackageId: row['localPatientPackageId'] as int?, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
         arguments: [supportMonthId]);
   }
