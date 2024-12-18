@@ -12,7 +12,7 @@ class PatientPackageEntity {
   final String packageName;
   final int eligibleAmount;
   final int? updatedEligibleAmount;
-  final int remainingAmount;
+  int remainingAmount;
 
   PatientPackageEntity({
     this.id,

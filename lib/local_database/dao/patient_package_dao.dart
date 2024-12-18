@@ -22,4 +22,10 @@ abstract class PatientPackageDao {
     /// Insert multiple support months
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMany(List<PatientPackageEntity> patientPackages);
+
+  
+   /// Subtract a specific amount from the `remainingAmount` field of a patient package by ID
+  @Query(
+      'UPDATE ${LocalDataBase.patient_package_table} SET remainingAmount = remainingAmount - :amount WHERE id = :id')
+  Future<void> subtractFromRemainingAmount(int id, int amount);
 }
