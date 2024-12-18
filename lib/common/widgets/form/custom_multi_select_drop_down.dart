@@ -1,81 +1,96 @@
 import 'package:flutter/material.dart';
 
-class CustomMultiSelectDropdown extends StatefulWidget {
-  final List<String> options;
-  final List<String> selectedOptions;
-  final String title;
-  final Function(List<String>) onSelectionChanged;
-
-  const CustomMultiSelectDropdown({
+class CustomMultiSelectDropdown extends FormField<List<String>> {
+  CustomMultiSelectDropdown({
     Key? key,
-    required this.options,
-    required this.selectedOptions,
-    required this.title,
-    required this.onSelectionChanged,
-  }) : super(key: key);
+    required List<String> options,
+    required List<String> selectedOptions,
+    required String title,
+    required Function(List<String>) onSelectionChanged,
+    String? Function(List<String>? value)? validator,
+  }) : super(
+          key: key,
+          initialValue: selectedOptions,
+          validator: validator,
+          builder: (FormFieldState<List<String>> state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _showMultiSelectDialog(
+                      state.context,
+                      options,
+                      state.value ?? [],
+                      title,
+                      (selectedOptions) {
+                        state.didChange(selectedOptions);
+                        onSelectionChanged(selectedOptions);
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: state.hasError ? Colors.red : Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            state.value == null || state.value!.isEmpty
+                                ? "Select $title"
+                                : state.value!.join(", "),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
+                  ),
+                ),
+                if (state.hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      state.errorText ?? '',
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        );
 
-  @override
-  _CustomMultiSelectDropdownState createState() =>
-      _CustomMultiSelectDropdownState();
-}
-
-class _CustomMultiSelectDropdownState extends State<CustomMultiSelectDropdown> {
-  List<String> _selectedOptions = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedOptions = List.from(widget.selectedOptions);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _showMultiSelectDialog(context);
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                _selectedOptions.isEmpty
-                    ? "Select ${widget.title}"
-                    : _selectedOptions.join(", "),
-                style: TextStyle(fontSize: 16, color: Colors.black),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const Icon(Icons.arrow_drop_down),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showMultiSelectDialog(BuildContext context) async {
+  static void _showMultiSelectDialog(
+    BuildContext context,
+    List<String> options,
+    List<String> selectedOptions,
+    String title,
+    Function(List<String>) onSelectionChanged,
+  ) async {
     final List<String>? results = await showDialog(
       context: context,
       builder: (context) {
         return MultiSelectDialog(
-          options: widget.options,
-          selectedOptions: _selectedOptions,
-          title: widget.title,
+          options: options,
+          selectedOptions: selectedOptions,
+          title: title,
         );
       },
     );
 
     if (results != null) {
-      setState(() {
-        _selectedOptions = results;
-      });
-      widget.onSelectionChanged(_selectedOptions);
+      onSelectionChanged(results);
     }
   }
 }

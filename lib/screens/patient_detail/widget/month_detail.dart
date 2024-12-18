@@ -26,7 +26,7 @@ class MonthDetail extends StatelessWidget {
           side: BorderSide(color: Colors.transparent),
         ),
         title: Text(
-          '${supportMonth.month}',
+          'Month ${supportMonth.month}',
         ),
         children: [
           Padding(
