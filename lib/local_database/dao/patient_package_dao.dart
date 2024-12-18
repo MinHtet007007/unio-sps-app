@@ -27,4 +27,9 @@ abstract class PatientPackageDao {
       'WHERE localPatientId IN (:patientIds)')
   Future<void> deleteByPatientIds(List<int> patientIds);
 
+  
+   /// Subtract a specific amount from the `remainingAmount` field of a patient package by ID
+  @Query(
+      'UPDATE ${LocalDataBase.patient_package_table} SET remainingAmount = remainingAmount - :amount WHERE id = :id')
+  Future<void> subtractFromRemainingAmount(int id, int amount);
 }

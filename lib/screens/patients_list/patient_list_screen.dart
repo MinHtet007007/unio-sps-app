@@ -54,6 +54,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
                 },
                 child: CustomLabelWidget(
                   text: 'New Patient',
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
                 ))
           ],
         ),
