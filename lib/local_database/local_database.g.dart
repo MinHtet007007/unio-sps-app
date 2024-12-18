@@ -104,7 +104,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT NOT NULL, `uniqueId` TEXT, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT, `uniqueId` TEXT, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER NOT NULL, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` INTEGER, `remark` TEXT, `isSynced` INTEGER NOT NULL)');
         await database.execute(
@@ -222,7 +222,7 @@ class _$PatientDao extends PatientDao {
             townshipId: row['townshipId'] as int,
             rrCode: row['rrCode'] as String?,
             drtbCode: row['drtbCode'] as String,
-            spCode: row['spCode'] as String,
+            spCode: row['spCode'] as String?,
             uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
             age: row['age'] as int,
@@ -260,6 +260,12 @@ class _$PatientDao extends PatientDao {
   }
 
   @override
+  Future<List<int>> getRemoteIds() async {
+    return _queryAdapter.queryList('SELECT remoteId FROM patients',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
+  }
+
+  @override
   Future<List<PatientEntity>> findUnsyncedPatients() async {
     return _queryAdapter.queryList('SELECT * FROM patients WHERE isSynced = 0',
         mapper: (Map<String, Object?> row) => PatientEntity(
@@ -270,7 +276,7 @@ class _$PatientDao extends PatientDao {
             townshipId: row['townshipId'] as int,
             rrCode: row['rrCode'] as String?,
             drtbCode: row['drtbCode'] as String,
-            spCode: row['spCode'] as String,
+            spCode: row['spCode'] as String?,
             uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
             age: row['age'] as int,
@@ -318,7 +324,7 @@ class _$PatientDao extends PatientDao {
             townshipId: row['townshipId'] as int,
             rrCode: row['rrCode'] as String?,
             drtbCode: row['drtbCode'] as String,
-            spCode: row['spCode'] as String,
+            spCode: row['spCode'] as String?,
             uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
             age: row['age'] as int,
@@ -359,6 +365,19 @@ class _$PatientDao extends PatientDao {
   @override
   Future<void> deleteAll() async {
     await _queryAdapter.queryNoReturn('DELETE FROM patients');
+  }
+
+  @override
+  Future<void> deletePatientsByIds(List<int> patientIds) async {
+    const offset = 1;
+    final _sqliteVariablesForPatientIds =
+        Iterable<String>.generate(patientIds.length, (i) => '?${i + offset}')
+            .join(',');
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patients WHERE id IN (' +
+            _sqliteVariablesForPatientIds +
+            ')',
+        arguments: [...patientIds]);
   }
 
   @override
@@ -490,6 +509,15 @@ class _$SupportMonthDao extends SupportMonthDao {
   }
 
   @override
+  Future<List<SupportMonthEntity>> getUnSyncedSupportMonthsByLocalPatientId(
+      int localPatientId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_support_months WHERE localPatientId = ?1 AND WHERE isSynced = 0',
+        mapper: (Map<String, Object?> row) => SupportMonthEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, localPatientId: row['localPatientId'] as int, remotePatientId: row['remotePatientId'] as int, patientName: row['patientName'] as String, townshipId: row['townshipId'] as int, date: row['date'] as String, month: row['month'] as int, monthYear: row['monthYear'] as String, height: row['height'] as int, weight: row['weight'] as int, bmi: row['bmi'] as int, planPackages: row['planPackages'] as String, receivePackageStatus: row['receivePackageStatus'] as String, reimbursementStatus: row['reimbursementStatus'] as String, amount: row['amount'] as int?, remark: row['remark'] as String?, isSynced: (row['isSynced'] as int) != 0),
+        arguments: [localPatientId]);
+  }
+
+  @override
   Future<List<SupportMonthEntity>> getSupportMonthsByTownshipId(
       int townshipId) async {
     return _queryAdapter.queryList(
@@ -559,6 +587,19 @@ class _$SupportMonthDao extends SupportMonthDao {
   @override
   Future<void> deleteAll() async {
     await _queryAdapter.queryNoReturn('DELETE FROM patient_support_months');
+  }
+
+  @override
+  Future<void> deleteByPatientIds(List<int> patientIds) async {
+    const offset = 1;
+    final _sqliteVariablesForPatientIds =
+        Iterable<String>.generate(patientIds.length, (i) => '?${i + offset}')
+            .join(',');
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_support_months WHERE localPatientId IN (' +
+            _sqliteVariablesForPatientIds +
+            ')',
+        arguments: [...patientIds]);
   }
 
   @override
@@ -647,6 +688,19 @@ class _$ReceivePackageDao extends ReceivePackageDao {
   }
 
   @override
+  Future<void> deleteByPatientIds(List<int> patientIds) async {
+    const offset = 1;
+    final _sqliteVariablesForPatientIds =
+        Iterable<String>.generate(patientIds.length, (i) => '?${i + offset}')
+            .join(',');
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_support_packages WHERE localPatientSupportMonthId IN (SELECT id FROM patient_support_months WHERE localPatientId IN (' +
+            _sqliteVariablesForPatientIds +
+            '))',
+        arguments: [...patientIds]);
+  }
+
+  @override
   Future<void> insertReceivePackage(ReceivePackageEntity receivePackage) async {
     await _receivePackageEntityInsertionAdapter.insert(
         receivePackage, OnConflictStrategy.replace);
@@ -728,6 +782,19 @@ class _$PatientPackageDao extends PatientPackageDao {
   @override
   Future<void> deleteAll() async {
     await _queryAdapter.queryNoReturn('DELETE FROM patient_packages');
+  }
+
+  @override
+  Future<void> deleteByPatientIds(List<int> patientIds) async {
+    const offset = 1;
+    final _sqliteVariablesForPatientIds =
+        Iterable<String>.generate(patientIds.length, (i) => '?${i + offset}')
+            .join(',');
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_packages WHERE localPatientId IN (' +
+            _sqliteVariablesForPatientIds +
+            ')',
+        arguments: [...patientIds]);
   }
 
   @override

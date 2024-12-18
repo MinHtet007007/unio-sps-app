@@ -42,7 +42,7 @@ class SupportMonthEntity {
       required this.reimbursementStatus,
       this.amount,
       this.remark,
-      required this.isSynced});
+      this.isSynced = false});
 
   factory SupportMonthEntity.mapRemoteSupportMonthToLocalEntity(
       SupportMonth remoteSupportMonth, int localPatientId) {

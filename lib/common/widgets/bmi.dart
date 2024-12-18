@@ -3,19 +3,20 @@ import 'package:flutter/material.dart';
 class BMI extends StatefulWidget {
   final TextEditingController heightController;
   final TextEditingController weightController;
+  final double? bmi;
+  final void Function(double) onBMIChange;
 
-  BMI({
-    required this.heightController,
-    required this.weightController,
-  });
+  BMI(
+      {required this.heightController,
+      required this.weightController,
+      required this.bmi,
+      required this.onBMIChange});
 
   @override
   _BMIState createState() => _BMIState();
 }
 
 class _BMIState extends State<BMI> {
-  double? bmi;
-
   void _calculateBMI() {
     final heightText = widget.heightController.text;
     final weightText = widget.weightController.text;
@@ -25,14 +26,13 @@ class _BMIState extends State<BMI> {
       final weight = double.tryParse(weightText) ?? 0;
 
       if (height > 0 && weight > 0) {
-        setState(() {
-          bmi = weight / ((height / 100) * (height / 100));
-        });
+        final bmi = weight / (height * height);
+        widget.onBMIChange(bmi);
       }
     }
   }
 
-   @override
+  @override
   void initState() {
     super.initState();
     widget.heightController.addListener(_calculateBMI);
@@ -51,9 +51,9 @@ class _BMIState extends State<BMI> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (bmi != null)
+        if (widget.bmi != null)
           Text(
-            'Your BMI: ${bmi!.toStringAsFixed(2)}',
+            'Your BMI: ${widget.bmi!.toStringAsFixed(2)}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
       ],

@@ -22,4 +22,9 @@ abstract class PatientPackageDao {
     /// Insert multiple support months
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMany(List<PatientPackageEntity> patientPackages);
+
+  @Query('DELETE FROM ${LocalDataBase.patient_package_table} '
+      'WHERE localPatientId IN (:patientIds)')
+  Future<void> deleteByPatientIds(List<int> patientIds);
+
 }

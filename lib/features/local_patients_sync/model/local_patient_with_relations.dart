@@ -14,7 +14,7 @@ class LocalPatientWithRelations {
   final int townshipId;
   final String? rrCode;
   final String drtbCode;
-  final String spCode;
+  final String? spCode;
   final String? uniqueId;
   final String name;
   final int age;
@@ -100,7 +100,37 @@ class LocalPatientWithRelations {
   factory LocalPatientWithRelations.fromJson(Map<String, dynamic> json) =>
       _$LocalPatientWithRelationsFromJson(json);
 
-  Map<String, dynamic> toJson() => _$LocalPatientWithRelationsToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'remote_id': remoteId,
+        'year': year,
+        'SPS_start_date': spsStartDate,
+        'township_id': townshipId,
+        'RR_code': rrCode,
+        'DRTB_code': drtbCode,
+        'SP_code': spCode,
+        'name': name,
+        'age': age,
+        'sex': sex,
+        'died_before_treatment_enrollment': diedBeforeTreatmentEnrollment,
+        'treatment_start_date': treatmentStartDate,
+        'treatment_regimen': treatmentRegimen,
+        'treatment_regimen_other': treatmentRegimenOther,
+        'patient_address': patientAddress,
+        'patient_phone_no': patientPhoneNo,
+        'contact_info': contactInfo,
+        'contact_phone_no': contactPhoneNo,
+        'primary_language': primaryLanguage,
+        'secondary_language': secondaryLanguage,
+        'height': height,
+        'weight': weight,
+        'BMI': bmi,
+        'remark': remark,
+        'current_township_id': currentTownshipId,
+        'patient_packages':
+            patientPackages.map((package) => package.toJson()).toList(),
+        'support_months': supportMonths.map((month) => month.toJson()).toList(),
+      };
 }
 
 LocalPatientWithRelations createLocalPatientWithRelations(

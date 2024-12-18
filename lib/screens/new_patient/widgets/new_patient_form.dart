@@ -13,7 +13,7 @@ import 'package:sps/local_database/entity/patient_entity.dart';
 
 class NewPatientForm extends StatefulWidget {
   final PatientEntity? data;
-  Future<void> Function (Map<String, dynamic> formData) onSubmit;
+  Future<void> Function(Map<String, dynamic> formData) onSubmit;
 
   List<DropdownMenuItem<String>> townshipOptions;
 
@@ -32,6 +32,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
   String? selectedTownship;
   String? selectedDiedBeforeTreatmentEnrollment;
   String? selectedTreatmentRegimen;
+   double? bmi;
 
   // Controllers
   final Map<String, TextEditingController> controllers = {
@@ -50,7 +51,6 @@ class _NewPatientFormState extends State<NewPatientForm> {
     'secondaryLanguage': TextEditingController(),
     'height': TextEditingController(),
     'weight': TextEditingController(),
-    'bmi': TextEditingController(),
   };
 
   final GlobalKey<FormState> _formKey = GlobalKey();
@@ -110,6 +110,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
         'townshipId': selectedTownship,
         'diedBeforeTreatmentEnrollment': selectedDiedBeforeTreatmentEnrollment,
         'treatmentRegimen': selectedTreatmentRegimen,
+        'bmi': bmi
       };
 
       // Collect the input field values
@@ -376,6 +377,12 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         BMI(
                           heightController: controllers['height']!,
                           weightController: controllers['weight']!,
+                          bmi: bmi,
+                          onBMIChange: (value) => {
+                            setState(() {
+                              bmi = value;
+                            })
+                          },
                         ),
                         const SizedBox(
                           height: 10,

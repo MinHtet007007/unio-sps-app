@@ -1,6 +1,7 @@
-import 'package:sps/local_database/entity/patient_entity.dart';
 
 sealed class LocalPatientsSyncState {}
+
+class LocalPatientsSyncInitialState extends LocalPatientsSyncState {}
 
 class LocalPatientsSyncLoadingState extends LocalPatientsSyncState {}
 

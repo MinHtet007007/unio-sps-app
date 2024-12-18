@@ -12,7 +12,7 @@ class PatientEntity {
   final int townshipId;
   final String? rrCode;
   final String drtbCode;
-  final String spCode;
+  final String? spCode;
   final String? uniqueId;
   final String name;
   final int age;
@@ -55,7 +55,7 @@ class PatientEntity {
       required this.townshipId,
       this.rrCode,
       required this.drtbCode,
-      required this.spCode,
+      this.spCode,
       this.uniqueId,
       required this.name,
       required this.age,

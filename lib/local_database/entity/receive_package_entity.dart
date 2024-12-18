@@ -5,21 +5,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'receive_package_entity.g.dart';
 
-
 @Entity(tableName: LocalDataBase.patient_support_package_table)
 @JsonSerializable()
 class ReceivePackageEntity {
   @PrimaryKey(autoGenerate: true)
   final int? id;
   final int? remoteId;
-  final int localPatientSupportMonthId; 
+  final int localPatientSupportMonthId;
   final int? remotePatientPackageId;
   final int? localPatientPackageId;
   final int amount;
-  final String patientPackageName; 
+  final String patientPackageName;
   final int? reimbursementMonth;
-  final String?
-      reimbursementMonthYear; 
+  final String? reimbursementMonthYear;
 
   ReceivePackageEntity({
     this.id,
@@ -46,8 +44,18 @@ class ReceivePackageEntity {
     );
   }
 
-    factory ReceivePackageEntity.fromJson(Map<String, dynamic> json) =>
+  factory ReceivePackageEntity.fromJson(Map<String, dynamic> json) =>
       _$ReceivePackageEntityFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ReceivePackageEntityToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'remote_id': remoteId,
+        'local_patient_support_month_id': localPatientSupportMonthId,
+        'remote_patient_package_id': remotePatientPackageId,
+        'local_patient_package_id': localPatientPackageId,
+        'amount': amount,
+        'patient_package_name': patientPackageName,
+        'reimbursement_month': reimbursementMonth,
+        'reimbursement_month_year': reimbursementMonthYear,
+      };
 }

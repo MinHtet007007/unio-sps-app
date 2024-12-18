@@ -5,7 +5,6 @@ import 'package:json_annotation/json_annotation.dart';
 part 'local_support_month_with_relations.g.dart';
 
 @JsonSerializable()
-
 class LocalSupportMonthWithRelations {
   final int? id;
   final int? remoteId;
@@ -48,10 +47,29 @@ class LocalSupportMonthWithRelations {
       required this.isSynced,
       required this.receivePackages});
 
-      factory LocalSupportMonthWithRelations.fromJson(Map<String, dynamic> json) =>
+  factory LocalSupportMonthWithRelations.fromJson(Map<String, dynamic> json) =>
       _$LocalSupportMonthWithRelationsFromJson(json);
-
-  Map<String, dynamic> toJson() => _$LocalSupportMonthWithRelationsToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'remote_id': remoteId,
+        'local_patient_id': localPatientId,
+        'remote_patient_id': remotePatientId,
+        'patient_name': patientName,
+        'township_id': townshipId,
+        'date': date,
+        'month': month,
+        'month_year': monthYear,
+        'height': height,
+        'weight': weight,
+        'BMI': bmi,
+        'plan_packages': planPackages,
+        'receive_package_status': receivePackageStatus,
+        'reimbursement_status': reimbursementStatus,
+        'amount': amount,
+        'remark': remark,
+        'receive_packages':
+            receivePackages.map((package) => package.toJson()).toList(),
+      };
 }
 
 LocalSupportMonthWithRelations createLocalSupportMonthWithRelations(

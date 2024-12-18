@@ -16,7 +16,7 @@ LocalPatientWithRelations _$LocalPatientWithRelationsFromJson(
       townshipId: (json['townshipId'] as num).toInt(),
       rrCode: json['rrCode'] as String?,
       drtbCode: json['drtbCode'] as String,
-      spCode: json['spCode'] as String,
+      spCode: json['spCode'] as String?,
       uniqueId: json['uniqueId'] as String?,
       name: json['name'] as String,
       age: (json['age'] as num).toInt(),

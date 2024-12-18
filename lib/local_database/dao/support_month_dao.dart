@@ -12,6 +12,11 @@ abstract class SupportMonthDao {
   @Query('SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE localPatientId = :localPatientId')
   Future<List<SupportMonthEntity>> getSupportMonthsByLocalPatientId(int localPatientId);
 
+    @Query(
+      'SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE localPatientId = :localPatientId AND WHERE isSynced = 0')
+  Future<List<SupportMonthEntity>> getUnSyncedSupportMonthsByLocalPatientId(
+      int localPatientId);
+
   /// Retrieve support months by township ID
   @Query('SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE townshipId = :townshipId')
   Future<List<SupportMonthEntity>> getSupportMonthsByTownshipId(int townshipId);
@@ -43,4 +48,9 @@ abstract class SupportMonthDao {
 
   @Query('DELETE FROM ${LocalDataBase.patient_support_month_table}')
   Future<void> deleteAll();
+
+  @Query('DELETE FROM ${LocalDataBase.patient_support_month_table} '
+      'WHERE localPatientId IN (:patientIds)')
+  Future<void> deleteByPatientIds(List<int> patientIds);
+
 }

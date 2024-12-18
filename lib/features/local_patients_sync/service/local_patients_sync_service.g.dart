@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'patient_sync_service.dart';
+part of 'local_patients_sync_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,8 +8,8 @@ part of 'patient_sync_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
-class _PatientSyncService implements PatientSyncService {
-  _PatientSyncService(
+class _LocalPatientsSyncService implements LocalPatientsSyncService {
+  _LocalPatientsSyncService(
     this._dio, {
     this.baseUrl,
   }) {
@@ -21,27 +21,37 @@ class _PatientSyncService implements PatientSyncService {
   String? baseUrl;
 
   @override
-  Future<RemotePatientResponse> fetchRemotePatients({
-    String? alreadySyncedIds,
-    DateTime? last_sync_date,
+  Future<RemotePatientResponse> uploadPatientsWithSignatures({
+    required String patients,
+    List<File>? signatures,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'already_synced_ids': alreadySyncedIds,
-      r'last_sync_date': last_sync_date?.toIso8601String(),
-    };
+    final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = FormData();
+    _data.fields.add(MapEntry(
+      'patients',
+      patients,
+    ));
+    if (signatures != null) {
+      _data.files.addAll(signatures.map((i) => MapEntry(
+          'signatures',
+          MultipartFile.fromFileSync(
+            i.path,
+            filename: i.path.split(Platform.pathSeparator).last,
+          ))));
+    }
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<RemotePatientResponse>(Options(
-      method: 'GET',
+      method: 'POST',
       headers: _headers,
       extra: _extra,
+      contentType: 'multipart/form-data',
     )
             .compose(
               _dio.options,
-              'app/patients',
+              'app/patients/sync',
               queryParameters: queryParameters,
               data: _data,
             )
