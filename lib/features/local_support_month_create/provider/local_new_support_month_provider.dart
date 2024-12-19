@@ -25,8 +25,13 @@ class LocalNewSupportMonthProvider
       final supportMonthDao = database.supportMonthDao;
       final supportMonthId = await supportMonthDao.insertSupportMonth(formData);
 
+      // update patient isSynced status
+      final patientDao = database.patientDao;
+      await patientDao.updatePatientSyncedStatus(
+          formData.localPatientId, false);
+
       if (supportMonthId > 0) {
-        // Insert the related Patient Support Packages
+        // Insert the related Patient received Packages
         final receivePackageDao = database.receivePackageDao;
         final patientPackageDap = database.patientPackageDao;
         for (var package in receivedPackages) {
@@ -36,10 +41,9 @@ class LocalNewSupportMonthProvider
               patientPackageName: package.patientPackageName,
               reimbursementMonth: package.reimbursementMonth,
               reimbursementMonthYear: package.reimbursementMonthYear));
-                await patientPackageDap.subtractFromRemainingAmount(package.localPatientPackageId!, package.amount);
+          await patientPackageDap.subtractFromRemainingAmount(
+              package.localPatientPackageId!, package.amount);
         }
-
-      
 
         state = LocalNewSupportMonthSuccessState();
         return;

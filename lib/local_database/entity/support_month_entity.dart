@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:floor/floor.dart';
 import 'package:sps/local_database/tables/local_database_tables.dart';
 import 'package:sps/models/support_month.dart';
@@ -8,7 +10,7 @@ class SupportMonthEntity {
   final int? id;
   final int? remoteId;
   final int localPatientId;
-  final int remotePatientId;
+  final int? remotePatientId;
   final String patientName;
   final int townshipId;
   final String date;
@@ -22,6 +24,7 @@ class SupportMonthEntity {
   final String reimbursementStatus;
   final int? amount;
   final String? remark;
+  final Uint8List? supportMonthSignature;
   final bool isSynced;
 
   SupportMonthEntity(
@@ -42,6 +45,7 @@ class SupportMonthEntity {
       required this.reimbursementStatus,
       this.amount,
       this.remark,
+      this.supportMonthSignature,
       required this.isSynced});
 
   factory SupportMonthEntity.mapRemoteSupportMonthToLocalEntity(

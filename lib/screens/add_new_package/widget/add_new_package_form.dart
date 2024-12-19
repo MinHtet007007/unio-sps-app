@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -10,18 +11,23 @@ import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
+import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
+import 'package:sps/screens/add_new_package/widget/reimbursement_table.dart';
 
 class AddNewPackageForm extends StatefulWidget {
   final PatientEntity patientDetails;
   final List<SupportMonthEntity> patientSupportMonths;
   final List<PatientPackageEntity> patientPackages;
+  Future<void> Function(SupportMonthEntity formData,
+      List<ReceivePackageEntity> receivedPackages) onSubmit;
 
-  const AddNewPackageForm({
+  AddNewPackageForm({
     super.key,
     required this.patientDetails,
     required this.patientPackages,
     required this.patientSupportMonths,
+    required this.onSubmit,
   });
 
   @override
@@ -65,7 +71,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
   String? selectedReceivedPackageId;
   int selectedPackageEligibleAmount = 0;
   List<Map<String, dynamic>> selectedSupportReceivedMonthPackages = [];
-  List<String> _selectedOptions = [];
+  List<String> _selectedPlanPackages = [];
   int grandTotal = 0;
   Uint8List? sign;
 
@@ -148,11 +154,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
       selectedReimbursements = [
         ...selectedReimbursements,
         {
-          "reimbursement_month": selectedReimbursementMonth == -1
-              ? "Pre-enroll Month"
-              : "Month-$selectedReimbursementMonth",
+          "reimbursement_month": selectedReimbursementMonth,
           "given_amount": givenAmount,
-          "reimbursement_packages": 'Package $selectedReimbursementPackageId',
+          "reimbursement_packages": packageToUpdate?.packageName,
           "reimbursement_month_year": _reimbursementMonthYearController.text,
           "package_id": selectedReimbursementPackageId, // Example ID
         }
@@ -210,7 +214,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
         ...selectedSupportReceivedMonthPackages,
         {
           "given_amount": givenAmount,
-          "package": 'Package $selectedReceivedPackageId',
+          "package": packageToUpdate?.packageName,
           "package_id": selectedReceivedPackageId, // Example ID
         }
       ];
@@ -232,9 +236,66 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
     tempGivenAmountStorage = 0;
   }
 
-  void onSubmit() async {
+  void onSave() async {
     if (_formKey.currentState!.validate()) {
-      debugPrint("pass form");
+      SupportMonthEntity formData = SupportMonthEntity(
+          localPatientId: widget.patientDetails.id!,
+          remotePatientId: widget.patientDetails.remoteId,
+          patientName: widget.patientDetails.name,
+          townshipId: widget.patientDetails.townshipId,
+          date: _dateController.text,
+          month: int.parse(selectedMonth!),
+          monthYear: _monthYearController.text,
+          height: widget.patientDetails.height,
+          weight: int.parse(_weightController.text),
+          bmi: BMI.toInt(),
+          planPackages: _selectedPlanPackages
+              .map((package) => package.replaceAll(RegExp(r'[^0-9]'), ''))
+              .where((number) => number.isNotEmpty)
+              .join(','),
+          receivePackageStatus: selectedReceivedPackageStatus!,
+          reimbursementStatus: reimbursementStatus!,
+          isSynced: false,
+          remark: _remarkController.text,
+          supportMonthSignature: sign);
+
+      List<ReceivePackageEntity> receivedPackages = [];
+
+      // Conditionally add data to receivedPackages
+      if (selectedReceivedPackageStatus == "yes") {
+        receivedPackages = [
+          // Add support received month packages
+          ...selectedSupportReceivedMonthPackages.map((d) =>
+              ReceivePackageEntity(
+                  localPatientPackageId: int.parse(d["package_id"]),
+                  amount: d["given_amount"],
+                  localPatientSupportMonthId: null,
+                  patientPackageName: d["package"],
+                  reimbursementMonth: null,
+                  reimbursementMonthYear: null)),
+          // Add reimbursements
+          ...selectedReimbursements.map((d) => ReceivePackageEntity(
+              localPatientPackageId: int.parse(d["package_id"]),
+              amount: d["given_amount"],
+              localPatientSupportMonthId: null,
+              patientPackageName: d["reimbursement_packages"],
+              reimbursementMonth: int.parse(d["reimbursement_month"]),
+              reimbursementMonthYear: d["reimbursement_month_year"])),
+        ];
+      } else {
+        receivedPackages = [
+          ...selectedReimbursements.map((d) => ReceivePackageEntity(
+              localPatientPackageId: int.parse(d["package_id"]),
+              amount: d["given_amount"],
+              localPatientSupportMonthId: null,
+              patientPackageName: d["reimbursement_packages"],
+              reimbursementMonth: int.parse(d["reimbursement_month"]),
+              reimbursementMonthYear: d["reimbursement_month_year"])),
+        ];
+      }
+      widget.onSubmit(formData, receivedPackages);
+      // debugPrint(receivedPackages.toString());
+      // debugPrint("pass form");
     }
   }
 
@@ -283,8 +344,20 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
       child: Column(
         children: [
           // TextButton(
-          //     onPressed: () =>
-          //         debugPrint(_reimbursementWeightController.text),
+          //     onPressed: () {
+          //       String result = _selectedPlanPackages
+          //           .map((package) => package.replaceAll(
+          //               RegExp(r'[^0-9]'), '')) // Extract numbers
+          //           .where((number) =>
+          //               number.isNotEmpty) // Filter out empty results
+          //           .join(',');
+          //       debugPrint(_selectedPlanPackages
+          //           .map((package) => package.replaceAll(
+          //               RegExp(r'[^0-9]'), '')) // Extract numbers
+          //           .where((number) =>
+          //               number.isNotEmpty) // Filter out empty results
+          //           .join(','));
+          //     },
           //     child: const Text("Print")),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -530,11 +603,11 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                           options: _editablePatientPackages
                               .map((p) => p.packageName)
                               .toList(),
-                          selectedOptions: _selectedOptions,
+                          selectedOptions: _selectedPlanPackages,
                           title: "Packages",
                           onSelectionChanged: (selectedList) {
                             setState(() {
-                              _selectedOptions = selectedList;
+                              _selectedPlanPackages = selectedList;
                             });
                           },
                           validator: (value) {
@@ -581,7 +654,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                             ),
                           ],
                           selectedData:
-                              "no", // Currently selected value (optional)
+                              reimbursementStatus, // Currently selected value (optional)
                           hintText:
                               "Select...", // Hint text displayed when nothing is selected (optional)
                           onChanged: (value) {
@@ -746,7 +819,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                   ),
                                 ),
                                 CustomDropDown(
-                                  title: "Support Received Month", // Label text
+                                  title: "Month", // Label text
                                   items: supportMonthsOptions.where((month) {
                                     return selectedMonth != null &&
                                         int.parse(month.value!) <
@@ -795,6 +868,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                   date: '2000-01-01',
                                   isMonthYear: true,
                                   maxDate: maxDate,
+                                  isRequired: false,
                                 ),
                               ],
                             ),
@@ -948,141 +1022,154 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                               height: 20,
                             ),
                             if (selectedReimbursements.isNotEmpty)
-                              Table(
-                                border: TableBorder.all(),
-                                children: [
-                                  const TableRow(
+                              // ReimbursementTable(
+                              //     selectedReimbursements:
+                              //         selectedReimbursements,
+                              //     editablePatientPackages:
+                              //         _editablePatientPackages,
+                              //     onDeleteReimbursement:
+                              //         (int index, int reimbursementTotal) {
+                              //       selectedReimbursements.removeAt(index);
+                              //       grandTotal = reimbursementTotal;
+                              //     })
+                            Table(
+                              border: TableBorder.all(),
+                              children: [
+                                const TableRow(
+                                  children: [
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('No'),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Month'),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Packages'),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Given Amount'),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Month Year'),
+                                      ),
+                                    ),
+                                    TableCell(
+                                      verticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text('Delete'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                ...selectedReimbursements
+                                    .asMap()
+                                    .entries
+                                    .map((entry) {
+                                  int index = entry.key;
+                                  var item = entry.value;
+                                  return TableRow(
                                     children: [
                                       TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text('No'),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text('${index + 1}'),
                                         ),
                                       ),
                                       TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text('Month'),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(item[
+                                                      'reimbursement_month'] ==
+                                                  -1
+                                              ? "Pre-enroll Month"
+                                              : "Month-${item['reimbursement_month']}"),
                                         ),
                                       ),
                                       TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text('Packages'),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                              '${item['reimbursement_packages']}'),
                                         ),
                                       ),
                                       TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text('Given Amount'),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child:
+                                              Text('${item['given_amount']}'),
                                         ),
                                       ),
                                       TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text('Month Year'),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                              '${item['reimbursement_month_year']}'),
                                         ),
                                       ),
                                       TableCell(
-                                        verticalAlignment:
-                                            TableCellVerticalAlignment.middle,
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text('Delete'),
-                                        ),
+                                            padding:
+                                                const EdgeInsets.all(8.0),
+                                            child: IconButton(
+                                              icon: const Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  int packageId = int.parse(
+                                                      item['package_id']);
+                                                  int givenAmount =
+                                                      item['given_amount'];
+
+                                                  // Find the package and update remainingAmount
+                                                  final package =
+                                                      _editablePatientPackages
+                                                          .firstWhere(
+                                                    (p) => p.id == packageId,
+                                                  );
+
+                                                  package.remainingAmount +=
+                                                      givenAmount;
+                                                  grandTotal = grandTotal -
+                                                      givenAmount;
+                                                  selectedReimbursements
+                                                      .removeAt(index);
+                                                });
+                                              },
+                                            )),
                                       ),
                                     ],
-                                  ),
-                                  ...selectedReimbursements
-                                      .asMap()
-                                      .entries
-                                      .map((entry) {
-                                    int index = entry.key;
-                                    var item = entry.value;
-                                    return TableRow(
-                                      children: [
-                                        TableCell(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text('${index + 1}'),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                                '${item['reimbursement_month']}'),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                                '${item['reimbursement_packages']}'),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child:
-                                                Text('${item['given_amount']}'),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                                '${item['reimbursement_month_year']}'),
-                                          ),
-                                        ),
-                                        TableCell(
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: IconButton(
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    int packageId = int.parse(
-                                                        item['package_id']);
-                                                    int givenAmount =
-                                                        item['given_amount'];
-
-                                                    // Find the package and update remainingAmount
-                                                    final package =
-                                                        _editablePatientPackages
-                                                            .firstWhere(
-                                                      (p) => p.id == packageId,
-                                                    );
-
-                                                    package.remainingAmount +=
-                                                        givenAmount;
-                                                    grandTotal = grandTotal -
-                                                        givenAmount;
-                                                    selectedReimbursements
-                                                        .removeAt(index);
-                                                  });
-                                                },
-                                              )),
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                ],
-                              ),
+                                  );
+                                }),
+                              ],
+                            ),
                           ],
                         ),
                       ],
@@ -1120,7 +1207,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                           ),
                         ],
                         selectedData:
-                            null, // Currently selected value (optional)
+                            selectedReceivedPackageStatus, // Currently selected value (optional)
                         hintText:
                             "Select...", // Hint text displayed when nothing is selected (optional)
                         onChanged: (value) {
@@ -1522,8 +1609,8 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: onSubmit,
-                          child: Text(
+                          onPressed: onSave,
+                          child: const Text(
                             "Save",
                           )),
                       // CustomSubmitButton(

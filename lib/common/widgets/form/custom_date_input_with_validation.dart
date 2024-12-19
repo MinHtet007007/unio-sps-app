@@ -8,6 +8,7 @@ class CustomDateInputWithValidation extends StatefulWidget {
   final bool isMonthYear;
   final DateTime? maxDate;
   final void Function(DateTime)? onDateChanged;
+  final bool isRequired;
 
   const CustomDateInputWithValidation({
     Key? key,
@@ -15,6 +16,7 @@ class CustomDateInputWithValidation extends StatefulWidget {
     required this.labelText,
     required this.date,
     this.isMonthYear = false,
+    this.isRequired = true,
     this.maxDate,
     this.onDateChanged,
   }) : super(key: key);
@@ -89,7 +91,7 @@ class _CustomDateInputWithValidationState
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
         validator: (val) {
-          if (val!.isEmpty) {
+          if (val!.isEmpty && widget.isRequired) {
             return "${widget.labelText} ရွေးပေးပါ";
           }
           return null;

@@ -7,7 +7,7 @@ class ReceivePackageEntity {
   @PrimaryKey(autoGenerate: true)
   final int? id;
   final int? remoteId;
-  final int localPatientSupportMonthId; 
+  final int? localPatientSupportMonthId; 
   final int? remotePatientPackageId;
   final int? localPatientPackageId;
   final int amount;

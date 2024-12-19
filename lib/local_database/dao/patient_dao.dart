@@ -23,4 +23,8 @@ abstract class PatientDao {
 
   @Query('DELETE FROM ${LocalDataBase.patient_table}')
   Future<void> deleteAll();
+
+  @Query(
+      'UPDATE ${LocalDataBase.patient_table} SET isSynced = :isSynced WHERE id = :id')
+  Future<void> updatePatientSyncedStatus(int id, bool isSynced);
 }
