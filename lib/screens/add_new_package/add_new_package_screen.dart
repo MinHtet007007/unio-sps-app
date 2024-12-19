@@ -5,8 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:sps/common/widgets/loading_widget.dart';
+import 'package:sps/features/local_support_month_create/provider/local_new_support_month_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
+import 'package:sps/local_database/entity/receive_package_entity.dart';
+import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/screens/add_new_package/widget/add_new_package_form.dart';
 
 class AddNewPackageScreen extends ConsumerStatefulWidget {
@@ -24,6 +27,15 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
 
     final patientNotifier = ref.read(localPatientProvider.notifier);
     patientNotifier.fetchPatient(widget.patientId);
+  }
+
+  Future<void> onSubmit(SupportMonthEntity formData,
+      List<ReceivePackageEntity> receivedPackages) async {
+    final localSupportMonthCreateNotifier =
+        ref.read(localNewSupportMonthProvider.notifier);
+    await localSupportMonthCreateNotifier.addSupportMonth(
+        formData, receivedPackages);
+    _fetchPatient();
   }
 
   @override
@@ -82,9 +94,11 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
         return const LoadingWidget();
       case LocalPatientSuccessState():
         return AddNewPackageForm(
-            patientDetails: state.localPatient,
-            patientPackages: state.localPatientPackages,
-            patientSupportMonths: state.localSupportMonths);
+          patientDetails: state.localPatient,
+          patientPackages: state.localPatientPackages,
+          patientSupportMonths: state.localSupportMonths,
+          onSubmit: onSubmit,
+        );
     }
   }
 }
