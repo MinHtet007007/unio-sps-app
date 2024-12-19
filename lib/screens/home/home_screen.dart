@@ -27,9 +27,8 @@ class _HomeState extends ConsumerState<Home> {
   void _fetchRemotePatients() async {
     await Future.delayed(Duration.zero);
 
-    // final homeSyncNotifier = ref.read(homePatientSyncProvider.notifier);
-    // await homeSyncNotifier.insertRemotePatients();
-    ref.read(localPatientsSyncProvider.notifier).syncLocalPatients();
+    final homeSyncNotifier = ref.read(homePatientSyncProvider.notifier);
+    await homeSyncNotifier.insertRemotePatients();
   }
 
   @override
@@ -86,6 +85,7 @@ class _HomeState extends ConsumerState<Home> {
                 child: ListView(
                   children: [
                     SyncButton(
+                        title: "server data ဆွဲမည်",
                         isLoading:
                             homeSyncNotifier is HomePatientsSyncLoadingState,
                         onPressed: _fetchRemotePatients),

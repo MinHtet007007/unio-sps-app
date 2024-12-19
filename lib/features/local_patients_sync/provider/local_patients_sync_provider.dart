@@ -86,8 +86,11 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
       await uploadPatientsWithSignatures(
           jsonString, signatures, syncedPatientIds);
       state = LocalPatientsSyncSuccessState();
+      state = LocalPatientsSyncInitialState();
     } catch (e, stackTrace) {
       state = LocalPatientsSyncFailedState('Cannot sync local patients');
+      state = LocalPatientsSyncInitialState();
+
       print('Error $e');
       print('stackTrace $stackTrace');
     }

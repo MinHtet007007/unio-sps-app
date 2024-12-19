@@ -798,6 +798,16 @@ class _$PatientPackageDao extends PatientPackageDao {
   }
 
   @override
+  Future<void> subtractFromRemainingAmount(
+    int id,
+    int amount,
+  ) async {
+    await _queryAdapter.queryNoReturn(
+        'UPDATE patient_packages SET remainingAmount = remainingAmount - ?2 WHERE id = ?1',
+        arguments: [id, amount]);
+  }
+
+  @override
   Future<void> insertPatientPackage(PatientPackageEntity patientPackage) async {
     await _patientPackageEntityInsertionAdapter.insert(
         patientPackage, OnConflictStrategy.replace);
