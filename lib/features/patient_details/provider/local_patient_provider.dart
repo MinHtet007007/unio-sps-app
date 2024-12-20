@@ -3,6 +3,7 @@ import 'package:sps/features/patient_details/provider/local_patient_state/local_
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
+import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
 
 class LocalPatientProvider extends StateNotifier<LocalPatientState> {
@@ -11,7 +12,7 @@ class LocalPatientProvider extends StateNotifier<LocalPatientState> {
 
   LocalPatientProvider(this.localDatabase) : super(LocalPatientLoadingState());
 
-  void fetchPatient(int id) async {
+  void fetchPatient(int id, {int? supportMonthId}) async {
     try {
       state = LocalPatientLoadingState();
       final database = await localDatabase.database;
@@ -19,14 +20,27 @@ class LocalPatientProvider extends StateNotifier<LocalPatientState> {
       final patientDao = database.patientDao;
       final supportMonthDao = database.supportMonthDao;
       final patientPackageDao = database.patientPackageDao;
+      final receivePackageDao = database.receivePackageDao;
       final PatientEntity? patient = await patientDao.findLocalPatientById(id);
-      final List<SupportMonthEntity> supportMonths =
+      List<SupportMonthEntity> supportMonths =
           await supportMonthDao.getSupportMonthsByLocalPatientId(id);
+
+      SupportMonthEntity? supportMonth;
+      List<ReceivePackageEntity>? receivedPackages;
+
+      if (supportMonthId != null) {
+        // handle supportMonthId logic here if needed
+        supportMonth =
+            await supportMonthDao.getSupportMonthById(supportMonthId);
+        receivedPackages = await receivePackageDao
+            .getReceivePackagesBySupportMonth(supportMonthId);
+      }
+
       final List<PatientPackageEntity> patientPackages =
           await patientPackageDao.getPatientPackagesByPatientId(id);
       if (patient != null) {
-        state =
-            LocalPatientSuccessState(patient, supportMonths, patientPackages);
+        state = LocalPatientSuccessState(patient, supportMonths,
+            patientPackages, supportMonth, receivedPackages);
         return;
       }
       state = LocalPatientFailedState('Patient Not Found');

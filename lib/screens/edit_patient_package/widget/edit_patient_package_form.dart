@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -15,64 +16,68 @@ import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/screens/add_new_package/widget/reimbursement_table.dart';
 import 'package:sps/screens/add_new_package/widget/support_package_table.dart';
 
-class AddNewPackageForm extends StatefulWidget {
+class EditPatientPackageForm extends StatefulWidget {
   final PatientEntity patientDetails;
-  final List<SupportMonthEntity> patientSupportMonths;
+  final SupportMonthEntity existingSupportMonth;
   final List<PatientPackageEntity> patientPackages;
+  List<ReceivePackageEntity> alreadyReceivedPackages;
   Future<void> Function(SupportMonthEntity formData,
       List<ReceivePackageEntity> receivedPackages) onSubmit;
 
-  AddNewPackageForm({
+  EditPatientPackageForm({
     super.key,
     required this.patientDetails,
+    required this.existingSupportMonth,
     required this.patientPackages,
-    required this.patientSupportMonths,
+    required this.alreadyReceivedPackages,
     required this.onSubmit,
   });
 
   @override
-  State<AddNewPackageForm> createState() => _AddNewPackageFormState();
+  State<EditPatientPackageForm> createState() => _EditPatientPackageFormState();
 }
 
-class _AddNewPackageFormState extends State<AddNewPackageForm> {
+class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _monthYearController = TextEditingController();
-  final TextEditingController _reimbursementMonthYearController =
-      TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
+  late final TextEditingController _dateController;
+  late final TextEditingController _monthYearController;
+  late final TextEditingController _remarkController;
+  late final TextEditingController _weightController;
   final TextEditingController _reimbursementWeightController =
       TextEditingController();
-  final TextEditingController _remarkController = TextEditingController();
+  final TextEditingController _reimbursementMonthYearController =
+      TextEditingController();
   final TextEditingController _reimbursementGivenAmountController =
       TextEditingController();
   final TextEditingController _receivedPackageThisMonthGivenAmountController =
       TextEditingController();
+
   SignatureController signatureController = SignatureController(
     penStrokeWidth: 3,
     penColor: Colors.white,
     exportPenColor: Colors.white,
     exportBackgroundColor: Colors.black,
   );
-  DateTime? maxDate;
+
   double BMI = 0.0;
-  double reimbursementBMI = 0.0;
-  List<DropdownMenuItem<String>> supportMonthsOptions = supportMonths;
-  String? reimbursementStatus;
   String? selectedMonth;
+  String? selectedReceivedPackageStatus;
+  List<String> _selectedPlanPackages = [];
+  Uint8List? sign;
+  DateTime? maxDate;
+  List<DropdownMenuItem<String>> supportMonthsOptions = supportMonths;
+  late List<PatientPackageEntity> _editablePatientPackages;
+  String? reimbursementStatus;
+  double reimbursementBMI = 0.0;
   String? selectedReimbursementMonth;
   String? selectedReimbursementPackageId;
   int selectedReimbursementPackageEligibleAmount = 0;
-  int tempGivenAmountStorage = 0;
-  late List<PatientPackageEntity> _editablePatientPackages;
   List<Map<String, dynamic>> selectedReimbursements = [];
-  String? selectedReceivedPackageStatus;
+  List<Map<String, dynamic>> selectedSupportReceivedMonthPackages = [];
+  int grandTotal = 0;
+  int tempGivenAmountStorage = 0;
   String? selectedReceivedPackageId;
   int selectedPackageEligibleAmount = 0;
-  List<Map<String, dynamic>> selectedSupportReceivedMonthPackages = [];
-  List<String> _selectedPlanPackages = [];
-  int grandTotal = 0;
-  Uint8List? sign;
 
   void _calculateBMI({bool isReimbursement = false}) {
     // Extract values once
@@ -106,19 +111,12 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
   }
 
   String calculateBMIInText(double value) {
-    if (value <= 0) {
-      return '';
-    } else if (value > 0 && value <= 18.5) {
-      return '(Underweight)';
-    } else if (value >= 18.5 && value <= 24.5) {
-      return '(Healthy)';
-    } else if (value > 24.5 && value <= 29.5) {
-      return '(Overweight)';
-    } else if (value > 29.5 && value <= 39.5) {
-      return '(Obese)';
-    } else {
-      return '(Extremely Obese)';
-    }
+    if (value <= 0) return '';
+    if (value <= 18.5) return '(Underweight)';
+    if (value <= 24.5) return '(Healthy)';
+    if (value <= 29.5) return '(Overweight)';
+    if (value <= 39.5) return '(Obese)';
+    return '(Extremely Obese)';
   }
 
   void _handleAddReimbursement() {
@@ -237,104 +235,70 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
 
   void onSave() async {
     if (_formKey.currentState!.validate()) {
-      SupportMonthEntity formData = SupportMonthEntity(
-          localPatientId: widget.patientDetails.id!,
-          remotePatientId: widget.patientDetails.remoteId,
-          patientName: widget.patientDetails.name,
-          townshipId: widget.patientDetails.townshipId,
-          date: _dateController.text,
-          month: int.parse(selectedMonth!),
-          monthYear: _monthYearController.text,
-          height: widget.patientDetails.height,
-          weight: int.parse(_weightController.text),
-          bmi: BMI.toInt(),
-          planPackages: _selectedPlanPackages
-              .map((package) => package.replaceAll(RegExp(r'[^0-9]'), ''))
-              .where((number) => number.isNotEmpty)
-              .join(','),
-          receivePackageStatus: selectedReceivedPackageStatus!,
-          reimbursementStatus: reimbursementStatus!,
-          isSynced: false,
-          remark: _remarkController.text,
-          supportMonthSignature: sign);
+      // final updatedFormData = SupportMonthEntity(
+      //   localPatientId: widget.patientDetails.id!,
+      //   remotePatientId: widget.patientDetails.remoteId,
+      //   patientName: widget.patientDetails.name,
+      //   townshipId: widget.patientDetails.townshipId,
+      //   date: _dateController.text,
+      //   month: int.parse(selectedMonth!),
+      //   monthYear: _monthYearController.text,
+      //   height: widget.patientDetails.height,
+      //   weight: int.parse(_weightController.text),
+      //   bmi: BMI.toInt(),
+      //   planPackages: _selectedPlanPackages.join(','),
+      //   receivePackageStatus: selectedReceivedPackageStatus!,
+      //   remark: _remarkController.text,
+      //   supportMonthSignature: sign,
+      //   isSynced: false,
+      // );
 
-      List<ReceivePackageEntity> receivedPackages = [];
-
-      // Conditionally add data to receivedPackages
-      if (selectedReceivedPackageStatus == "yes") {
-        receivedPackages = [
-          // Add support received month packages
-          ...selectedSupportReceivedMonthPackages.map((d) =>
-              ReceivePackageEntity(
-                  localPatientPackageId: int.parse(d["package_id"]),
-                  amount: d["given_amount"],
-                  localPatientSupportMonthId: 0, // TODO
-                  patientPackageName: d["package"],
-                  reimbursementMonth: null,
-                  reimbursementMonthYear: null)),
-          // Add reimbursements
-          ...selectedReimbursements.map((d) => ReceivePackageEntity(
-              localPatientPackageId: int.parse(d["package_id"]),
-              amount: d["given_amount"],
-              localPatientSupportMonthId: 0, // TODO
-              patientPackageName: d["reimbursement_packages"],
-              reimbursementMonth: int.parse(d["reimbursement_month"]),
-              reimbursementMonthYear: d["reimbursement_month_year"])),
-        ];
-      } else {
-        receivedPackages = [
-          ...selectedReimbursements.map((d) => ReceivePackageEntity(
-              localPatientPackageId: int.parse(d["package_id"]),
-              amount: d["given_amount"],
-              localPatientSupportMonthId: 0, // TODO
-              patientPackageName: d["reimbursement_packages"],
-              reimbursementMonth: int.parse(d["reimbursement_month"]),
-              reimbursementMonthYear: d["reimbursement_month_year"])),
-        ];
-      }
-      widget.onSubmit(formData, receivedPackages);
-      // debugPrint(receivedPackages.toString());
-      // debugPrint("pass form");
+      // widget.onSubmit(updatedFormData, []);
     }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _editablePatientPackages = List.from(widget.patientPackages);
+
+    _dateController =
+        TextEditingController(text: widget.existingSupportMonth.date);
+    _monthYearController =
+        TextEditingController(text: widget.existingSupportMonth.monthYear);
+    _remarkController =
+        TextEditingController(text: widget.existingSupportMonth.remark);
+    _weightController = TextEditingController(
+        text: widget.existingSupportMonth.weight.toString());
+
     _weightController.addListener(_calculateBMI);
     _reimbursementWeightController.addListener(() {
       _calculateBMI(isReimbursement: true);
     });
 
-    // Add listener to update the eligible amount
-    _receivedPackageThisMonthGivenAmountController.addListener(() {
-      setState(() {
-        final inputText = _receivedPackageThisMonthGivenAmountController.text;
-        final inputValue = int.tryParse(inputText) ?? 0;
-
-        // Adjust eligible amount dynamically
-        selectedPackageEligibleAmount += (tempGivenAmountStorage - inputValue);
-
-        // Update last input value
-        tempGivenAmountStorage = inputValue;
-      });
-    });
-
-    _reimbursementGivenAmountController.addListener(() {
-      setState(() {
-        final inputText = _reimbursementGivenAmountController.text;
-        final inputValue = int.tryParse(inputText) ?? 0;
-
-        // Adjust eligible amount dynamically
-        selectedReimbursementPackageEligibleAmount +=
-            (tempGivenAmountStorage - inputValue);
-
-        // Update last input value
-        tempGivenAmountStorage = inputValue;
-      });
-    });
+    selectedMonth = widget.existingSupportMonth.month.toString();
+    selectedReceivedPackageStatus =
+        widget.existingSupportMonth.receivePackageStatus.toLowerCase();
+    reimbursementStatus =
+        widget.existingSupportMonth.reimbursementStatus.toLowerCase();
+    _selectedPlanPackages = widget.existingSupportMonth.planPackages
+        .split(',')
+        .map((number) => "Package $number")
+        .toList();
+    BMI = widget.existingSupportMonth.bmi.toDouble();
+    selectedReimbursements =  widget.alreadyReceivedPackages
+        .where((d) => d.reimbursementMonth != null)
+        .map((reimbursementPackage) {
+      return {
+        'reimbursement_month':
+            reimbursementPackage.reimbursementMonth,
+        'given_amount': reimbursementPackage.amount,
+        'reimbursement_packages': reimbursementPackage.patientPackageName,
+        'reimbursement_month_year':
+            reimbursementPackage.reimbursementMonthYear,
+        // 'package_id': reimbursementPackage['patient_package_id'],
+      };
+    }).toList();
   }
 
   @override
@@ -348,14 +312,20 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
               key: _formKey,
               child: Column(
                 children: [
+                      TextButton(
+                      onPressed: () {
+                        debugPrint(widget.alreadyReceivedPackages.toString());
+                      },
+                      child: const Text("Print")),
                   Column(
                     children: [
-                      const Padding(
+                       const Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                        
                             Text(
                               'Support Received Date',
                               style: TextStyle(
@@ -397,17 +367,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                       ),
                       CustomDropDown(
                         title: "Support Received Month", // Label text
-                        items: widget.patientSupportMonths.isNotEmpty
-                            ? supportMonthsOptions.where((el) {
-                                final lastSupportMonth =
-                                    widget.patientSupportMonths.last;
-                                if (el.value == null) {
-                                  return false;
-                                }
-                                return lastSupportMonth.month <
-                                    int.parse(el.value!);
-                              }).toList()
-                            : supportMonthsOptions,
+                        items: supportMonthsOptions,
                         selectedData:
                             selectedMonth, // Currently selected value (optional)
                         hintText:
@@ -1341,7 +1301,6 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                           ),
                         ],
                       ),
-
                       if (sign != null)
                         Column(
                           children: [
