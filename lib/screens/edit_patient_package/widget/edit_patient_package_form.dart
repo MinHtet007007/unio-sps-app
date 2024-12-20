@@ -296,7 +296,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
         'reimbursement_packages': reimbursementPackage.patientPackageName,
         'reimbursement_month_year':
             reimbursementPackage.reimbursementMonthYear,
-        // 'package_id': reimbursementPackage['patient_package_id'],
+        'package_id': widget.patientPackages.firstWhere((d)=>d.packageName == reimbursementPackage.patientPackageName).id,
       };
     }).toList();
   }
