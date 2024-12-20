@@ -16,7 +16,7 @@ abstract class LocalPatientsSyncService {
   Future<RemotePatientResponse> uploadPatientsWithSignatures(
     {
       @Part() required String patients,
-      @Part() List<File>? signatures,
+      @Part(name: "signatures[]") List<MultipartFile>? signatures,
 
     }
   );

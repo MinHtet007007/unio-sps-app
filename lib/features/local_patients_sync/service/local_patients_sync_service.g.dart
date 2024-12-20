@@ -23,7 +23,7 @@ class _LocalPatientsSyncService implements LocalPatientsSyncService {
   @override
   Future<RemotePatientResponse> uploadPatientsWithSignatures({
     required String patients,
-    List<File>? signatures,
+    List<MultipartFile>? signatures,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -35,12 +35,7 @@ class _LocalPatientsSyncService implements LocalPatientsSyncService {
       patients,
     ));
     if (signatures != null) {
-      _data.files.addAll(signatures.map((i) => MapEntry(
-          'signatures',
-          MultipartFile.fromFileSync(
-            i.path,
-            filename: i.path.split(Platform.pathSeparator).last,
-          ))));
+      _data.files.addAll(signatures.map((i) => MapEntry('signatures[]', i)));
     }
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<RemotePatientResponse>(Options(

@@ -9,7 +9,7 @@ class LocalSupportMonthWithRelations {
   final int? id;
   final int? remoteId;
   final int localPatientId;
-  final int remotePatientId;
+  final int? remotePatientId;
   final String patientName;
   final int townshipId;
   final String date;
@@ -23,6 +23,7 @@ class LocalSupportMonthWithRelations {
   final String reimbursementStatus;
   final int? amount;
   final String? remark;
+  final String? signature_key;
   final bool isSynced;
   final List<ReceivePackageEntity> receivePackages;
 
@@ -42,6 +43,7 @@ class LocalSupportMonthWithRelations {
       required this.planPackages,
       required this.receivePackageStatus,
       required this.reimbursementStatus,
+      this.signature_key,
       this.amount,
       this.remark,
       required this.isSynced,
@@ -62,6 +64,7 @@ class LocalSupportMonthWithRelations {
         'height': height,
         'weight': weight,
         'BMI': bmi,
+        'signature_key': signature_key,
         'plan_packages': planPackages,
         'receive_package_status': receivePackageStatus,
         'reimbursement_status': reimbursementStatus,
@@ -74,10 +77,12 @@ class LocalSupportMonthWithRelations {
 
 LocalSupportMonthWithRelations createLocalSupportMonthWithRelations(
   SupportMonthEntity supportMonthEntity,
+  String? signature_key,
   List<ReceivePackageEntity> packages,
 ) {
   return LocalSupportMonthWithRelations(
     id: supportMonthEntity.id,
+    signature_key: signature_key,
     remoteId: supportMonthEntity.remoteId,
     localPatientId: supportMonthEntity.localPatientId,
     remotePatientId: supportMonthEntity.remotePatientId,

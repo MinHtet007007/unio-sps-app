@@ -65,12 +65,16 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(userProvider);
+    final localNewPatientState = ref.watch(localNewPatientProvider);
 
     ref.listen(localNewPatientProvider, (state, _) {
       if (state is LocalNewPatientSuccessState) {
         SnackbarUtils.showSuccessToast(context, 'Patient Create Success');
         context.pop();
         context.pushReplacement(RouteName.patient);
+      }
+      if (state is LocalNewPatientFailedState) {
+        SnackbarUtils.showError(context, 'Patient Cannot be Created');
       }
     });
 
@@ -82,6 +86,7 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
       return NewPatientForm(
         townshipOptions: townshipOptions,
         onSubmit: onSubmit,
+        loading: localNewPatientState is LocalNewPatientLoadingState
       );
     }
     return const ErrorScreen(title: 'Create Patient', message: 'Cannot Create Patient');

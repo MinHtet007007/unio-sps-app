@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/common/provider/dio/dio_provider.dart';
@@ -28,10 +29,11 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
       state = LocalPatientsSyncLoadingState();
       final database = await localDatabase.database;
       List<PatientEntity> patients =
-          await database.patientDao.findAllLocalPatients();
+          await database.patientDao.findUnsyncedPatients();
       List<LocalPatientWithRelations> result = [];
       var patientIndex = 0;
       var supportMonthIndex = 0;
+      List<File> signatures = [];
       List<int> syncedPatientIds = [];
       for (final patient in patients) {
         final List<LocalSupportMonthWithRelations>
@@ -41,25 +43,28 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
         }
 
         final supportMonths = await database.supportMonthDao
-            .getSupportMonthsByLocalPatientId(patient.id as int);
+            .getUnSyncedSupportMonthsByLocalPatientId(patient.id as int);
         for (final supportMonth in supportMonths) {
           if (supportMonth.id == null) {
             throw Error();
           }
+          final monthKey = 'signature_${patientIndex}_$supportMonthIndex';
+
           final receivePackages = await database.receivePackageDao
               .getReceivePackagesBySupportMonth(supportMonth.id as int);
+          final signatureKey =
+              supportMonth.supportMonthSignature != null ? monthKey : null;
+
           final localSupportMonth = createLocalSupportMonthWithRelations(
-              supportMonth, receivePackages);
+              supportMonth, signatureKey, receivePackages);
           localSupportMonthWithRelations.add(localSupportMonth);
 
-          //add signature
-          // if (supportMonth.signature != null) {
-          //   String path = await getFilePath(supportMonth.signature);
-
-          //   formData.files.add(MapEntry(
-          //       'month_0_signature$patientIndex$supportMonthIndex',
-          //       await MultipartFile.fromFile(path)));
-          // }
+          // add signature
+          if (supportMonth.supportMonthSignature != null) {
+            File signatureFile = await getSignatureFile(
+                supportMonth.supportMonthSignature as Uint8List);
+                signatures.add(signatureFile);
+          }
           supportMonthIndex++;
         }
         final patientPackages = await database.patientPackageDao
@@ -73,11 +78,6 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
         // track synced ids to delete after syn
         syncedPatientIds.add(patient.id as int);
       }
-
-      final signature1 =
-          await createDummyFile('signature1.txt', 'Dummy signature content 1');
-
-      final signatures = [signature1];
 
       // Serialize the list to JSON
       final patientsJson = result.map((patient) => patient.toJson()).toList();
@@ -97,8 +97,16 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
   }
 
   Future<void> uploadPatientsWithSignatures(String patientsJson,
-      List<File> signatures, List<int> syncedPatientIds) async {
+      List<File> signatureFiles, List<int> syncedPatientIds) async {
     final patientService = LocalPatientsSyncService(_dio);
+    // Convert files to MultipartFile
+    final List<MultipartFile> signatures =
+        await Future.wait(signatureFiles.map((file) async {
+      return MultipartFile.fromFile(
+        file.path,
+        filename: file.path.split('/').last, // Extract filename
+      );
+    }));
     final response = await patientService.uploadPatientsWithSignatures(
         patients: patientsJson, signatures: signatures);
 

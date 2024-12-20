@@ -13,7 +13,7 @@ abstract class SupportMonthDao {
   Future<List<SupportMonthEntity>> getSupportMonthsByLocalPatientId(int localPatientId);
 
     @Query(
-      'SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE localPatientId = :localPatientId AND WHERE isSynced = 0')
+      'SELECT * FROM ${LocalDataBase.patient_support_month_table} WHERE localPatientId = :localPatientId AND isSynced = 0')
   Future<List<SupportMonthEntity>> getUnSyncedSupportMonthsByLocalPatientId(
       int localPatientId);
 
