@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'support_month_sync_service.dart';
+part of 'local_patients_sync_service.dart';
 
 // **************************************************************************
 // RetrofitGenerator
@@ -8,12 +8,12 @@ part of 'support_month_sync_service.dart';
 
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
-class _SupportMonthSyncService implements SupportMonthSyncService {
-  _SupportMonthSyncService(
+class _LocalPatientsSyncService implements LocalPatientsSyncService {
+  _LocalPatientsSyncService(
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://mdrspsfy25-api.unionais.org/api/v1/';
+    baseUrl ??= 'https://205e-103-231-95-45.ngrok-free.app/api/v1/';
   }
 
   final Dio _dio;
@@ -21,24 +21,24 @@ class _SupportMonthSyncService implements SupportMonthSyncService {
   String? baseUrl;
 
   @override
-  Future<SupportMonthSyncResponse> syncLocalSupportMonths({
-    required int number,
-    required Map<String, dynamic> bulkData,
+  Future<RemotePatientResponse> uploadPatientsWithSignatures({
+    required String patients,
+    List<MultipartFile>? signatures,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = FormData();
     _data.fields.add(MapEntry(
-      'number',
-      number.toString(),
+      'patients',
+      patients,
     ));
-    _data.fields.add(MapEntry(
-      'bulkData',
-      jsonEncode(bulkData),
-    ));
+    if (signatures != null) {
+      _data.files.addAll(signatures.map((i) => MapEntry('signatures[]', i)));
+    }
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<SupportMonthSyncResponse>(Options(
+        _setStreamType<RemotePatientResponse>(Options(
       method: 'POST',
       headers: _headers,
       extra: _extra,
@@ -46,7 +46,7 @@ class _SupportMonthSyncService implements SupportMonthSyncService {
     )
             .compose(
               _dio.options,
-              'app/support-months/sync',
+              'app/patients/sync',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -55,7 +55,7 @@ class _SupportMonthSyncService implements SupportMonthSyncService {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = SupportMonthSyncResponse.fromJson(_result.data!);
+    final value = RemotePatientResponse.fromJson(_result.data!);
     return value;
   }
 

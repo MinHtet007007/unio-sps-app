@@ -9,7 +9,7 @@ class Patient {
   final Township township;
   final String? rrCode;
   final String drtbCode;
-  final String spCode;
+  final String? spCode;
   final String uniqueId;
   final String name;
   final int age;

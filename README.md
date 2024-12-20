@@ -18,7 +18,6 @@ At server
 
 
 if patient is not new 
-do not store patient package 
 do not need to map object 
 when storing support month and each package, reduce patient package amount 
 

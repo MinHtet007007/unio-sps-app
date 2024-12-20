@@ -21,6 +21,7 @@ class CustomListView extends StatelessWidget {
             id: patient.id as int,
             name: patient.name,
             code: patient.rrCode ?? patient.drtbCode,
+            isSynced: patient.isSynced
           );
         });
   }

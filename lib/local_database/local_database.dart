@@ -1,4 +1,3 @@
-// required package imports
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:sps/local_database/dao/patient_dao.dart';
@@ -30,7 +29,7 @@ abstract class AppDatabase extends FloorDatabase {
   ReceivePackageDao get receivePackageDao;
   PatientPackageDao get patientPackageDao;
   UserTownshipDao get userTownshipDao;
-  
+
   @transaction
   Future<void> resetDatabase() async {
     patientDao.deleteAll();
@@ -82,4 +81,25 @@ abstract class AppDatabase extends FloorDatabase {
       throw Exception("Transaction failed: $e");
     }
   }
+  @transaction
+  Future<bool> deleteSyncedPatients(List<int> syncedPatientIds) async {
+    if (syncedPatientIds.isEmpty) {
+      print("No synced IDs provided. Skipping deletion.");
+      return false;
+    }
+
+    try {
+      await receivePackageDao.deleteByPatientIds(syncedPatientIds);
+      await supportMonthDao.deleteByPatientIds(syncedPatientIds);
+      await patientPackageDao.deleteByPatientIds(syncedPatientIds);
+      await patientDao.deletePatientsByIds(syncedPatientIds);
+
+      print("Successfully deleted all synced patients and related records.");
+      return true;
+    } catch (e) {
+      print("Error while deleting synced patients: $e");
+      throw Exception("Transaction failed: $e");
+    }
+  }
+
 }
