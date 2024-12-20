@@ -1,3 +1,4 @@
+import 'package:sps/screens/edit_patient_package/edit_patient_package_screen.dart';
 import 'package:sps/screens/home/home_screen.dart';
 import 'package:sps/screens/add_new_package/add_new_package_screen.dart';
 import 'package:sps/screens/login/login_screen.dart';
@@ -45,7 +46,7 @@ class RouteList {
       path: RouteName.patient,
       builder: (context, state) => const PatientListScreen(),
     ),
-     GoRoute(
+    GoRoute(
       path: RouteName.patientCreate,
       builder: (context, state) => const NewPatientScreen(),
     ),
@@ -63,6 +64,15 @@ class RouteList {
         return AddNewPackageScreen(patientId: int.parse(patientId));
       },
     ),
+    GoRoute(
+      path: '${RouteName.packageEdit}/:patientId/:packageId',
+      builder: (context, state) {
+        final patientId = state.pathParameters['patientId']!;
+        final packageId = state.pathParameters['packageId']!;
+        return EditPatientPackageScreen(
+            patientId: int.parse(patientId), packageId: int.parse(packageId));
+      },
+    ),
   ];
 }
 
@@ -78,4 +88,5 @@ class RouteName {
   static const String patientDetail = '/patient';
   static const String patientCreate = '/patient-create';
   static const String packageCreate = '/package-create';
+  static const String packageEdit = '/package-edit';
 }

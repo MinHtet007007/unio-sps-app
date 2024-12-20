@@ -604,7 +604,7 @@ class _$ReceivePackageDao extends ReceivePackageDao {
   Future<List<ReceivePackageEntity>> getReceivePackagesBySupportMonth(
       int supportMonthId) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM patient_support_packages WHERE patientSupportMonthId = ?1',
+        'SELECT * FROM patient_support_packages WHERE localPatientSupportMonthId = ?1',
         mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int?, remotePatientPackageId: row['remotePatientPackageId'] as int?, localPatientPackageId: row['localPatientPackageId'] as int?, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
         arguments: [supportMonthId]);
   }

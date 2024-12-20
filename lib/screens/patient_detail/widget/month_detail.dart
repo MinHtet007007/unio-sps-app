@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/data_row.dart';
+import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
 
 class MonthDetail extends StatelessWidget {
   SupportMonthEntity supportMonth;
+  final PatientEntity patient;
   MonthDetail({
     super.key,
     required this.supportMonth,
+    required this.patient,
   });
 
   @override
@@ -38,6 +43,22 @@ class MonthDetail extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          context.push(
+                              '${RouteName.packageEdit}/${patient.id}/${supportMonth.id}');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorTheme.black,
+                        ),
+                        child: const Text(
+                          'Edit Package',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
                       // ElevatedButton(
                       //   onPressed: () async {
                       //     // var phase = getCounselingPhase(patient.dotsStartDate as String,
@@ -47,32 +68,13 @@ class MonthDetail extends StatelessWidget {
                       //     //     extra: phaseData);
                       //   },
                       //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: ColorTheme.black,
+                      //     backgroundColor: ColorTheme.danger,
                       //   ),
                       //   child: const Text(
-                      //     'Edit Package',
+                      //     'Delete',
                       //     style: TextStyle(color: Colors.white),
                       //   ),
                       // ),
-                      // SizedBox(
-                      //   width: 10,
-                      // ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          // var phase = getCounselingPhase(patient.dotsStartDate as String,
-                          //     patient.treatmentRegimen as String);
-                          // final phaseData = PhaseData(phase: phase);
-                          // await context.push('${RouteName.patientCounselings}/${patient.id}',
-                          //     extra: phaseData);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorTheme.danger,
-                        ),
-                        child: const Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
                     ],
                   ),
                 ),

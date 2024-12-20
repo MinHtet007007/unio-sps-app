@@ -68,7 +68,7 @@ class PatientDetailsWidget extends StatelessWidget {
           child: ListView.builder(
             itemCount: supportMonths?.length ?? 0,
             itemBuilder: (context, index) {
-              return MonthDetail(supportMonth: supportMonths![index]);
+              return MonthDetail(supportMonth: supportMonths![index], patient: patient,);
             },
           ),
         ),

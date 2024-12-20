@@ -36,11 +36,13 @@ class LocalNewSupportMonthProvider
         final patientPackageDap = database.patientPackageDao;
         for (var package in receivedPackages) {
           await receivePackageDao.insertReceivePackage(ReceivePackageEntity(
-              amount: package.amount,
-              localPatientSupportMonthId: supportMonthId,
-              patientPackageName: package.patientPackageName,
-              reimbursementMonth: package.reimbursementMonth,
-              reimbursementMonthYear: package.reimbursementMonthYear));
+            amount: package.amount,
+            localPatientSupportMonthId: supportMonthId,
+            patientPackageName: package.patientPackageName,
+            reimbursementMonth: package.reimbursementMonth,
+            reimbursementMonthYear: package.reimbursementMonthYear,
+            localPatientPackageId: package.localPatientPackageId,
+          ));
           await patientPackageDap.subtractFromRemainingAmount(
               package.localPatientPackageId!, package.amount);
         }
