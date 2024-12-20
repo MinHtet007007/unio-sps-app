@@ -56,7 +56,7 @@ class SupportMonth {
       townshipId: json['township_id'] as int,
       township: Township.fromJson(json['township'] as Map<String, dynamic>),
       date: json['date'] as String,
-      month: int.parse(json['month']),
+      month: json['month'],
       monthYear: json['month_year'] as String,
       height: json['height'] as int,
       weight: json['weight'] as int,

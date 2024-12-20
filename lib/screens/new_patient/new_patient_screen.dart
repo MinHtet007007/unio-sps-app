@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sps/common/constants/form_options.dart';
 import 'package:sps/common/constants/route_list.dart';
+import 'package:sps/common/widgets/error_screen.dart';
 import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/features/local_patient_create/provider/local_new_patient_provider.dart';
 import 'package:sps/features/local_patient_create/provider/local_new_patient_state/local_new_patient_state.dart';
@@ -21,47 +22,59 @@ class NewPatientScreen extends ConsumerStatefulWidget {
 
 class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
   Future<void> onSubmit(Map<String, dynamic> formData) async {
-    final patient = PatientEntity(
-      year: formData['year'],
-      spsStartDate: formData['spsStartDate'],
-      townshipId: int.parse(formData['townshipId']),
-      rrCode: formData['rrCode'],
-      spCode: '',
-      drtbCode: formData['drtbCode'] ?? '',
-      name: formData['name'] ?? '',
-      age: int.parse(formData['age']),
-      sex: formData['sex'],
-      diedBeforeTreatmentEnrollment: formData['diedBeforeTreatmentEnrollment'],
-      treatmentStartDate: formData['treatmentStartDate'],
-      treatmentRegimen: formData['treatmentRegimen'] ?? '',
-      treatmentRegimenOther: formData['treatmentRegimenOther'],
-      patientAddress: formData['address'],
-      patientPhoneNo: formData['phone'],
-      contactInfo: formData['contactInfo'],
-      contactPhoneNo: formData['contactPhoneNo'],
-      primaryLanguage: formData['primaryLanguage'],
-      secondaryLanguage: formData['secondaryLanguage'],
-      height: int.parse(formData['height']),
-      weight: int.parse(formData['weight']),
-      bmi: int.parse(formData['bmi']),
-      currentTownshipId:
-          int.parse(formData['townshipId']),
-      isSynced: false,
-    );
+    try {
+      final patient = PatientEntity(
+        year: formData['year']?.toString() ?? '',
+        spsStartDate: formData['spsStartDate']?.toString() ?? '',
+        townshipId:
+            int.tryParse(formData['townshipId']?.toString() ?? '0') ?? 0,
+        rrCode: formData['rrCode']?.toString() ?? '',
+        drtbCode: formData['drtbCode']?.toString() ?? '',
+        name: formData['name']?.toString() ?? '',
+        age: int.tryParse(formData['age']?.toString() ?? '0') ?? 0,
+        sex: formData['sex']?.toString() ?? '',
+        diedBeforeTreatmentEnrollment:
+            formData['diedBeforeTreatmentEnrollment']?.toString() ?? '',
+        treatmentStartDate: formData['treatmentStartDate']?.toString() ?? '',
+        treatmentRegimen: formData['treatmentRegimen']?.toString() ?? '',
+        treatmentRegimenOther:
+            formData['treatmentRegimenOther']?.toString() ?? '',
+        patientAddress: formData['address']?.toString() ?? '',
+        patientPhoneNo: formData['phone']?.toString() ?? '',
+        contactInfo: formData['contactInfo']?.toString() ?? '',
+        contactPhoneNo: formData['contactPhone']?.toString() ?? '',
+        primaryLanguage: formData['primaryLanguage']?.toString() ?? '',
+        secondaryLanguage: formData['secondaryLanguage']?.toString() ?? '',
+        height: int.tryParse(formData['height']?.toString() ?? '0') ?? 0,
+        weight: int.tryParse(formData['weight']?.toString() ?? '0') ?? 0,
+        bmi: int.tryParse(formData['bmi']?.toString() ?? '0') ?? 0,
+        currentTownshipId:
+            int.tryParse(formData['townshipId']?.toString() ?? '0') ?? 0,
+        isSynced: false,
+      );
 
-    final localPatientCreateNotifier =
-        ref.read(localNewPatientProvider.notifier);
-    await localPatientCreateNotifier.addPatient(patient);
+      final localPatientCreateNotifier =
+          ref.read(localNewPatientProvider.notifier);
+      await localPatientCreateNotifier.addPatient(patient);
+    } catch (e, stackTrace) {
+      print('Error $e');
+      print('stackTrace $stackTrace');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final userState = ref.watch(userProvider);
+    final localNewPatientState = ref.watch(localNewPatientProvider);
 
     ref.listen(localNewPatientProvider, (state, _) {
       if (state is LocalNewPatientSuccessState) {
         SnackbarUtils.showSuccessToast(context, 'Patient Create Success');
-        context.pushReplacementNamed(RouteName.patient);
+        context.pop();
+        context.pushReplacement(RouteName.patient);
+      }
+      if (state is LocalNewPatientFailedState) {
+        SnackbarUtils.showError(context, 'Patient Cannot be Created');
       }
     });
 
@@ -73,8 +86,9 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
       return NewPatientForm(
         townshipOptions: townshipOptions,
         onSubmit: onSubmit,
+        loading: localNewPatientState is LocalNewPatientLoadingState
       );
     }
-    return const Center(child: Text('Cannot create patient'));
+    return const ErrorScreen(title: 'Create Patient', message: 'Cannot Create Patient');
   }
 }

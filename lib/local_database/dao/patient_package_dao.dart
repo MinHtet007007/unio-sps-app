@@ -23,6 +23,10 @@ abstract class PatientPackageDao {
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMany(List<PatientPackageEntity> patientPackages);
 
+  @Query('DELETE FROM ${LocalDataBase.patient_package_table} '
+      'WHERE localPatientId IN (:patientIds)')
+  Future<void> deleteByPatientIds(List<int> patientIds);
+
   
    /// Subtract a specific amount from the `remainingAmount` field of a patient package by ID
   @Query(

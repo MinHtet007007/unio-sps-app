@@ -10,5 +10,8 @@ abstract class PatientSyncService {
   factory PatientSyncService(Dio dio) => _PatientSyncService(dio);
 
   @GET(ApiConst.patientEndPoint)
-  Future<RemotePatientResponse> fetchRemotePatients();
+  Future<RemotePatientResponse> fetchRemotePatients({
+    @Query("already_synced_ids") String? alreadySyncedIds,
+    @Query("last_sync_date") DateTime? last_sync_date,
+  });
 }

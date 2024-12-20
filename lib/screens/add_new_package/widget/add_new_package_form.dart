@@ -268,7 +268,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
               ReceivePackageEntity(
                   localPatientPackageId: int.parse(d["package_id"]),
                   amount: d["given_amount"],
-                  localPatientSupportMonthId: null,
+                  localPatientSupportMonthId: 0, // TODO
                   patientPackageName: d["package"],
                   reimbursementMonth: null,
                   reimbursementMonthYear: null)),
@@ -276,7 +276,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
           ...selectedReimbursements.map((d) => ReceivePackageEntity(
               localPatientPackageId: int.parse(d["package_id"]),
               amount: d["given_amount"],
-              localPatientSupportMonthId: null,
+              localPatientSupportMonthId: 0, // TODO
               patientPackageName: d["reimbursement_packages"],
               reimbursementMonth: int.parse(d["reimbursement_month"]),
               reimbursementMonthYear: d["reimbursement_month_year"])),
@@ -286,7 +286,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
           ...selectedReimbursements.map((d) => ReceivePackageEntity(
               localPatientPackageId: int.parse(d["package_id"]),
               amount: d["given_amount"],
-              localPatientSupportMonthId: null,
+              localPatientSupportMonthId: 0, // TODO
               patientPackageName: d["reimbursement_packages"],
               reimbursementMonth: int.parse(d["reimbursement_month"]),
               reimbursementMonthYear: d["reimbursement_month_year"])),

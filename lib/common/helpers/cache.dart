@@ -18,6 +18,7 @@ class Cache {
   static Future<void> saveLastSyncedTime() async {
     final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now().toIso8601String();
+    
     await prefs.setString(lastSyncedTimeKey, now);
   }
 

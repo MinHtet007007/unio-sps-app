@@ -1,7 +1,10 @@
 import 'package:floor/floor.dart';
 import 'package:sps/local_database/tables/local_database_tables.dart';
 import 'package:sps/models/patient_package.dart';
+import 'package:json_annotation/json_annotation.dart';
+part 'patient_package_entity.g.dart';
 
+@JsonSerializable()
 @Entity(tableName: LocalDataBase.patient_package_table)
 class PatientPackageEntity {
   @PrimaryKey(autoGenerate: true)
@@ -38,4 +41,17 @@ class PatientPackageEntity {
       remainingAmount: remotePatientPackage.remainingAmount,
     );
   }
+  factory PatientPackageEntity.fromJson(Map<String, dynamic> json) =>
+      _$PatientPackageEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'remote_id': remoteId,
+        'local_patient_id': localPatientId,
+        'remote_patient_id': remotePatientId,
+        'package_name': packageName,
+        'eligible_amount': eligibleAmount,
+        'updated_eligible_amount': updatedEligibleAmount,
+        'remaining_amount': remainingAmount,
+      };
 }

@@ -43,10 +43,10 @@ class SupportMonthEntity {
       required this.planPackages,
       required this.receivePackageStatus,
       required this.reimbursementStatus,
+      this.supportMonthSignature,
       this.amount,
       this.remark,
-      this.supportMonthSignature,
-      required this.isSynced});
+      this.isSynced = false});
 
   factory SupportMonthEntity.mapRemoteSupportMonthToLocalEntity(
       SupportMonth remoteSupportMonth, int localPatientId) {
