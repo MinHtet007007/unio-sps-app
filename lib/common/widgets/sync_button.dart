@@ -6,11 +6,13 @@ class SyncButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool enabled;
   final String title;
+  final Color? backgroundColor;
   const SyncButton(
       {Key? key,
       required this.isLoading,
       required this.title,
       required this.onPressed,
+      this.backgroundColor = Colors.blue,
       this.enabled = true})
       : super(key: key);
 
@@ -20,7 +22,7 @@ class SyncButton extends StatelessWidget {
       onPressed: isLoading || !enabled ? null : onPressed,
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all(
-            isLoading ? Colors.grey.shade400 : Colors.blue),
+            isLoading ? Colors.grey.shade400 : backgroundColor),
         foregroundColor: WidgetStateProperty.all(Colors.white),
       ),
       child: CustomLabelWidget(

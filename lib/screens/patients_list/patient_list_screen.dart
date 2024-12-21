@@ -50,10 +50,14 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     final localState = ref.watch(localPatientsProvider);
     final localPatientsSyncState = ref.watch(localPatientsSyncProvider);
     ref.listen(localPatientsSyncProvider, (state, _) {
+      print(state);
       if (state is LocalPatientsSyncSuccessState) {
         SnackbarUtils.showSuccessToast(
             context, 'လူနာငါးယောက်ဒေတာများ ပို့ပြီးပါပြီ');
         _fetchPatients();
+      }
+      if (state is LocalPatientsSyncFailedState) {
+        SnackbarUtils.showError(context, state.errorMessage);
       }
     });
 
@@ -69,7 +73,8 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
               title: "local data ပို့မည်",
               isLoading:
                   localPatientsSyncState is LocalPatientsSyncLoadingState,
-              onPressed: _sendLocalPatients)
+              onPressed: _sendLocalPatients,
+              backgroundColor: Colors.red)
         ],
       ),
       body: _patientListWidget(localState),
@@ -77,9 +82,9 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
         onPressed: () {
           context.push(RouteName.patientCreate);
         },
-        backgroundColor: Colors.blue, // Icon to display
+        backgroundColor: Colors.deepPurple, // Icon to display
         tooltip: 'Add', // Button color
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

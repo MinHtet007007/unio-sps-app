@@ -5,11 +5,11 @@ import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 
 class LocalNewPatientProvider extends StateNotifier<LocalNewPatientState> {
-  LocalNewPatientState localNewPatientState = LocalNewPatientFormState();
+  LocalNewPatientState localNewPatientState = LocalNewPatientInitialState();
   LocalDatabase localDatabase;
 
   LocalNewPatientProvider(this.localDatabase)
-      : super(LocalNewPatientFormState());
+      : super(LocalNewPatientInitialState());
 
   Future<void> addPatient(PatientEntity formData) async {
     try {
@@ -29,6 +29,8 @@ class LocalNewPatientProvider extends StateNotifier<LocalNewPatientState> {
       print(error);
       print(stackTrace);
       state = LocalNewPatientFailedState(error.toString());
+    } finally {
+      state = LocalNewPatientInitialState();
     }
   }
 
