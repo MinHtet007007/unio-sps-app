@@ -30,6 +30,10 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
       final database = await localDatabase.database;
       List<PatientEntity> patients =
           await database.patientDao.findUnsyncedPatients();
+      if (patients.isEmpty) {
+        state = LocalPatientsSyncFailedState('Not found any local patients');
+        return;
+      }
       List<LocalPatientWithRelations> result = [];
       var patientIndex = 0;
       var supportMonthIndex = 0;
@@ -63,7 +67,7 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
           if (supportMonth.supportMonthSignature != null) {
             File signatureFile = await getSignatureFile(
                 supportMonth.supportMonthSignature as Uint8List);
-                signatures.add(signatureFile);
+            signatures.add(signatureFile);
           }
           supportMonthIndex++;
         }
@@ -86,13 +90,13 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
       await uploadPatientsWithSignatures(
           jsonString, signatures, syncedPatientIds);
       state = LocalPatientsSyncSuccessState();
-      state = LocalPatientsSyncInitialState();
     } catch (e, stackTrace) {
       state = LocalPatientsSyncFailedState('Cannot sync local patients');
-      state = LocalPatientsSyncInitialState();
 
       print('Error $e');
       print('stackTrace $stackTrace');
+    } finally {
+      state = LocalPatientsSyncInitialState();
     }
   }
 

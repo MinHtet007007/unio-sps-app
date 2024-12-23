@@ -36,7 +36,10 @@ class _HomeState extends ConsumerState<Home> {
     final homeSyncNotifier = ref.watch(homePatientSyncProvider);
     ref.listen(homePatientSyncProvider, (state, _) {
       if (state is HomePatientsSyncFailedState) {
-        SnackbarUtils.showError(context, 'Error');
+        SnackbarUtils.showError(context, state.errorMessage);
+      }
+      if (state is HomePatientsSyncSuccessState) {
+        SnackbarUtils.showError(context, 'Success');
       }
     });
 
