@@ -363,21 +363,39 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             const SizedBox(
                               height: 10,
                             ),
-                            CustomTextInput(
+                            CustomTextInputWithValidation(
                                 inputController: controllers['height']
                                     as TextEditingController,
                                 labelText: 'Height',
                                 type: 'number',
-                                isRequired: true),
+                                validate: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return CustomText.getText(
+                                        context, 'Height ဖြည့်ပေးပါ');
+                                  } else if (int.parse(value) > 251) {
+                                    return CustomText.getText(
+                                        context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                  }
+                                  return null;
+                                }),
                             const SizedBox(
                               height: 10,
                             ),
-                            CustomTextInput(
+                            CustomTextInputWithValidation(
                                 inputController: controllers['weight']
                                     as TextEditingController,
                                 labelText: 'Weight',
                                 type: 'number',
-                                isRequired: true),
+                                validate: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return CustomText.getText(
+                                        context, 'ဖုန်းနံပါတ် ဖြည့်ပေးပါ');
+                                  } else if (int.parse(value) > 635) {
+                                    return CustomText.getText(
+                                        context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                  }
+                                  return null;
+                                }),
                             const SizedBox(
                               height: 10,
                             ),

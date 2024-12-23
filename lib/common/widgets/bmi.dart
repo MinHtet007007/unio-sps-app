@@ -22,11 +22,13 @@ class _BMIState extends State<BMI> {
     final weightText = widget.weightController.text;
 
     if (heightText.isNotEmpty && weightText.isNotEmpty) {
-      final height = double.tryParse(heightText) ?? 0;
+      final initialHeight = double.tryParse(heightText) ?? 0;
+      final height = initialHeight * 0.01;
       final weight = double.tryParse(weightText) ?? 0;
 
       if (height > 0 && weight > 0) {
-        final bmi = weight / (height * height);
+        final calculatedBMI = weight / (height * height);
+        final bmi = double.parse(calculatedBMI.toStringAsFixed(1));
         widget.onBMIChange(bmi);
       }
     }
