@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/common/widgets/sync_button.dart';
-import 'package:sps/features/local_patients_sync/provider/local_patients_sync_provider.dart';
 import 'package:sps/features/patient_home_sync/provider/home_sync_provider.dart';
 import 'package:sps/features/patient_home_sync/provider/home_sync_state.dart';
-import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -39,7 +37,7 @@ class _HomeState extends ConsumerState<Home> {
         SnackbarUtils.showError(context, state.errorMessage);
       }
       if (state is HomePatientsSyncSuccessState) {
-        SnackbarUtils.showError(context, 'Success');
+        SnackbarUtils.showSuccessToast(context, 'Success');
       }
     });
 
@@ -87,11 +85,12 @@ class _HomeState extends ConsumerState<Home> {
                 padding: const EdgeInsets.all(8.0),
                 child: ListView(
                   children: [
-                    SyncButton(
-                        title: "server data ဆွဲမည်",
-                        isLoading:
-                            homeSyncNotifier is HomePatientsSyncLoadingState,
-                        onPressed: _fetchRemotePatients),
+                    if (homeSyncNotifier is! HomePatientsSyncLoadingState)
+                      SyncButton(
+                          title: "server data ဆွဲမည်",
+                          isLoading:
+                              homeSyncNotifier is HomePatientsSyncLoadingState,
+                          onPressed: _fetchRemotePatients),
                     CardButton(
                       color: ColorTheme.primary,
                       press: () {

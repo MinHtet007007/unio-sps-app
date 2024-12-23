@@ -1,4 +1,3 @@
-import 'package:sps/local_database/entity/patient_entity.dart';
 
 sealed class HomePatientsSyncState {}
 

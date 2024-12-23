@@ -114,7 +114,6 @@ class LocalPatientsSyncProvider extends StateNotifier<LocalPatientsSyncState> {
     final response = await patientService.uploadPatientsWithSignatures(
         patients: patientsJson, signatures: signatures);
 
-    print('Response: ${response.data}');
     final database = await localDatabase.database;
 
     await database.deleteSyncedPatients(syncedPatientIds);

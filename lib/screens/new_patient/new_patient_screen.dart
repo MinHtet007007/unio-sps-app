@@ -30,7 +30,7 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
             int.tryParse(formData['townshipId']?.toString() ?? '0') ?? 0,
         rrCode: formData['rrCode']?.toString() ?? '',
         drtbCode: formData['drtbCode']?.toString() ?? '',
-        name: formData['name']?.toString() ?? '',
+      name: formData['name']?.toString() ?? '',
         age: int.tryParse(formData['age']?.toString() ?? '0') ?? 0,
         sex: formData['sex']?.toString() ?? '',
         diedBeforeTreatmentEnrollment:

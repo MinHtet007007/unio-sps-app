@@ -22,9 +22,7 @@ class PatientPackage {
       patientId: json['patient_id'],
       packageName: json['package_name'],
       eligibleAmount: int.parse(json['eligible_amount']),
-      updatedEligibleAmount: json['updated_eligible_amount'] != null
-          ? int.parse(json['updated_eligible_amount'])
-          : null,
+      updatedEligibleAmount: json['updated_eligible_amount'],
       remainingAmount: json['remaining_amount'],
     );
   }

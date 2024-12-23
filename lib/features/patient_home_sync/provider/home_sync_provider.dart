@@ -35,7 +35,7 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
           await database.syncPatient(patient);
         }
         await Cache.saveLastSyncedTime();
-      } 
+      }
       state = HomePatientsSyncSuccessState();
     } catch (error, stackTrace) {
       print(error);

@@ -146,7 +146,7 @@ List<DropdownMenuItem<String>> convertTownshipsToDropdownOptions(
     List<UserTownshipEntity> townships) {
   return townships
       .map((township) => DropdownMenuItem(
-            value: '${township.id}',
+            value: '${township.remoteId}',
             child: CustomLabelWidget(style: style, text: township.name),
           ))
       .toList();

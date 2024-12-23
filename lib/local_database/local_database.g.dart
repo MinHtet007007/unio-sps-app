@@ -112,7 +112,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_packages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER, `packageName` TEXT NOT NULL, `eligibleAmount` INTEGER NOT NULL, `updatedEligibleAmount` INTEGER, `remainingAmount` INTEGER NOT NULL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `user_townships` (`id` INTEGER, `name` TEXT NOT NULL, `abbreviation` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `user_townships` (`id` INTEGER, `remoteId` INTEGER NOT NULL, `name` TEXT NOT NULL, `abbreviation` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -872,6 +872,7 @@ class _$UserTownshipDao extends UserTownshipDao {
             'user_townships',
             (UserTownshipEntity item) => <String, Object?>{
                   'id': item.id,
+                  'remoteId': item.remoteId,
                   'name': item.name,
                   'abbreviation': item.abbreviation
                 });
@@ -890,6 +891,7 @@ class _$UserTownshipDao extends UserTownshipDao {
     return _queryAdapter.queryList('SELECT * FROM user_townships',
         mapper: (Map<String, Object?> row) => UserTownshipEntity(
             id: row['id'] as int?,
+            remoteId: row['remoteId'] as int,
             name: row['name'] as String,
             abbreviation: row['abbreviation'] as String));
   }

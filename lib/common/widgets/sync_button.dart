@@ -19,7 +19,7 @@ class SyncButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: isLoading || !enabled ? null : onPressed,
+      onPressed: isLoading ? null : onPressed,
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.all(
             isLoading ? Colors.grey.shade400 : backgroundColor),
