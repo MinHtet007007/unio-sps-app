@@ -1,15 +1,17 @@
-// import 'dart:nativewrappers/_internal/vm/lib/core_patch.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:sps/common/widgets/loading_widget.dart';
+import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/features/local_support_month_create/provider/local_new_support_month_provider.dart';
+import 'package:sps/features/local_support_month_create/provider/local_new_support_month_state/local_new_support_month_state.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
-import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
+import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/add_new_package/widget/add_new_package_form.dart';
 
 class AddNewPackageScreen extends ConsumerStatefulWidget {
@@ -24,23 +26,20 @@ class AddNewPackageScreen extends ConsumerStatefulWidget {
 class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
   void _fetchPatient() async {
     await Future.delayed(Duration.zero);
-
     final patientNotifier = ref.read(localPatientProvider.notifier);
     patientNotifier.fetchPatient(widget.patientId);
   }
 
   Future<void> onSubmit(SupportMonthEntity formData,
-      List<ReceivePackageEntity> receivedPackages) async {
+      List<ReceivedPackageRequest> receivedPackages) async {
     final localSupportMonthCreateNotifier =
         ref.read(localNewSupportMonthProvider.notifier);
     await localSupportMonthCreateNotifier.addSupportMonth(
         formData, receivedPackages);
-    _fetchPatient();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _fetchPatient();
   }
@@ -48,31 +47,25 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
   @override
   Widget build(BuildContext context) {
     final localState = ref.watch(localPatientProvider);
-    // final support_months = localState is LocalPatientSuccessState
-    //     ? localState.localSupportMonths
-    //     : [];
-    // final PatientEntity? patientDetails =
-    //     localState is LocalPatientSuccessState ? localState.localPatient : null;
-    // final List<PatientPackageEntity>? patientPackages =
-    //     localState is LocalPatientSuccessState
-    //         ? localState.localPatientPackages
-    //         : null;
-    // // final options = patientPackages
-    // //     ?.map(
-    // //       (p) => {'value': p, "label": p.packageName},
-    // //     )
-    // //     .toList();
-    // final List<String> options = localState is LocalPatientSuccessState
-    //     ? patientPackages!.map((p) => p.packageName).toList()
-    //     : [];
 
-    // if (localState is LocalPatientSuccessState) {
-    //   final supportMonths = localState.localPatientPackages;
-    //   for (var month in supportMonths) {
-    //     debugPrint(month.eligibleAmount.toString());
-    //   }
-    //   // debugPrint(supportMonths.length.toString());
-    // }
+    ref.listen<LocalNewSupportMonthState>(
+      localNewSupportMonthProvider,
+      (previous, current) {
+        if (current is LocalNewSupportMonthSuccessState) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            SnackbarUtils.showSuccessToast(
+                context, 'Support Month Create Success');
+            context.pop();
+            context.pushReplacement(
+                "${RouteName.patientDetail}/${widget.patientId}");
+          });
+        } else if (current is LocalNewSupportMonthFailedState) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            SnackbarUtils.showError(context, 'Support Month Cannot be Created');
+          });
+        }
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(

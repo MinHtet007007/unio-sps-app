@@ -12,6 +12,7 @@ import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
+import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/add_new_package/widget/reimbursement_table.dart';
 import 'package:sps/screens/add_new_package/widget/support_package_table.dart';
 
@@ -20,7 +21,7 @@ class AddNewPackageForm extends StatefulWidget {
   final List<SupportMonthEntity> patientSupportMonths;
   final List<PatientPackageEntity> patientPackages;
   Future<void> Function(SupportMonthEntity formData,
-      List<ReceivePackageEntity> receivedPackages) onSubmit;
+      List<ReceivedPackageRequest> receivedPackages) onSubmit;
 
   AddNewPackageForm({
     super.key,
@@ -258,35 +259,32 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
           remark: _remarkController.text,
           supportMonthSignature: sign);
 
-      List<ReceivePackageEntity> receivedPackages = [];
+      List<ReceivedPackageRequest> receivedPackages = [];
 
       // Conditionally add data to receivedPackages
       if (selectedReceivedPackageStatus == "yes") {
         receivedPackages = [
           // Add support received month packages
           ...selectedSupportReceivedMonthPackages.map((d) =>
-              ReceivePackageEntity(
+              ReceivedPackageRequest(
                   localPatientPackageId: int.parse(d["package_id"]),
                   amount: d["given_amount"],
-                  localPatientSupportMonthId: 0, // TODO
                   patientPackageName: d["package"],
                   reimbursementMonth: null,
                   reimbursementMonthYear: null)),
           // Add reimbursements
-          ...selectedReimbursements.map((d) => ReceivePackageEntity(
+          ...selectedReimbursements.map((d) => ReceivedPackageRequest(
               localPatientPackageId: int.parse(d["package_id"]),
               amount: d["given_amount"],
-              localPatientSupportMonthId: 0, // TODO
               patientPackageName: d["reimbursement_packages"],
               reimbursementMonth: int.parse(d["reimbursement_month"]),
               reimbursementMonthYear: d["reimbursement_month_year"])),
         ];
       } else {
         receivedPackages = [
-          ...selectedReimbursements.map((d) => ReceivePackageEntity(
+          ...selectedReimbursements.map((d) => ReceivedPackageRequest(
               localPatientPackageId: int.parse(d["package_id"]),
               amount: d["given_amount"],
-              localPatientSupportMonthId: 0, // TODO
               patientPackageName: d["reimbursement_packages"],
               reimbursementMonth: int.parse(d["reimbursement_month"]),
               reimbursementMonthYear: d["reimbursement_month_year"])),

@@ -32,4 +32,9 @@ abstract class PatientPackageDao {
   @Query(
       'UPDATE ${LocalDataBase.patient_package_table} SET remainingAmount = remainingAmount - :amount WHERE id = :id')
   Future<void> subtractFromRemainingAmount(int id, int amount);
+
+  /// Add a specific amount from the `remainingAmount` field of a patient package by ID
+  @Query(
+      'UPDATE ${LocalDataBase.patient_package_table} SET remainingAmount = remainingAmount + :amount WHERE id = :id')
+  Future<void> addToRemainingAmount(int id, int amount);
 }

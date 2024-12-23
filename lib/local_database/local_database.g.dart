@@ -632,8 +632,8 @@ class _$SupportMonthDao extends SupportMonthDao {
   }
 
   @override
-  Future<void> updateSupportMonth(SupportMonthEntity supportMonth) async {
-    await _supportMonthEntityUpdateAdapter.update(
+  Future<int> updateSupportMonth(SupportMonthEntity supportMonth) {
+    return _supportMonthEntityUpdateAdapter.updateAndReturnChangedRows(
         supportMonth, OnConflictStrategy.replace);
   }
 }
@@ -715,6 +715,21 @@ class _$ReceivePackageDao extends ReceivePackageDao {
             _sqliteVariablesForPatientIds +
             '))',
         arguments: [...patientIds]);
+  }
+
+  @override
+  Future<List<ReceivePackageEntity>> getPackagesBySupportMonthId(int id) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_support_packages WHERE localPatientSupportMonthId = ?1',
+        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int?, localPatientPackageId: row['localPatientPackageId'] as int?, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
+        arguments: [id]);
+  }
+
+  @override
+  Future<void> deletePackagesBySupportMonthId(int id) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM patient_support_packages WHERE localPatientSupportMonthId = ?1',
+        arguments: [id]);
   }
 
   @override
@@ -821,6 +836,16 @@ class _$PatientPackageDao extends PatientPackageDao {
   ) async {
     await _queryAdapter.queryNoReturn(
         'UPDATE patient_packages SET remainingAmount = remainingAmount - ?2 WHERE id = ?1',
+        arguments: [id, amount]);
+  }
+
+  @override
+  Future<void> addToRemainingAmount(
+    int id,
+    int amount,
+  ) async {
+    await _queryAdapter.queryNoReturn(
+        'UPDATE patient_packages SET remainingAmount = remainingAmount + ?2 WHERE id = ?1',
         arguments: [id, amount]);
   }
 

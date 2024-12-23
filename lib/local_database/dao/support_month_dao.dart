@@ -35,7 +35,7 @@ abstract class SupportMonthDao {
 
   /// Update a support month
   @Update(onConflict: OnConflictStrategy.replace)
-  Future<void> updateSupportMonth(SupportMonthEntity supportMonth);
+  Future<int> updateSupportMonth(SupportMonthEntity supportMonth);
 
   /// Delete a support month by its ID
   @Query('DELETE FROM ${LocalDataBase.patient_support_month_table} WHERE id = :id')
