@@ -286,19 +286,48 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
         .map((number) => "Package $number")
         .toList();
     BMI = widget.existingSupportMonth.bmi.toDouble();
-    selectedReimbursements =  widget.alreadyReceivedPackages
+    sign = widget.existingSupportMonth.supportMonthSignature;
+    selectedReimbursements = widget.alreadyReceivedPackages
         .where((d) => d.reimbursementMonth != null)
         .map((reimbursementPackage) {
       return {
-        'reimbursement_month':
-            reimbursementPackage.reimbursementMonth,
+        'reimbursement_month': reimbursementPackage.reimbursementMonth,
         'given_amount': reimbursementPackage.amount,
         'reimbursement_packages': reimbursementPackage.patientPackageName,
-        'reimbursement_month_year':
-            reimbursementPackage.reimbursementMonthYear,
-        'package_id': widget.patientPackages.firstWhere((d)=>d.packageName == reimbursementPackage.patientPackageName).id,
+        'reimbursement_month_year': reimbursementPackage.reimbursementMonthYear,
+        'package_id': widget.patientPackages
+            .firstWhere(
+                (d) => d.packageName == reimbursementPackage.patientPackageName)
+            .id
+            .toString(),
       };
     }).toList();
+    selectedSupportReceivedMonthPackages = widget.alreadyReceivedPackages
+        .where((d) =>
+            d.reimbursementMonth ==
+            null) // Filter the list based on the null reimbursementMonth
+        .map((d) => {
+              'package_id': widget.patientPackages
+                  .firstWhere(
+                      (data) => data.packageName == d.patientPackageName)
+                  .id
+                  .toString(),
+              'given_amount': d.amount,
+              'package': d.patientPackageName,
+            })
+        .toList();
+
+    int selectedReimbursementsTotalGivenAmount = selectedReimbursements.fold(
+      0,
+      (sum, item) => sum + (item['given_amount'] as int),
+    );
+    int selectedSupportReceivedMonthPackagesTotalGivenAmount =
+        selectedSupportReceivedMonthPackages.fold(
+      0,
+      (sum, item) => sum + (item['given_amount'] as int),
+    );
+    grandTotal = selectedReimbursementsTotalGivenAmount +
+        selectedSupportReceivedMonthPackagesTotalGivenAmount;
   }
 
   @override
@@ -312,20 +341,19 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
               key: _formKey,
               child: Column(
                 children: [
-                      TextButton(
+                  TextButton(
                       onPressed: () {
                         debugPrint(widget.alreadyReceivedPackages.toString());
                       },
                       child: const Text("Print")),
                   Column(
                     children: [
-                       const Padding(
+                      const Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                        
                             Text(
                               'Support Received Date',
                               style: TextStyle(

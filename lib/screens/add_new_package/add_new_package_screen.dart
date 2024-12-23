@@ -10,8 +10,8 @@ import 'package:sps/features/local_support_month_create/provider/local_new_suppo
 import 'package:sps/features/local_support_month_create/provider/local_new_support_month_state/local_new_support_month_state.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
-import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
+import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/add_new_package/widget/add_new_package_form.dart';
 
 class AddNewPackageScreen extends ConsumerStatefulWidget {
@@ -31,7 +31,7 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
   }
 
   Future<void> onSubmit(SupportMonthEntity formData,
-      List<ReceivePackageEntity> receivedPackages) async {
+      List<ReceivedPackageRequest> receivedPackages) async {
     final localSupportMonthCreateNotifier =
         ref.read(localNewSupportMonthProvider.notifier);
     await localSupportMonthCreateNotifier.addSupportMonth(
@@ -47,8 +47,33 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
   @override
   Widget build(BuildContext context) {
     final localState = ref.watch(localPatientProvider);
+    final localNewSupportMonthState = ref.watch(localNewSupportMonthProvider);
 
-    // Wrap the body with Builder to provide a valid Scaffold context
+    ref.listen<LocalNewSupportMonthState>(
+      localNewSupportMonthProvider,
+      (previous, current) {
+        if (current is LocalNewSupportMonthSuccessState) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            SnackbarUtils.showSuccessToast(
+                context, 'Support Month Create Success');
+            // ref
+            //     .read(localNewSupportMonthProvider.notifier)
+            //     .resetState(); // Reset state
+            context.pop();
+            context.pushReplacement(
+                "${RouteName.patientDetail}/${widget.patientId}");
+          });
+        } else if (current is LocalNewSupportMonthFailedState) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            SnackbarUtils.showError(context, 'Support Month Cannot be Created');
+            // ref
+            //     .read(localNewSupportMonthProvider.notifier)
+            //     .resetState(); // Reset state
+          });
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: CustomLabelWidget(
@@ -57,30 +82,7 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
         ),
         backgroundColor: ColorTheme.primary,
       ),
-      body: Builder(
-        builder: (BuildContext scaffoldContext) {
-          // Use scaffoldContext to show snack bars
-          ref.listen<LocalNewSupportMonthState>(localNewSupportMonthProvider,
-              (state, _) {
-            if (state is LocalNewSupportMonthSuccessState) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                SnackbarUtils.showSuccessToast(
-                    scaffoldContext, 'Support Month Create Success');
-                context.pop();
-                context.pushReplacement(
-                    "${RouteName.patientDetail}/${widget.patientId}");
-              });
-            } else if (state is LocalNewSupportMonthFailedState) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                SnackbarUtils.showError(
-                    scaffoldContext, 'Support Month Cannot be Created');
-              });
-            }
-          });
-
-          return _buildWidgetBasedOnState(localState);
-        },
-      ),
+      body: _buildWidgetBasedOnState(localState),
     );
   }
 
