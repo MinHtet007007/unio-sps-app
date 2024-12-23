@@ -47,7 +47,6 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
   @override
   Widget build(BuildContext context) {
     final localState = ref.watch(localPatientProvider);
-    final localNewSupportMonthState = ref.watch(localNewSupportMonthProvider);
 
     ref.listen<LocalNewSupportMonthState>(
       localNewSupportMonthProvider,
@@ -56,9 +55,6 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             SnackbarUtils.showSuccessToast(
                 context, 'Support Month Create Success');
-            // ref
-            //     .read(localNewSupportMonthProvider.notifier)
-            //     .resetState(); // Reset state
             context.pop();
             context.pushReplacement(
                 "${RouteName.patientDetail}/${widget.patientId}");
@@ -66,9 +62,6 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
         } else if (current is LocalNewSupportMonthFailedState) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             SnackbarUtils.showError(context, 'Support Month Cannot be Created');
-            // ref
-            //     .read(localNewSupportMonthProvider.notifier)
-            //     .resetState(); // Reset state
           });
         }
       },
