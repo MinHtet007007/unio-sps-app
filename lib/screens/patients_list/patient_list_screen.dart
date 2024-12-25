@@ -65,7 +65,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
       appBar: AppBar(
         title: CustomLabelWidget(
           text: "လူနာစာရင်း",
-          style: const TextStyle(fontSize: 16, color: Colors.white),
+          style: AppBarTextStyle,
         ),
         backgroundColor: ColorTheme.primary,
         actions: [
@@ -78,14 +78,6 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
         ],
       ),
       body: _patientListWidget(localState),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push(RouteName.patientCreate);
-        },
-        backgroundColor: Colors.deepPurple, // Icon to display
-        tooltip: 'Add', // Button color
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
     );
   }
 

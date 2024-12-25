@@ -102,19 +102,19 @@ class _HomeState extends ConsumerState<Home> {
                     CardButton(
                       color: ColorTheme.primary,
                       press: () {
-                        context.push(RouteName.report);
+                        context.push(RouteName.patientCreate);
                       },
-                      title: "အနှစ်ချုပ်",
+                      title: "လူနာအသစ် ထည့်ရန်",
                       image: "summary.png",
                     ),
-                    CardButton(
-                      color: ColorTheme.primary,
-                      press: () {
-                        context.push(RouteName.note);
-                      },
-                      title: "မှတ်စု",
-                      image: "handout.png",
-                    )
+                    // CardButton(
+                    //   color: ColorTheme.primary,
+                    //   press: () {
+                    //     context.push(RouteName.note);
+                    //   },
+                    //   title: "မှတ်စု",
+                    //   image: "handout.png",
+                    // )
                   ],
                 ),
               ));

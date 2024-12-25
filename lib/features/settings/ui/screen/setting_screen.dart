@@ -18,9 +18,7 @@ class SettingScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text(
           'Setting',
-          style: TextStyle(
-            color: ColorTheme.white,
-          ),
+          style: AppBarTextStyle,
         ),
         backgroundColor: ColorTheme.primary,
         elevation: 0,
@@ -84,13 +82,13 @@ class SettingScreen extends ConsumerWidget {
                 child: ListTile(
                   leading: const Icon(Icons.font_download_outlined,
                       color: ColorTheme.secondary),
-                  title: CustomLabelWidget(text: 'ဖောင့် ပြောင်းမည်'),
+                  title: CustomLabelWidget(text: 'Font Change'),
                 ),
               )),
           Card(
             child: ListTile(
               leading: const Icon(Icons.logout, color: ColorTheme.secondary),
-              title: CustomLabelWidget(text: 'ထွက်မည်'),
+              title: CustomLabelWidget(text: 'Logout'),
               onTap: () {
                 authStateProvider.logout();
                 // if (!mounted) return;

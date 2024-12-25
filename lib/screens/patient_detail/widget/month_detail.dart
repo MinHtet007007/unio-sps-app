@@ -18,10 +18,10 @@ class MonthDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.lightBlue,
+      color: Colors.grey[300],
       child: ExpansionTile(
-        iconColor: Colors.white,
-        collapsedIconColor: Colors.white,
+        iconColor: Colors.red,
+        collapsedIconColor: Colors.red,
         collapsedShape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
           side: BorderSide(color: Colors.transparent),
@@ -32,6 +32,10 @@ class MonthDetail extends StatelessWidget {
         ),
         title: Text(
           'Month ${supportMonth.month}',
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         children: [
           Padding(
