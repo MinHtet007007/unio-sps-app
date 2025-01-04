@@ -261,7 +261,8 @@ class _$PatientDao extends PatientDao {
 
   @override
   Future<List<int>> getRemoteIds() async {
-    return _queryAdapter.queryList('SELECT remoteId FROM patients',
+    return _queryAdapter.queryList(
+        'SELECT remoteId FROM patients WHERE remoteId IS NOT NULL',
         mapper: (Map<String, Object?> row) => row.values.first as int);
   }
 

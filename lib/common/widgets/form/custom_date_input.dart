@@ -55,7 +55,7 @@ class CustomDateInput extends StatelessWidget {
         textInputAction: TextInputAction.next,
         validator: (val) {
           if (val!.isEmpty) {
-            return "$labelText ရွေးပေးပါ";
+            return "$labelText is required";
           }
           return null;
         },

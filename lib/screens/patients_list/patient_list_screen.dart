@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
 import 'package:sps/common/widgets/loading_widget.dart';
@@ -50,10 +48,8 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     final localState = ref.watch(localPatientsProvider);
     final localPatientsSyncState = ref.watch(localPatientsSyncProvider);
     ref.listen(localPatientsSyncProvider, (state, _) {
-      print(state);
       if (state is LocalPatientsSyncSuccessState) {
-        SnackbarUtils.showSuccessToast(
-            context, 'လူနာငါးယောက်ဒေတာများ ပို့ပြီးပါပြီ');
+        SnackbarUtils.showSuccessToast(context, 'Success');
         _fetchPatients();
       }
       if (state is LocalPatientsSyncFailedState) {
@@ -68,6 +64,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
           style: AppBarTextStyle,
         ),
         backgroundColor: ColorTheme.primary,
+        iconTheme: const IconThemeData(color: ColorTheme.white),
         actions: [
           SyncButton(
               title: "local data ပို့မည်",

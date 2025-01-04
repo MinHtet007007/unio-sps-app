@@ -36,6 +36,7 @@ abstract class AppDatabase extends FloorDatabase {
     patientPackageDao.deleteAll();
     supportMonthDao.deleteAll();
     receivePackageDao.deleteAll();
+    userTownshipDao.deleteAllUserTownships();
   }
 
   @transaction
@@ -81,6 +82,7 @@ abstract class AppDatabase extends FloorDatabase {
       throw Exception("Transaction failed: $e");
     }
   }
+
   @transaction
   Future<bool> deleteSyncedPatients(List<int> syncedPatientIds) async {
     if (syncedPatientIds.isEmpty) {
@@ -101,5 +103,4 @@ abstract class AppDatabase extends FloorDatabase {
       throw Exception("Transaction failed: $e");
     }
   }
-
 }

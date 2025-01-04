@@ -172,11 +172,11 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
-                                context, 'Age ဖြည့်ပေးပါ');
+                                context, 'Age is required');
                           } else if (int.parse(value) < 1 ||
                               int.parse(value) > 120) {
                             return CustomText.getText(
-                                context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                context, 'Age must be between 1 and 120');
                           }
                           return null;
                         }),
@@ -253,10 +253,10 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
-                                context, 'Phone ဖြည့်ပေးပါ');
+                                context, 'Phone is required');
                           } else if (value.length < 8 || value.length > 11) {
                             return CustomText.getText(
-                                context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                context, 'Phone number is invalid');
                           }
                           return null;
                         }),
@@ -280,10 +280,10 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
-                                context, 'ဖုန်းနံပါတ် ဖြည့်ပေးပါ');
+                                context, 'Phone number is required');
                           } else if (value.length < 8 || value.length > 11) {
                             return CustomText.getText(
-                                context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                context, 'Phone number is invalid');
                           }
                           return null;
                         }),
@@ -315,10 +315,10 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
-                                context, 'Height ဖြည့်ပေးပါ');
+                                context, 'Height is required');
                           } else if (int.parse(value) > 251) {
                             return CustomText.getText(
-                                context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                context, 'Height must be less than 251');
                           }
                           return null;
                         }),
@@ -333,10 +333,10 @@ class _NewPatientFormState extends State<NewPatientForm> {
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
-                                context, 'Weight ဖြည့်ပေးပါ');
+                                context, 'Weight is required');
                           } else if (int.parse(value) > 635) {
                             return CustomText.getText(
-                                context, 'အချက်အလက်မှားယွင်းနေသည်');
+                                context, 'Weight must be less than 635');
                           }
                           return null;
                         }),

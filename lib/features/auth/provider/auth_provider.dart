@@ -56,12 +56,18 @@ class AuthProvider extends StateNotifier<AuthUserState> {
   }
 
   void logout() async {
-    state = AuthMeLoadingState();
-    await Cache.deleteAll();
-    final database = await localDatabase.database;
-    await database.resetDatabase();
-    await localDatabase.closeDatabase();
-    state = AuthLoginForm();
+    try {
+      state = AuthMeLoadingState();
+      await Cache.deleteAll();
+      final database = await localDatabase.database;
+      await database.resetDatabase();
+      // await localDatabase.closeDatabase();
+      state = AuthLoginForm();
+    } catch (e, stackTrace) {
+      state = AuthMeFailedState();
+      print('err $e');
+      print('stack trace $stackTrace');
+    }
   }
 
   void getMe() async {

@@ -41,6 +41,7 @@ class CustomLabelWidget extends ConsumerWidget {
         getLabel(text, fontState.font),
         style: getStyle(fontState.font),
         textAlign: align,
+        
       );
     }
 

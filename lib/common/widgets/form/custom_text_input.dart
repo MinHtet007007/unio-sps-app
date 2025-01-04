@@ -77,7 +77,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
                 return null;
               }
               if (value == null || value.isEmpty) {
-                return '${widget.labelText} ဖြည့်ပေးပါ';
+                return '${widget.labelText} is required';
               }
               return null;
             },

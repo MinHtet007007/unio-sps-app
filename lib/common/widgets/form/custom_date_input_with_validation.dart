@@ -92,7 +92,7 @@ class _CustomDateInputWithValidationState
         textInputAction: TextInputAction.next,
         validator: (val) {
           if (val!.isEmpty && widget.isRequired) {
-            return "${widget.labelText} ရွေးပေးပါ";
+            return "${widget.labelText} is required";
           }
           return null;
         },

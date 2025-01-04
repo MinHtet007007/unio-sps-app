@@ -64,7 +64,7 @@ class CustomDropDown extends StatelessWidget {
                 color: Colors.blue,
               ),
               validator: isRequired
-                  ? (value) => value == null ? '$title ရွေးပေးပါ' : null
+                  ? (value) => value == null ? '$title is required' : null
                   : null,
               iconSize: 42,
             ),
