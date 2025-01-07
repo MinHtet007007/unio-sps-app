@@ -39,7 +39,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
         appBar: AppBar(
           title: CustomLabelWidget(
             text: "လူနာ အချက်အလက်",
-            style: const TextStyle(fontSize: 16, color: Colors.white),
+            style: AppBarTextStyle,
           ),
           backgroundColor: ColorTheme.primary,
         ),

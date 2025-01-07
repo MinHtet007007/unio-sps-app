@@ -27,9 +27,10 @@ class LocalDatabase {
   }
 
   Future<void> closeDatabase() async {
-    final db = await database;
-    await db.close();
-    _database = null;
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
   }
 }
 

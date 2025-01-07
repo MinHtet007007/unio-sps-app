@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sps/common/constants/form_options.dart';
-import 'package:sps/common/constants/route_list.dart';
+import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/error_screen.dart';
 import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/features/local_patient_create/provider/local_new_patient_provider.dart';
@@ -11,6 +11,8 @@ import 'package:sps/features/user/provider/user_provider.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/user_township_entity.dart';
 import 'package:sps/screens/new_patient/widgets/new_patient_form.dart';
+
+import '../../common/widgets/custom_label_widget.dart';
 
 class NewPatientScreen extends ConsumerStatefulWidget {
   const NewPatientScreen({super.key});
@@ -30,7 +32,7 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
             int.tryParse(formData['townshipId']?.toString() ?? '0') ?? 0,
         rrCode: formData['rrCode']?.toString() ?? '',
         drtbCode: formData['drtbCode']?.toString() ?? '',
-      name: formData['name']?.toString() ?? '',
+        name: formData['name']?.toString() ?? '',
         age: int.tryParse(formData['age']?.toString() ?? '0') ?? 0,
         sex: formData['sex']?.toString() ?? '',
         diedBeforeTreatmentEnrollment:
@@ -71,7 +73,6 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
       if (state is LocalNewPatientSuccessState) {
         SnackbarUtils.showSuccessToast(context, 'Patient Create Success');
         context.pop();
-        context.pushReplacement(RouteName.patient);
       }
       if (state is LocalNewPatientFailedState) {
         SnackbarUtils.showError(context, 'Patient Cannot be Created');
@@ -83,12 +84,25 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
           convertTownshipsToDropdownOptions(
               userState.townships as List<UserTownshipEntity>);
 
-      return NewPatientForm(
-        townshipOptions: townshipOptions,
-        onSubmit: onSubmit,
-        loading: localNewPatientState is LocalNewPatientLoadingState
+      return Scaffold(
+        appBar: AppBar(
+          title: CustomLabelWidget(
+            text: 'New Patient',
+            style: AppBarTextStyle,
+          ),
+          backgroundColor: ColorTheme.primary,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: ColorTheme.white),
+        ),
+        body: localNewPatientState is LocalNewPatientLoadingState
+            ? const Center(child: CircularProgressIndicator())
+            : NewPatientForm(
+                townshipOptions: townshipOptions,
+                onSubmit: onSubmit,
+              ),
       );
     }
-    return const ErrorScreen(title: 'Create Patient', message: 'Cannot Create Patient');
+    return const ErrorScreen(
+        title: 'Create Patient', message: 'Cannot Create Patient');
   }
 }

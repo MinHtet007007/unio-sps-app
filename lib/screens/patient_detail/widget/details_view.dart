@@ -22,7 +22,6 @@ class PatientDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // print(patient.patientPhoneNo);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -49,13 +48,22 @@ class PatientDetailsWidget extends StatelessWidget {
                 ],
               ),
             ),
-            dataRow('အမည်', patient.name),
-            dataRow('လိပ်စာ', patient.patientAddress),
-            dataRow('ဖုန်းနံပါတ်', patient.patientPhoneNo),
+            dataRow('Name', patient.name),
+            dataRow('Address', patient.patientAddress),
+            dataRow('Phone', patient.patientPhoneNo),
+            dataRow('SPS Start Date', patient.spsStartDate ?? ''),
             dataRow('RR code', patient.rrCode ?? ''),
             dataRow('DRTB code', patient.drtbCode ?? ''),
             dataRow('SP code', patient.spCode ?? ''),
-            dataRow('ဆေးစသောက်သည့်နေ့စွဲ', patient.treatmentStartDate ?? ''),
+            dataRow('Treatment Start Date', patient.treatmentStartDate ?? ''),
+             const SizedBox(height: 20),
+            // Add a title or label for the support months list
+            if (supportMonths != null)
+              const Text(
+                'Support Months',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            const SizedBox(height: 10),
             ListView.builder(
               shrinkWrap: true,
               physics:
