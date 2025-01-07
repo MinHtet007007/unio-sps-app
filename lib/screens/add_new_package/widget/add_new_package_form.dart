@@ -1,13 +1,16 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:sps/common/constants/form_options.dart';
+import 'package:sps/common/helpers/is_every_element_include.dart';
 import 'package:sps/common/widgets/form/custom_date_input_with_validation.dart';
 import 'package:sps/common/widgets/form/custom_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_multi_select_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
+import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
@@ -22,6 +25,7 @@ class AddNewPackageForm extends StatefulWidget {
   final List<PatientPackageEntity> patientPackages;
   Future<void> Function(SupportMonthEntity formData,
       List<ReceivedPackageRequest> receivedPackages) onSubmit;
+  final List<ReceivePackageEntity> alreadyReceivedPackagesByPatientId;
 
   AddNewPackageForm({
     super.key,
@@ -29,6 +33,7 @@ class AddNewPackageForm extends StatefulWidget {
     required this.patientPackages,
     required this.patientSupportMonths,
     required this.onSubmit,
+    required this.alreadyReceivedPackagesByPatientId,
   });
 
   @override
@@ -37,6 +42,8 @@ class AddNewPackageForm extends StatefulWidget {
 
 class _AddNewPackageFormState extends State<AddNewPackageForm> {
   final _formKey = GlobalKey<FormState>();
+  final _reimbursementFormKey = GlobalKey<FormState>();
+  final _receivedPackagesThisMonthFormKey = GlobalKey<FormState>();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _monthYearController = TextEditingController();
   final TextEditingController _reimbursementMonthYearController =
@@ -59,7 +66,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
   double BMI = 0.0;
   double reimbursementBMI = 0.0;
   List<DropdownMenuItem<String>> supportMonthsOptions = supportMonths;
-  String? reimbursementStatus;
+  String? reimbursementStatus = "no";
   String? selectedMonth;
   String? selectedReimbursementMonth;
   String? selectedReimbursementPackageId;
@@ -74,6 +81,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
   List<String> _selectedPlanPackages = [];
   int grandTotal = 0;
   Uint8List? sign;
+  bool isLoading = false;
 
   void _calculateBMI({bool isReimbursement = false}) {
     // Extract values once
@@ -123,176 +131,270 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
   }
 
   void _handleAddReimbursement() {
-    // Calculate the given amount
-    int givenAmount =
-        int.tryParse(_reimbursementGivenAmountController.text) ?? 0;
+    if (_reimbursementFormKey.currentState!.validate()) {
+      // Calculate the given amount
+      int givenAmount =
+          int.tryParse(_reimbursementGivenAmountController.text) ?? 0;
 
-    // Find the package by its ID
-    PatientPackageEntity? packageToUpdate = _editablePatientPackages.firstWhere(
-        (package) => package.id == int.parse(selectedReimbursementPackageId!));
+      // Find the package by its ID
+      PatientPackageEntity? packageToUpdate =
+          _editablePatientPackages.firstWhere((package) =>
+              package.id == int.parse(selectedReimbursementPackageId!));
 
-    // Update the eligible amount in the package
-    packageToUpdate = PatientPackageEntity(
-      id: packageToUpdate.id,
-      remoteId: packageToUpdate.remoteId,
-      localPatientId: packageToUpdate.localPatientId,
-      remotePatientId: packageToUpdate.remotePatientId,
-      packageName: packageToUpdate.packageName,
-      eligibleAmount: packageToUpdate.eligibleAmount, // Deduct given amount
-      updatedEligibleAmount: packageToUpdate.updatedEligibleAmount,
-      remainingAmount: packageToUpdate.remainingAmount - givenAmount,
-    );
+      // Update the eligible amount in the package
+      packageToUpdate = PatientPackageEntity(
+        id: packageToUpdate.id,
+        remoteId: packageToUpdate.remoteId,
+        localPatientId: packageToUpdate.localPatientId,
+        remotePatientId: packageToUpdate.remotePatientId,
+        packageName: packageToUpdate.packageName,
+        eligibleAmount: packageToUpdate.eligibleAmount, // Deduct given amount
+        updatedEligibleAmount: packageToUpdate.updatedEligibleAmount,
+        remainingAmount: packageToUpdate.remainingAmount - givenAmount,
+      );
 
-    // Update the package in the list
-    int index = _editablePatientPackages
-        .indexWhere((pkg) => pkg.id == packageToUpdate?.id);
-    if (index != -1) {
-      _editablePatientPackages[index] = packageToUpdate;
+      // Update the package in the list
+      int index = _editablePatientPackages
+          .indexWhere((pkg) => pkg.id == packageToUpdate?.id);
+      if (index != -1) {
+        _editablePatientPackages[index] = packageToUpdate;
+      }
+
+      setState(() {
+        selectedReimbursements = [
+          ...selectedReimbursements,
+          {
+            "reimbursement_month": selectedReimbursementMonth,
+            "given_amount": givenAmount,
+            "reimbursement_packages": packageToUpdate?.packageName,
+            "reimbursement_month_year": _reimbursementMonthYearController.text,
+            "package_id": selectedReimbursementPackageId, // Example ID
+          }
+        ];
+        int selectedReimbursementsTotalGivenAmount =
+            selectedReimbursements.fold(
+          0,
+          (sum, item) => sum + (item['given_amount'] as int),
+        );
+        int selectedSupportReceivedMonthPackagesTotalGivenAmount =
+            selectedSupportReceivedMonthPackages.fold(
+          0,
+          (sum, item) => sum + (item['given_amount'] as int),
+        );
+        grandTotal = selectedReimbursementsTotalGivenAmount +
+            selectedSupportReceivedMonthPackagesTotalGivenAmount;
+      });
+
+      selectedReimbursementMonth = null;
+      _reimbursementMonthYearController.clear();
+      selectedReimbursementPackageId = null;
+      _reimbursementGivenAmountController.clear();
+      tempGivenAmountStorage = 0;
     }
-
-    setState(() {
-      selectedReimbursements = [
-        ...selectedReimbursements,
-        {
-          "reimbursement_month": selectedReimbursementMonth,
-          "given_amount": givenAmount,
-          "reimbursement_packages": packageToUpdate?.packageName,
-          "reimbursement_month_year": _reimbursementMonthYearController.text,
-          "package_id": selectedReimbursementPackageId, // Example ID
-        }
-      ];
-      int selectedReimbursementsTotalGivenAmount = selectedReimbursements.fold(
-        0,
-        (sum, item) => sum + (item['given_amount'] as int),
-      );
-      int selectedSupportReceivedMonthPackagesTotalGivenAmount =
-          selectedSupportReceivedMonthPackages.fold(
-        0,
-        (sum, item) => sum + (item['given_amount'] as int),
-      );
-      grandTotal = selectedReimbursementsTotalGivenAmount +
-          selectedSupportReceivedMonthPackagesTotalGivenAmount;
-    });
-
-    selectedReimbursementMonth = null;
-    _reimbursementMonthYearController.clear();
-    selectedReimbursementPackageId = null;
-    _reimbursementGivenAmountController.clear();
-    tempGivenAmountStorage = 0;
   }
 
   void _handleAddSupportReceivedMonthPackages() {
-    // Calculate the given amount
-    int givenAmount =
-        int.tryParse(_receivedPackageThisMonthGivenAmountController.text) ?? 0;
+    if (_receivedPackagesThisMonthFormKey.currentState!.validate()) {
+      // Calculate the given amount
+      int givenAmount =
+          int.tryParse(_receivedPackageThisMonthGivenAmountController.text) ??
+              0;
 
-    // Find the package by its ID
-    PatientPackageEntity? packageToUpdate = _editablePatientPackages.firstWhere(
-        (package) => package.id == int.parse(selectedReceivedPackageId!));
+      // Find the package by its ID
+      PatientPackageEntity? packageToUpdate =
+          _editablePatientPackages.firstWhere(
+              (package) => package.id == int.parse(selectedReceivedPackageId!));
 
-    // Update the eligible amount in the package
-    packageToUpdate = PatientPackageEntity(
-      id: packageToUpdate.id,
-      remoteId: packageToUpdate.remoteId,
-      localPatientId: packageToUpdate.localPatientId,
-      remotePatientId: packageToUpdate.remotePatientId,
-      packageName: packageToUpdate.packageName,
-      eligibleAmount: packageToUpdate.eligibleAmount, // Deduct given amount
-      updatedEligibleAmount: packageToUpdate.updatedEligibleAmount,
-      remainingAmount: packageToUpdate.remainingAmount - givenAmount,
-    );
+      // Update the eligible amount in the package
+      packageToUpdate = PatientPackageEntity(
+        id: packageToUpdate.id,
+        remoteId: packageToUpdate.remoteId,
+        localPatientId: packageToUpdate.localPatientId,
+        remotePatientId: packageToUpdate.remotePatientId,
+        packageName: packageToUpdate.packageName,
+        eligibleAmount: packageToUpdate.eligibleAmount, // Deduct given amount
+        updatedEligibleAmount: packageToUpdate.updatedEligibleAmount,
+        remainingAmount: packageToUpdate.remainingAmount - givenAmount,
+      );
 
-    // Update the package in the list
-    int index = _editablePatientPackages
-        .indexWhere((pkg) => pkg.id == packageToUpdate?.id);
-    if (index != -1) {
-      _editablePatientPackages[index] = packageToUpdate;
+      // Update the package in the list
+      int index = _editablePatientPackages
+          .indexWhere((pkg) => pkg.id == packageToUpdate?.id);
+      if (index != -1) {
+        _editablePatientPackages[index] = packageToUpdate;
+      }
+
+      setState(() {
+        selectedSupportReceivedMonthPackages = [
+          ...selectedSupportReceivedMonthPackages,
+          {
+            "given_amount": givenAmount,
+            "package": packageToUpdate?.packageName,
+            "package_id": selectedReceivedPackageId, // Example ID
+          }
+        ];
+        int selectedReimbursementsTotalGivenAmount =
+            selectedReimbursements.fold(
+          0,
+          (sum, item) => sum + (item['given_amount'] as int),
+        );
+        int selectedSupportReceivedMonthPackagesTotalGivenAmount =
+            selectedSupportReceivedMonthPackages.fold(
+          0,
+          (sum, item) => sum + (item['given_amount'] as int),
+        );
+        grandTotal = selectedReimbursementsTotalGivenAmount +
+            selectedSupportReceivedMonthPackagesTotalGivenAmount;
+      });
+
+      selectedReceivedPackageId = null;
+      _receivedPackageThisMonthGivenAmountController.clear();
+      tempGivenAmountStorage = 0;
     }
-
-    setState(() {
-      selectedSupportReceivedMonthPackages = [
-        ...selectedSupportReceivedMonthPackages,
-        {
-          "given_amount": givenAmount,
-          "package": packageToUpdate?.packageName,
-          "package_id": selectedReceivedPackageId, // Example ID
-        }
-      ];
-      int selectedReimbursementsTotalGivenAmount = selectedReimbursements.fold(
-        0,
-        (sum, item) => sum + (item['given_amount'] as int),
-      );
-      int selectedSupportReceivedMonthPackagesTotalGivenAmount =
-          selectedSupportReceivedMonthPackages.fold(
-        0,
-        (sum, item) => sum + (item['given_amount'] as int),
-      );
-      grandTotal = selectedReimbursementsTotalGivenAmount +
-          selectedSupportReceivedMonthPackagesTotalGivenAmount;
-    });
-
-    selectedReceivedPackageId = null;
-    _receivedPackageThisMonthGivenAmountController.clear();
-    tempGivenAmountStorage = 0;
   }
 
-  void onSave() async {
+  Future<void> onSave() async {
     if (_formKey.currentState!.validate()) {
-      SupportMonthEntity formData = SupportMonthEntity(
+      try {
+        setState(() {
+          isLoading = true;
+        });
+
+        // Prepare the reimbursement map for quick lookups
+        final reimbursementMap = {
+          for (var reimbursement in selectedReimbursements)
+            '${reimbursement["reimbursement_month"]}_${reimbursement["reimbursement_packages"]}':
+                reimbursement
+        };
+
+        // Extract plan and receive package names
+        final planPackages = _selectedPlanPackages;
+        final List<String> receivePackages = [
+          ...selectedSupportReceivedMonthPackages.map((pkg) => pkg["package"]),
+          ...selectedReimbursements.map((pkg) => pkg["reimbursement_packages"]),
+        ];
+
+        // Validation: Check if plan and received packages match
+        if (!isEveryElementIncluded(planPackages, receivePackages)) {
+          SnackbarUtils.showError(
+              context, "Please check Plan and Receive Packages.");
+          return;
+        }
+
+        // Validation: Ensure reimbursements are added if status is "Yes"
+        if (reimbursementStatus == "yes" && selectedReimbursements.isEmpty) {
+          SnackbarUtils.showError(
+              context, "Please insert a reimbursement package.");
+          return;
+        }
+
+        // Validation: Check for BMI constraints with Package 8
+        final hasHighBMI = widget.patientSupportMonths.length > 1 &&
+            widget.patientSupportMonths
+                .sublist(widget.patientSupportMonths.length >= 2
+                    ? widget.patientSupportMonths.length - 2
+                    : 0)
+                .every((month) => month.bmi >= 18.5);
+
+        final isIncompatibleWithBPalM =
+            widget.patientDetails.treatmentRegimen == "5. BPalM";
+        final isIncompatibleWithBPal =
+            widget.patientDetails.treatmentRegimen == "4. BPal";
+
+        if (selectedSupportReceivedMonthPackages
+                .any((pkg) => pkg["package"] == "Package 8") &&
+            widget.patientSupportMonths.length > 1 &&
+            hasHighBMI &&
+            !isIncompatibleWithBPalM &&
+            !isIncompatibleWithBPal) {
+          SnackbarUtils.showError(
+            context,
+            "Package 8 is not compatible with BMI above 18.5 for two consecutive months.",
+          );
+          return;
+        }
+
+        // Validation: Check for duplicate reimbursements
+        final hasDuplicateReimbursement = widget.alreadyReceivedPackagesByPatientId.any(
+          (pkg) => reimbursementMap.containsKey(
+              '${pkg.reimbursementMonth}_${pkg.patientPackageName}'),
+        );
+
+        if (hasDuplicateReimbursement) {
+          SnackbarUtils.showError(
+            context,
+            "Selected reimbursement package and month already exist. Please check again.",
+          );
+          return;
+        }
+
+        // Prepare data for submission
+        final formattedPlanPackages = _selectedPlanPackages
+            .map((package) => package.replaceAll(RegExp(r'[^0-9]'), ''))
+            .where((number) => number.isNotEmpty)
+            .join(',');
+
+        List<ReceivedPackageRequest> receivePackagesData =
+            selectedReceivedPackageStatus == "yes"
+                ? [
+                    // Add support received month packages
+                    ...selectedSupportReceivedMonthPackages.map((d) =>
+                        ReceivedPackageRequest(
+                            localPatientPackageId: int.parse(d["package_id"]),
+                            amount: d["given_amount"],
+                            patientPackageName: d["package"],
+                            reimbursementMonth: null,
+                            reimbursementMonthYear: null)),
+                    // Add reimbursements
+                    ...selectedReimbursements.map((d) => ReceivedPackageRequest(
+                        localPatientPackageId: int.parse(d["package_id"]),
+                        amount: d["given_amount"],
+                        patientPackageName: d["reimbursement_packages"],
+                        reimbursementMonth: int.parse(d["reimbursement_month"]),
+                        reimbursementMonthYear: d["reimbursement_month_year"])),
+                  ]
+                : [
+                    ...selectedReimbursements.map((d) => ReceivedPackageRequest(
+                        localPatientPackageId: int.parse(d["package_id"]),
+                        amount: d["given_amount"],
+                        patientPackageName: d["reimbursement_packages"],
+                        reimbursementMonth: int.parse(d["reimbursement_month"]),
+                        reimbursementMonthYear: d["reimbursement_month_year"])),
+                  ];
+
+        // Construct the form data
+        final formData = SupportMonthEntity(
           localPatientId: widget.patientDetails.id!,
           remotePatientId: widget.patientDetails.remoteId,
           patientName: widget.patientDetails.name,
           townshipId: widget.patientDetails.townshipId,
           date: _dateController.text,
-          month: int.parse(selectedMonth!),
+          month: selectedMonth != null ? int.parse(selectedMonth!) : 0,
           monthYear: _monthYearController.text,
           height: widget.patientDetails.height,
           weight: int.parse(_weightController.text),
           bmi: BMI.toInt(),
-          planPackages: _selectedPlanPackages
-              .map((package) => package.replaceAll(RegExp(r'[^0-9]'), ''))
-              .where((number) => number.isNotEmpty)
-              .join(','),
+          planPackages: formattedPlanPackages,
           receivePackageStatus: selectedReceivedPackageStatus!,
           reimbursementStatus: reimbursementStatus!,
           isSynced: false,
           remark: _remarkController.text,
-          supportMonthSignature: sign);
+          supportMonthSignature: sign,
+        );
 
-      List<ReceivedPackageRequest> receivedPackages = [];
+        // Submit data
+        await widget.onSubmit(formData, receivePackagesData);
 
-      // Conditionally add data to receivedPackages
-      if (selectedReceivedPackageStatus == "yes") {
-        receivedPackages = [
-          // Add support received month packages
-          ...selectedSupportReceivedMonthPackages.map((d) =>
-              ReceivedPackageRequest(
-                  localPatientPackageId: int.parse(d["package_id"]),
-                  amount: d["given_amount"],
-                  patientPackageName: d["package"],
-                  reimbursementMonth: null,
-                  reimbursementMonthYear: null)),
-          // Add reimbursements
-          ...selectedReimbursements.map((d) => ReceivedPackageRequest(
-              localPatientPackageId: int.parse(d["package_id"]),
-              amount: d["given_amount"],
-              patientPackageName: d["reimbursement_packages"],
-              reimbursementMonth: int.parse(d["reimbursement_month"]),
-              reimbursementMonthYear: d["reimbursement_month_year"])),
-        ];
-      } else {
-        receivedPackages = [
-          ...selectedReimbursements.map((d) => ReceivedPackageRequest(
-              localPatientPackageId: int.parse(d["package_id"]),
-              amount: d["given_amount"],
-              patientPackageName: d["reimbursement_packages"],
-              reimbursementMonth: int.parse(d["reimbursement_month"]),
-              reimbursementMonthYear: d["reimbursement_month_year"])),
-        ];
+        // showNotification("Support month saved successfully.");
+      } catch (error) {
+        print("Error saving support month: $error");
+        SnackbarUtils.showError(
+            context, "An error occurred. Please try again.");
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
       }
-      widget.onSubmit(formData, receivedPackages);
-      // debugPrint(receivedPackages.toString());
-      // debugPrint("pass form");
     }
   }
 
@@ -346,6 +448,12 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
               key: _formKey,
               child: Column(
                 children: [
+                  // TextButton(
+                  //     onPressed: () {
+                  //       // debugPrint(widget.alreadyReceivedPackagesByPatientId.toString());
+                  //       uploadImageToServer(context);
+                  //     },
+                  //     child: Text("upload")),
                   Column(
                     children: [
                       const Padding(
@@ -645,7 +753,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                             });
                           },
                           isRequired:
-                              false, // Whether the selection is mandatory (optional, defaults to true)
+                              true, // Whether the selection is mandatory (optional, defaults to true)
                         )
                       ],
                     ),
@@ -779,135 +887,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                 ],
                               ),
                             ),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Month',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                CustomDropDown(
-                                  title: "Month", // Label text
-                                  items: supportMonthsOptions.where((month) {
-                                    return selectedMonth != null &&
-                                        int.parse(month.value!) <
-                                            int.parse(selectedMonth!);
-                                  }).toList(),
-                                  selectedData:
-                                      selectedReimbursementMonth, // Currently selected value (optional)
-                                  hintText:
-                                      "Select...", // Hint text displayed when nothing is selected (optional)
-                                  onChanged: (value) {
-                                    // Callback function when selection changes (optional)
-                                    // print("Selected: $value");
-                                    setState(() {
-                                      selectedReimbursementMonth = value;
-                                    });
-                                  },
-                                  isRequired:
-                                      false, // Whether the selection is mandatory (optional, defaults to true)
-                                )
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Month Year',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                CustomDateInputWithValidation(
-                                  dateController:
-                                      _reimbursementMonthYearController,
-                                  labelText: 'Support Received Month',
-                                  date: '2000-01-01',
-                                  isMonthYear: true,
-                                  maxDate: maxDate,
-                                  isRequired: false,
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Packages',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                CustomDropDown(
-                                  title: "Packages", // Label text
-                                  items: _editablePatientPackages.map((d) {
-                                    return DropdownMenuItem<String>(
-                                      value: d.id.toString(),
-                                      child: Text(d.packageName),
-                                    );
-                                  }).toList(),
-                                  selectedData:
-                                      selectedReimbursementPackageId, // Currently selected value (optional)
-                                  hintText:
-                                      "Select Package...", // Hint text displayed when nothing is selected (optional)
-                                  onChanged: (value) {
-                                    // Callback function when selection changes (optional)
-                                    // print("Selected: $value");
-                                    setState(() {
-                                      PatientPackageEntity?
-                                          reimbursementSelectedPackage =
-                                          _editablePatientPackages.firstWhere(
-                                              (package) =>
-                                                  package.id ==
-                                                  int.parse(value));
-                                      selectedReimbursementPackageId = value;
-                                      selectedReimbursementPackageEligibleAmount =
-                                          reimbursementSelectedPackage
-                                              .remainingAmount;
-                                    });
-                                  },
-                                  isRequired:
-                                      false, // Whether the selection is mandatory (optional, defaults to true)
-                                )
-                              ],
-                            ),
-                            if (selectedReimbursementPackageId != null)
-                              Column(
+                            Form(
+                              key: _reimbursementFormKey,
+                              child: Column(
                                 children: [
                                   Column(
                                     children: [
@@ -922,7 +904,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                               MainAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Eligible Amount',
+                                              'Month',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 13),
@@ -930,27 +912,27 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                           ],
                                         ),
                                       ),
-                                      Card(
-                                        elevation: 5,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Center(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  selectedReimbursementPackageEligibleAmount
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      CustomDropDown(
+                                        title: "Month", // Label text
+                                        items:
+                                            supportMonthsOptions.where((month) {
+                                          return selectedMonth != null &&
+                                              int.parse(month.value!) <
+                                                  int.parse(selectedMonth!);
+                                        }).toList(),
+                                        selectedData:
+                                            selectedReimbursementMonth, // Currently selected value (optional)
+                                        hintText:
+                                            "Select...", // Hint text displayed when nothing is selected (optional)
+                                        onChanged: (value) {
+                                          // Callback function when selection changes (optional)
+                                          // print("Selected: $value");
+                                          setState(() {
+                                            selectedReimbursementMonth = value;
+                                          });
+                                        },
+                                        isRequired:
+                                            true, // Whether the selection is mandatory (optional, defaults to true)
                                       )
                                     ],
                                   ),
@@ -967,7 +949,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                               MainAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'Given Amount',
+                                              'Month Year',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 13),
@@ -975,22 +957,166 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                           ],
                                         ),
                                       ),
-                                      CustomTextInput(
-                                        inputController:
-                                            _reimbursementGivenAmountController,
-                                        labelText: "Enter Given Amount",
-                                        type: "number",
-                                        maxValue: _editablePatientPackages
-                                            .firstWhere((d) =>
-                                                d.id ==
-                                                int.parse(
-                                                    selectedReimbursementPackageId!))
-                                            .remainingAmount,
+                                      CustomDateInputWithValidation(
+                                        dateController:
+                                            _reimbursementMonthYearController,
+                                        labelText: 'Support Received Month',
+                                        date: '2000-01-01',
+                                        isMonthYear: true,
+                                        maxDate: maxDate,
+                                        isRequired: true,
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 5),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Packages',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 13),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      CustomDropDown(
+                                        title: "Packages", // Label text
+                                        items:
+                                            _editablePatientPackages.map((d) {
+                                          return DropdownMenuItem<String>(
+                                            value: d.id.toString(),
+                                            child: Text(d.packageName),
+                                          );
+                                        }).toList(),
+                                        selectedData:
+                                            selectedReimbursementPackageId, // Currently selected value (optional)
+                                        hintText:
+                                            "Select Package...", // Hint text displayed when nothing is selected (optional)
+                                        onChanged: (value) {
+                                          // Callback function when selection changes (optional)
+                                          // print("Selected: $value");
+                                          setState(() {
+                                            PatientPackageEntity?
+                                                reimbursementSelectedPackage =
+                                                _editablePatientPackages
+                                                    .firstWhere((package) =>
+                                                        package.id ==
+                                                        int.parse(value));
+                                            selectedReimbursementPackageId =
+                                                value;
+                                            selectedReimbursementPackageEligibleAmount =
+                                                reimbursementSelectedPackage
+                                                    .remainingAmount;
+                                          });
+                                        },
+                                        isRequired:
+                                            true, // Whether the selection is mandatory (optional, defaults to true)
                                       )
                                     ],
                                   ),
+                                  if (selectedReimbursementPackageId != null)
+                                    Column(
+                                      children: [
+                                        Column(
+                                          children: [
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 10, vertical: 5),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Eligible Amount',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 13),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Card(
+                                              elevation: 5,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                child: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        selectedReimbursementPackageEligibleAmount
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 10, vertical: 5),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Given Amount',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 13),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            CustomTextInput(
+                                              inputController:
+                                                  _reimbursementGivenAmountController,
+                                              labelText: "Enter Given Amount",
+                                              type: "number",
+                                              maxValue: _editablePatientPackages
+                                                  .firstWhere((d) =>
+                                                      d.id ==
+                                                      int.parse(
+                                                          selectedReimbursementPackageId!))
+                                                  .remainingAmount,
+                                              isRequired: true,
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                 ],
                               ),
+                            ),
                             const SizedBox(
                               height: 20,
                             ),
@@ -1069,58 +1195,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                   if (selectedReceivedPackageStatus == "yes")
                     Column(
                       children: [
-                        Column(
-                          children: [
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Packages',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            CustomDropDown(
-                              title: "Packages", // Label text
-                              items: _editablePatientPackages.map((d) {
-                                return DropdownMenuItem<String>(
-                                  value: d.id.toString(),
-                                  child: Text(d.packageName),
-                                );
-                              }).toList(),
-                              selectedData:
-                                  selectedReceivedPackageId, // Currently selected value (optional)
-                              hintText:
-                                  "Select Package...", // Hint text displayed when nothing is selected (optional)
-                              onChanged: (value) {
-                                // Callback function when selection changes (optional)
-                                // print("Selected: $value");
-                                setState(() {
-                                  PatientPackageEntity? selectedPackage =
-                                      _editablePatientPackages.firstWhere(
-                                          (package) =>
-                                              package.id == int.parse(value));
-                                  selectedReceivedPackageId = value;
-                                  selectedPackageEligibleAmount =
-                                      selectedPackage.remainingAmount;
-                                });
-                              },
-                              isRequired:
-                                  false, // Whether the selection is mandatory (optional, defaults to true)
-                            )
-                          ],
-                        ),
-                        if (selectedReceivedPackageId != null)
-                          Column(
+                        Form(
+                          key: _receivedPackagesThisMonthFormKey,
+                          child: Column(
                             children: [
                               Column(
                                 children: [
@@ -1135,7 +1212,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                           MainAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Eligible Amount',
+                                          'Packages',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13),
@@ -1143,67 +1220,127 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                       ],
                                     ),
                                   ),
-                                  Card(
-                                    elevation: 5,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              selectedPackageEligibleAmount
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
+                                  CustomDropDown(
+                                    title: "Packages", // Label text
+                                    items: _editablePatientPackages.map((d) {
+                                      return DropdownMenuItem<String>(
+                                        value: d.id.toString(),
+                                        child: Text(d.packageName),
+                                      );
+                                    }).toList(),
+                                    selectedData:
+                                        selectedReceivedPackageId, // Currently selected value (optional)
+                                    hintText:
+                                        "Select Package...", // Hint text displayed when nothing is selected (optional)
+                                    onChanged: (value) {
+                                      // Callback function when selection changes (optional)
+                                      // print("Selected: $value");
+                                      setState(() {
+                                        PatientPackageEntity? selectedPackage =
+                                            _editablePatientPackages.firstWhere(
+                                                (package) =>
+                                                    package.id ==
+                                                    int.parse(value));
+                                        selectedReceivedPackageId = value;
+                                        selectedPackageEligibleAmount =
+                                            selectedPackage.remainingAmount;
+                                      });
+                                    },
+                                    isRequired:
+                                        true, // Whether the selection is mandatory (optional, defaults to true)
+                                  )
+                                ],
+                              ),
+                              if (selectedReceivedPackageId != null)
+                                Column(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 5),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Eligible Amount',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Card(
+                                          elevation: 5,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Center(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    selectedPackageEligibleAmount
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Given Amount',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13),
-                                        ),
+                                          ),
+                                        )
                                       ],
                                     ),
-                                  ),
-                                  CustomTextInput(
-                                    inputController:
-                                        _receivedPackageThisMonthGivenAmountController,
-                                    labelText: "Enter Given Amount",
-                                    type: "number",
-                                    maxValue: _editablePatientPackages
-                                        .firstWhere((d) =>
-                                            d.id ==
-                                            int.parse(
-                                                selectedReceivedPackageId!))
-                                        .remainingAmount,
-                                  )
-                                ],
-                              ),
+                                    Column(
+                                      children: [
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 5),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Given Amount',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        CustomTextInput(
+                                          inputController:
+                                              _receivedPackageThisMonthGivenAmountController,
+                                          labelText: "Enter Given Amount",
+                                          type: "number",
+                                          maxValue: _editablePatientPackages
+                                              .firstWhere((d) =>
+                                                  d.id ==
+                                                  int.parse(
+                                                      selectedReceivedPackageId!))
+                                              .remainingAmount,
+                                          isRequired: true,
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
+                        ),
                         const SizedBox(
                           height: 20,
                         ),
@@ -1339,7 +1476,6 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                           ),
                         ],
                       ),
-
                       if (sign != null)
                         Column(
                           children: [
@@ -1366,8 +1502,8 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                             ),
                           ),
                           onPressed: onSave,
-                          child: const Text(
-                            "Save",
+                          child: Text(
+                            isLoading ? "Loading" : "Save",
                           )),
                       const SizedBox(
                         height: 20,

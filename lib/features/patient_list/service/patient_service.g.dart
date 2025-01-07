@@ -13,7 +13,7 @@ class _PatientService implements PatientService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://205e-103-231-95-45.ngrok-free.app/api/v1/';
+    baseUrl ??= 'https://412e-38-51-129-211.ngrok-free.app/api/v1/';
   }
 
   final Dio _dio;

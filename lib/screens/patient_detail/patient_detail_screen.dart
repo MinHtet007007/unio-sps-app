@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sps/common/constants/theme.dart';
@@ -58,7 +57,12 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
       case LocalPatientLoadingState():
         return const LoadingWidget();
       case LocalPatientSuccessState():
-        return PatientDetailsWidget(patient: state.localPatient, supportMonths: state.localSupportMonths,);
+        return PatientDetailsWidget(
+          patient: state.localPatient,
+          supportMonths: state.localSupportMonths,
+          alreadyReceivedPackagesByPatientId:
+              state.localReceivedPackagesByPatientId!,
+        );
     }
   }
 }

@@ -12,9 +12,10 @@ class LocalPatientSuccessState extends LocalPatientState {
   final List<SupportMonthEntity> localSupportMonths;
   final List<PatientPackageEntity> localPatientPackages;
   final SupportMonthEntity? localSupportMonth;
-  final List<ReceivePackageEntity>? localReceivedPackages;
+  final List<ReceivePackageEntity>? localReceivedPackagesBySupportMonthId;
+  final List<ReceivePackageEntity>? localReceivedPackagesByPatientId;
   LocalPatientSuccessState(this.localPatient, this.localSupportMonths,
-      this.localPatientPackages, this.localSupportMonth, this.localReceivedPackages);
+      this.localPatientPackages, this.localSupportMonth, this.localReceivedPackagesBySupportMonthId, this.localReceivedPackagesByPatientId);
 }
 
 class LocalPatientFailedState extends LocalPatientState {

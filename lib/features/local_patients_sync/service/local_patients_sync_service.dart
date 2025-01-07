@@ -13,11 +13,8 @@ abstract class LocalPatientsSyncService {
 
   @POST(ApiConst.localPatientsSyncEndPoint)
   @MultiPart()
-  Future<RemotePatientResponse> uploadPatientsWithSignatures(
-    {
-      @Part() required String patients,
-      @Part(name: "signatures[]") List<MultipartFile>? signatures,
-
-    }
-  );
+  Future<RemotePatientResponse> uploadPatientsWithSignatures({
+    @Part() required String patients,
+    @Part(name: "signatures[]") List<MultipartFile>? signatures,
+  });
 }

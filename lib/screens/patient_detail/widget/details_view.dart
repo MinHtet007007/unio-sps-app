@@ -4,17 +4,20 @@ import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/data_row.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
+import 'package:sps/local_database/entity/receive_package_entity.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/screens/patient_detail/widget/month_detail.dart';
 
 class PatientDetailsWidget extends StatelessWidget {
   final PatientEntity patient;
   final List<SupportMonthEntity>? supportMonths;
+  final List<ReceivePackageEntity> alreadyReceivedPackagesByPatientId;
 
   const PatientDetailsWidget({
     super.key,
     required this.patient,
     required this.supportMonths,
+    required this.alreadyReceivedPackagesByPatientId,
   });
 
   @override
@@ -53,7 +56,7 @@ class PatientDetailsWidget extends StatelessWidget {
             dataRow('DRTB code', patient.drtbCode ?? ''),
             dataRow('SP code', patient.spCode ?? ''),
             dataRow('Treatment Start Date', patient.treatmentStartDate ?? ''),
-            const SizedBox(height: 20),
+             const SizedBox(height: 20),
             // Add a title or label for the support months list
             if (supportMonths != null)
               const Text(
@@ -61,16 +64,19 @@ class PatientDetailsWidget extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             const SizedBox(height: 10),
-            // Wrap the ListView in a constrained widget
             ListView.builder(
-              shrinkWrap: true, // Ensures it works inside SingleChildScrollView
+              shrinkWrap: true,
               physics:
-                  const NeverScrollableScrollPhysics(), // Disable ListView scrolling
+                  NeverScrollableScrollPhysics(), // Prevent independent scrolling
               itemCount: supportMonths?.length ?? 0,
               itemBuilder: (context, index) {
+                SupportMonthEntity supportMonth = supportMonths![index];
                 return MonthDetail(
-                  supportMonth: supportMonths![index],
+                  supportMonth: supportMonth,
                   patient: patient,
+                  index: index,
+                  alreadyReceivedPackagesByPatientId:
+                      alreadyReceivedPackagesByPatientId,
                 );
               },
             ),

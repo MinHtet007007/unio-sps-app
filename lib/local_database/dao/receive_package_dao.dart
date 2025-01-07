@@ -38,4 +38,12 @@ abstract class ReceivePackageDao {
   @Query(
       'DELETE FROM ${LocalDataBase.patient_support_package_table} WHERE localPatientSupportMonthId = :id')
   Future<void> deletePackagesBySupportMonthId(int id);
+
+  @Query('''
+  SELECT * FROM ${LocalDataBase.patient_support_package_table} WHERE localPatientSupportMonthId IN (
+    SELECT id FROM ${LocalDataBase.patient_support_month_table} WHERE localPatientId = :localPatientId
+  )
+''')
+  Future<List<ReceivePackageEntity>> getReceivedPackagesByLocalPatientId(
+      int localPatientId);
 }

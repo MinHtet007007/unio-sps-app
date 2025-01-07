@@ -92,13 +92,19 @@ class _EditPatientPackageScreenState
         return const LoadingWidget();
       case LocalPatientSuccessState():
         if (state.localSupportMonth != null &&
-            state.localReceivedPackages != null) {
+            state.localReceivedPackagesBySupportMonthId != null) {
           return EditPatientPackageForm(
             patientDetails: state.localPatient,
             patientPackages: state.localPatientPackages,
             onSubmit: onSubmit,
             existingSupportMonth: state.localSupportMonth!,
-            alreadyReceivedPackages: state.localReceivedPackages!,
+            alreadyReceivedPackagesBySupportMonthId:
+                state.localReceivedPackagesBySupportMonthId!,
+            alreadyReceivedPackagesByPatientId: state
+                .localReceivedPackagesByPatientId!
+                .where((d) => d.localPatientSupportMonthId != widget.packageId)
+                .toList(),
+            patientSupportMonths: state.localSupportMonths,
           );
         } else {
           return const Text("Something went wrong");

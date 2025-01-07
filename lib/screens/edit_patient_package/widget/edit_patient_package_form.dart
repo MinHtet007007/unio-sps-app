@@ -4,11 +4,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:sps/common/constants/form_options.dart';
+import 'package:sps/common/helpers/is_every_element_include.dart';
 import 'package:sps/common/widgets/form/custom_date_input_with_validation.dart';
 import 'package:sps/common/widgets/form/custom_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_multi_select_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
+import 'package:sps/common/widgets/snack_bar_utils.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
@@ -21,17 +23,21 @@ class EditPatientPackageForm extends StatefulWidget {
   final PatientEntity patientDetails;
   final SupportMonthEntity existingSupportMonth;
   final List<PatientPackageEntity> patientPackages;
-  List<ReceivePackageEntity> alreadyReceivedPackages;
+  final List<ReceivePackageEntity> alreadyReceivedPackagesBySupportMonthId;
   Future<void> Function(SupportMonthEntity formData,
       List<ReceivedPackageRequest> receivedPackages) onSubmit;
+  final List<ReceivePackageEntity> alreadyReceivedPackagesByPatientId;
+  final List<SupportMonthEntity> patientSupportMonths;
 
   EditPatientPackageForm({
     super.key,
     required this.patientDetails,
     required this.existingSupportMonth,
     required this.patientPackages,
-    required this.alreadyReceivedPackages,
+    required this.alreadyReceivedPackagesBySupportMonthId,
     required this.onSubmit,
+    required this.alreadyReceivedPackagesByPatientId,
+    required this.patientSupportMonths,
   });
 
   @override
@@ -79,6 +85,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
   int tempGivenAmountStorage = 0;
   String? selectedReceivedPackageId;
   int selectedPackageEligibleAmount = 0;
+  bool isLoading = false;
 
   void _calculateBMI({bool isReimbursement = false}) {
     // Extract values once
@@ -234,67 +241,154 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
     tempGivenAmountStorage = 0;
   }
 
-  void onSave() async {
+  Future<void> onSave() async {
     if (_formKey.currentState!.validate()) {
-      SupportMonthEntity formData = SupportMonthEntity(
-          id: widget.existingSupportMonth.id,
+      try {
+        setState(() {
+          isLoading = true;
+        });
+
+        // Prepare the reimbursement map for quick lookups
+        final reimbursementMap = {
+          for (var reimbursement in selectedReimbursements)
+            '${reimbursement["reimbursement_month"]}_${reimbursement["reimbursement_packages"]}':
+                reimbursement
+        };
+
+        // Extract plan and receive package names
+        final planPackages = _selectedPlanPackages;
+        final List<String> receivePackages = [
+          ...selectedSupportReceivedMonthPackages.map((pkg) => pkg["package"]),
+          ...selectedReimbursements.map((pkg) => pkg["reimbursement_packages"]),
+        ];
+
+        // Validation: Check if plan and received packages match
+        if (!isEveryElementIncluded(planPackages, receivePackages)) {
+          SnackbarUtils.showError(
+              context, "Please check Plan and Receive Packages.");
+          return;
+        }
+
+        // Validation: Ensure reimbursements are added if status is "Yes"
+        if (reimbursementStatus == "yes" && selectedReimbursements.isEmpty) {
+          SnackbarUtils.showError(
+              context, "Please insert a reimbursement package.");
+          return;
+        }
+
+        // Validation: Check for BMI constraints with Package 8
+        final hasHighBMI = widget.patientSupportMonths.length > 1 &&
+            widget.patientSupportMonths
+                .sublist(widget.patientSupportMonths.length >= 2
+                    ? widget.patientSupportMonths.length - 2
+                    : 0)
+                .every((month) => month.bmi >= 18.5);
+
+        final isIncompatibleWithBPalM =
+            widget.patientDetails.treatmentRegimen == "5. BPalM";
+        final isIncompatibleWithBPal =
+            widget.patientDetails.treatmentRegimen == "4. BPal";
+
+        if (selectedSupportReceivedMonthPackages
+                .any((pkg) => pkg["package"] == "Package 8") &&
+            widget.patientSupportMonths.length > 1 &&
+            hasHighBMI &&
+            !isIncompatibleWithBPalM &&
+            !isIncompatibleWithBPal) {
+          SnackbarUtils.showError(
+            context,
+            "Package 8 is not compatible with BMI above 18.5 for two consecutive months.",
+          );
+          return;
+        }
+
+        // Validation: Check for duplicate reimbursements
+        final hasDuplicateReimbursement =
+            widget.alreadyReceivedPackagesByPatientId.any(
+          (pkg) => reimbursementMap.containsKey(
+              '${pkg.reimbursementMonth}_${pkg.patientPackageName}'),
+        );
+
+        if (hasDuplicateReimbursement) {
+          SnackbarUtils.showError(
+            context,
+            "Selected reimbursement package and month already exist. Please check again.",
+          );
+          return;
+        }
+
+        // Prepare data for submission
+        final formattedPlanPackages = _selectedPlanPackages
+            .map((package) => package.replaceAll(RegExp(r'[^0-9]'), ''))
+            .where((number) => number.isNotEmpty)
+            .join(',');
+
+        List<ReceivedPackageRequest> receivePackagesData =
+            selectedReceivedPackageStatus == "yes"
+                ? [
+                    // Add support received month packages
+                    ...selectedSupportReceivedMonthPackages.map((d) =>
+                        ReceivedPackageRequest(
+                            localPatientPackageId: int.parse(d["package_id"]),
+                            amount: d["given_amount"],
+                            patientPackageName: d["package"],
+                            reimbursementMonth: null,
+                            reimbursementMonthYear: null)),
+                    // Add reimbursements
+                    ...selectedReimbursements.map((d) => ReceivedPackageRequest(
+                        localPatientPackageId: int.parse(d["package_id"]),
+                        amount: d["given_amount"],
+                        patientPackageName: d["reimbursement_packages"],
+                        reimbursementMonth: int.parse(d["reimbursement_month"]),
+                        reimbursementMonthYear: d["reimbursement_month_year"])),
+                  ]
+                : [
+                    ...selectedReimbursements.map((d) => ReceivedPackageRequest(
+                        localPatientPackageId: int.parse(d["package_id"]),
+                        amount: d["given_amount"],
+                        patientPackageName: d["reimbursement_packages"],
+                        reimbursementMonth: int.parse(d["reimbursement_month"]),
+                        reimbursementMonthYear: d["reimbursement_month_year"])),
+                  ];
+
+        // Construct the form data
+        final formData = SupportMonthEntity(
+           id: widget.existingSupportMonth.id,
           remoteId: widget.existingSupportMonth.remoteId,
           localPatientId: widget.patientDetails.id!,
           remotePatientId: widget.patientDetails.remoteId,
           patientName: widget.patientDetails.name,
           townshipId: widget.patientDetails.townshipId,
           date: _dateController.text,
-          month: int.parse(selectedMonth!),
+          month: selectedMonth != null ? int.parse(selectedMonth!) : 0,
           monthYear: _monthYearController.text,
           height: widget.patientDetails.height,
           weight: int.parse(_weightController.text),
           bmi: BMI.toInt(),
-          planPackages: _selectedPlanPackages
-              .map((package) => package.replaceAll(RegExp(r'[^0-9]'), ''))
-              .where((number) => number.isNotEmpty)
-              .join(','),
+          planPackages: formattedPlanPackages,
           receivePackageStatus: selectedReceivedPackageStatus!,
           reimbursementStatus: reimbursementStatus!,
           isSynced: false,
           remark: _remarkController.text,
-          supportMonthSignature: sign);
+          supportMonthSignature: sign,
+        );
 
-      List<ReceivedPackageRequest> receivedPackages = [];
+        // Submit data
+        await widget.onSubmit(formData, receivePackagesData);
 
-      // Conditionally add data to receivedPackages
-      if (selectedReceivedPackageStatus == "yes") {
-        receivedPackages = [
-          // Add support received month packages
-          ...selectedSupportReceivedMonthPackages.map((d) =>
-              ReceivedPackageRequest(
-                  localPatientPackageId: int.parse(d["package_id"]),
-                  amount: d["given_amount"],
-                  patientPackageName: d["package"],
-                  reimbursementMonth: null,
-                  reimbursementMonthYear: null)),
-          // Add reimbursements
-          ...selectedReimbursements.map((d) => ReceivedPackageRequest(
-              localPatientPackageId: int.parse(d["package_id"]),
-              amount: d["given_amount"],
-              patientPackageName: d["reimbursement_packages"],
-              reimbursementMonth: int.parse(d["reimbursement_month"]),
-              reimbursementMonthYear: d["reimbursement_month_year"])),
-        ];
-      } else {
-        receivedPackages = [
-          ...selectedReimbursements.map((d) => ReceivedPackageRequest(
-              localPatientPackageId: int.parse(d["package_id"]),
-              amount: d["given_amount"],
-              patientPackageName: d["reimbursement_packages"],
-              reimbursementMonth: int.parse(d["reimbursement_month"]),
-              reimbursementMonthYear: d["reimbursement_month_year"])),
-        ];
+        // showNotification("Support month saved successfully.");
+      } catch (error) {
+        print("Error saving support month: $error");
+        SnackbarUtils.showError(
+            context, "An error occurred. Please try again.");
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
       }
-      widget.onSubmit(formData, receivedPackages);
-      // debugPrint(receivedPackages.toString());
-      // debugPrint("pass form");
     }
   }
+
 
   @override
   void initState() {
@@ -326,11 +420,12 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
         .toList();
     BMI = widget.existingSupportMonth.bmi.toDouble();
     sign = widget.existingSupportMonth.supportMonthSignature;
-    selectedReimbursements = widget.alreadyReceivedPackages
+    selectedReimbursements = widget.alreadyReceivedPackagesBySupportMonthId
         .where((d) => d.reimbursementMonth != null)
         .map((reimbursementPackage) {
       return {
-        'reimbursement_month': reimbursementPackage.reimbursementMonth.toString(),
+        'reimbursement_month':
+            reimbursementPackage.reimbursementMonth.toString(),
         'given_amount': reimbursementPackage.amount,
         'reimbursement_packages': reimbursementPackage.patientPackageName,
         'reimbursement_month_year': reimbursementPackage.reimbursementMonthYear,
@@ -341,7 +436,8 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
             .toString(),
       };
     }).toList();
-    selectedSupportReceivedMonthPackages = widget.alreadyReceivedPackages
+    selectedSupportReceivedMonthPackages = widget
+        .alreadyReceivedPackagesBySupportMonthId
         .where((d) =>
             d.reimbursementMonth ==
             null) // Filter the list based on the null reimbursementMonth
@@ -380,11 +476,11 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
               key: _formKey,
               child: Column(
                 children: [
-                  TextButton(
-                      onPressed: () {
-                        debugPrint(widget.alreadyReceivedPackages.toString());
-                      },
-                      child: const Text("Print")),
+                  // TextButton(
+                  //     onPressed: () {
+                  //       debugPrint(widget.alreadyReceivedPackagesBySupportMonthId.toString());
+                  //     },
+                  //     child: const Text("Print")),
                   Column(
                     children: [
                       const Padding(

@@ -91,6 +91,7 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
           patientPackages: state.localPatientPackages,
           patientSupportMonths: state.localSupportMonths,
           onSubmit: onSubmit,
+          alreadyReceivedPackagesByPatientId: state.localReceivedPackagesByPatientId!,
         );
     }
   }

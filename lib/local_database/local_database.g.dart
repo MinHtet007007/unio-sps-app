@@ -734,6 +734,15 @@ class _$ReceivePackageDao extends ReceivePackageDao {
   }
 
   @override
+  Future<List<ReceivePackageEntity>> getReceivedPackagesByLocalPatientId(
+      int localPatientId) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM patient_support_packages WHERE localPatientSupportMonthId IN (     SELECT id FROM patient_support_months WHERE localPatientId = ?1   )',
+        mapper: (Map<String, Object?> row) => ReceivePackageEntity(id: row['id'] as int?, remoteId: row['remoteId'] as int?, amount: row['amount'] as int, localPatientSupportMonthId: row['localPatientSupportMonthId'] as int, remotePatientPackageId: row['remotePatientPackageId'] as int?, localPatientPackageId: row['localPatientPackageId'] as int?, patientPackageName: row['patientPackageName'] as String, reimbursementMonth: row['reimbursementMonth'] as int?, reimbursementMonthYear: row['reimbursementMonthYear'] as String?),
+        arguments: [localPatientId]);
+  }
+
+  @override
   Future<void> insertReceivePackage(ReceivePackageEntity receivePackage) async {
     await _receivePackageEntityInsertionAdapter.insert(
         receivePackage, OnConflictStrategy.replace);
