@@ -17,10 +17,4 @@ abstract class LocalPatientsSyncService {
     @Part() required String patients,
     @Part(name: "signatures[]") List<MultipartFile>? signatures,
   });
-
-  @POST("/upload-amazon-test")
-  @MultiPart()
-  Future<HttpResponse> uploadImage(
-    @Part(name: "file") File file,
-  );
 }

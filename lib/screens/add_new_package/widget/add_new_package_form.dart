@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:sps/common/constants/form_options.dart';
@@ -12,7 +11,6 @@ import 'package:sps/common/widgets/form/custom_multi_select_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
 import 'package:sps/common/widgets/snack_bar_utils.dart';
-import 'package:sps/features/local_patients_sync/service/local_patients_sync_service.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/patient_package_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
@@ -20,7 +18,6 @@ import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/add_new_package/widget/reimbursement_table.dart';
 import 'package:sps/screens/add_new_package/widget/support_package_table.dart';
-import 'package:sps/utils/file.dart';
 
 class AddNewPackageForm extends StatefulWidget {
   final PatientEntity patientDetails;
@@ -440,47 +437,6 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
     });
   }
 
-  void uploadImageToServer(BuildContext context) async {
-    // Pick an image
-    // final picker = ImagePicker();
-    // final XFile? pickedFile =
-    //     await picker.pickImage(source: ImageSource.gallery);
-
-    if (sign != null) {
-      final File file = await getSignatureFile(sign!);
-
-      try {
-        // Create Dio instance
-        final dio = Dio();
-        final apiClient = LocalPatientsSyncService(dio);
-
-        // Call the API
-        final response = await apiClient.uploadImage(file);
-
-        if (response.response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Upload Successful: ${response.data['path']}')),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Failed: ${response.response.statusMessage}')),
-          );
-        }
-      } catch (e) {
-        print('Error: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No file selected')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -492,12 +448,12 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
               key: _formKey,
               child: Column(
                 children: [
-                  TextButton(
-                      onPressed: () {
-                        // debugPrint(widget.alreadyReceivedPackagesByPatientId.toString());
-                        uploadImageToServer(context);
-                      },
-                      child: Text("upload")),
+                  // TextButton(
+                  //     onPressed: () {
+                  //       // debugPrint(widget.alreadyReceivedPackagesByPatientId.toString());
+                  //       uploadImageToServer(context);
+                  //     },
+                  //     child: Text("upload")),
                   Column(
                     children: [
                       const Padding(
