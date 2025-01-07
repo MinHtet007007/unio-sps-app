@@ -26,21 +26,28 @@ class LocalPatientProvider extends StateNotifier<LocalPatientState> {
           await supportMonthDao.getSupportMonthsByLocalPatientId(id);
 
       SupportMonthEntity? supportMonth;
-      List<ReceivePackageEntity>? receivedPackages;
+      List<ReceivePackageEntity>? receivedPackagesBySupportMonthId;
+      List<ReceivePackageEntity>? receivedPackagesByPatientId =
+          await receivePackageDao.getReceivedPackagesByLocalPatientId(id);
 
       if (supportMonthId != null) {
         // handle supportMonthId logic here if needed
         supportMonth =
             await supportMonthDao.getSupportMonthById(supportMonthId);
-        receivedPackages = await receivePackageDao
+        receivedPackagesBySupportMonthId = await receivePackageDao
             .getReceivePackagesBySupportMonth(supportMonthId);
       }
 
       final List<PatientPackageEntity> patientPackages =
           await patientPackageDao.getPatientPackagesByPatientId(id);
       if (patient != null) {
-        state = LocalPatientSuccessState(patient, supportMonths,
-            patientPackages, supportMonth, receivedPackages);
+        state = LocalPatientSuccessState(
+            patient,
+            supportMonths,
+            patientPackages,
+            supportMonth,
+            receivedPackagesBySupportMonthId,
+            receivedPackagesByPatientId);
         return;
       }
       state = LocalPatientFailedState('Patient Not Found');
@@ -49,6 +56,21 @@ class LocalPatientProvider extends StateNotifier<LocalPatientState> {
       state = LocalPatientFailedState(error.toString());
     }
   }
+
+// Future<List<SupportMonthWithReceivedPackages>> getSupportMonthsWithReceivedPackages(
+//       int localPatientId, List<SupportMonthEntity> supportMonths) async {
+//     // final supportMonths =
+//     //     await getSupportMonthsByLocalPatientId(localPatientId);
+//     final receivedPackages =
+//         await getReceivedPackagesByLocalPatientId(localPatientId);
+
+//     return supportMonths.map((month) {
+//       final packages = receivedPackages
+//           .where((pkg) => pkg.supportMonthId == month.id)
+//           .toList();
+//       return SupportMonthWithReceivedPackages(month, packages);
+//     }).toList();
+//   }
 }
 
 final localPatientProvider =

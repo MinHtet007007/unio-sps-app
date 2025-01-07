@@ -13,7 +13,7 @@ class _LocalPatientsSyncService implements LocalPatientsSyncService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://205e-103-231-95-45.ngrok-free.app/api/v1/';
+    baseUrl ??= 'https://412e-38-51-129-211.ngrok-free.app/api/v1/';
   }
 
   final Dio _dio;
@@ -57,6 +57,42 @@ class _LocalPatientsSyncService implements LocalPatientsSyncService {
             ))));
     final value = RemotePatientResponse.fromJson(_result.data!);
     return value;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> uploadImage(File file) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(MapEntry(
+      'file',
+      MultipartFile.fromFileSync(
+        file.path,
+        filename: file.path.split(Platform.pathSeparator).last,
+      ),
+    ));
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'multipart/form-data',
+    )
+            .compose(
+              _dio.options,
+              '/upload-amazon-test',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

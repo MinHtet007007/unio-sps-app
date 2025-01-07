@@ -19,57 +19,67 @@ class LocalNewSupportMonthProvider
     try {
       state = LocalNewSupportMonthLoadingState();
 
-      // Retrieve the database instance
+      // Retrieve the database instance and DAOs
       final database = await localDatabase.database;
+      final supportMonthDao = database.supportMonthDao;
+      final patientDao = database.patientDao;
+      final receivePackageDao = database.receivePackageDao;
+      final patientPackageDao = database.patientPackageDao;
 
       // Insert the Support Month data
-      final supportMonthDao = database.supportMonthDao;
       final supportMonthId = await supportMonthDao.insertSupportMonth(formData);
 
-      // Update patient's `isSynced` status
-      final patientDao = database.patientDao;
-      await patientDao.updatePatientSyncedStatus(
-          formData.localPatientId, false);
-
-      if (supportMonthId > 0) {
-        // Insert related Patient Received Packages and update their amounts
-        final receivePackageDao = database.receivePackageDao;
-        final patientPackageDao = database.patientPackageDao;
-
-        for (var package in receivedPackages) {
-          await receivePackageDao.insertReceivePackage(
-            ReceivePackageEntity(
-              id: null, // Ensure the ID is auto-generated
-              amount: package.amount,
-              localPatientSupportMonthId: supportMonthId,
-              patientPackageName: package.patientPackageName,
-              reimbursementMonth: package.reimbursementMonth,
-              reimbursementMonthYear: package.reimbursementMonthYear,
-              localPatientPackageId: package.localPatientPackageId,
-            ),
-          );
-
-          // Subtract from the remaining amount in the patient's package
-          if (package.localPatientPackageId != null) {
-            await patientPackageDao.subtractFromRemainingAmount(
-              package.localPatientPackageId!,
-              package.amount,
-            );
-          }
-        }
-
-        // Update state to success
-        state = LocalNewSupportMonthSuccessState();
+      if (supportMonthId <= 0) {
+        state = LocalNewSupportMonthFailedState(
+            'Support Month could not be created');
         return;
       }
 
-      // Handle case where supportMonthId is not valid
-      state =
-          LocalNewSupportMonthFailedState('Support Month could not be created');
+      // Update patient's `isSynced` status
+      final syncStatusFuture =
+          patientDao.updatePatientSyncedStatus(formData.localPatientId, false);
+
+      // Prepare bulk insert operations for received packages
+      final receivePackageEntities = receivedPackages.map((package) {
+        return ReceivePackageEntity(
+          id: null, // Ensure the ID is auto-generated
+          amount: package.amount,
+          localPatientSupportMonthId: supportMonthId,
+          patientPackageName: package.patientPackageName,
+          reimbursementMonth: package.reimbursementMonth,
+          reimbursementMonthYear: package.reimbursementMonthYear,
+          localPatientPackageId: package.localPatientPackageId,
+        );
+      }).toList();
+
+      final insertPackagesFuture = receivePackageDao.insertMany(
+        receivePackageEntities,
+      );
+
+      // Prepare bulk update operations for subtracting package amounts
+      final updateAmountsFutures = receivedPackages
+          .where(
+        (package) => package.localPatientPackageId != null && package.patientPackageName != "Package 8",
+      )
+          .map((package) {
+        return patientPackageDao.subtractFromRemainingAmount(
+          package.localPatientPackageId!,
+          package.amount,
+        );
+      });
+
+      // Execute bulk insert and updates in parallel
+      await Future.wait([
+        syncStatusFuture,
+        insertPackagesFuture,
+        ...updateAmountsFutures,
+      ]);
+
+      // Update state to success
+      state = LocalNewSupportMonthSuccessState();
     } catch (e, stackTrace) {
       // Handle exceptions and update state to failure
-      print('Error: $e');
-      print('StackTrace: $stackTrace');
+      print('Error: $e\nStackTrace: $stackTrace');
       state = LocalNewSupportMonthFailedState(e.toString());
     }
   }

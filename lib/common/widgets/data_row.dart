@@ -17,6 +17,7 @@ Padding dataRow(String label, String data) {
             style: const TextStyle(
               fontSize: 16.0,
             ),
+            align: TextAlign.left,
           ),
         ),
         const SizedBox(
@@ -26,6 +27,7 @@ Padding dataRow(String label, String data) {
           child: CustomLabelWidget(
             text: data,
             style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            align: TextAlign.right,
           ),
         ),
       ],
