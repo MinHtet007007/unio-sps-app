@@ -69,7 +69,7 @@ class MonthDetail extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ElevatedButton(
                           onPressed: () async {
@@ -88,6 +88,27 @@ class MonthDetail extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (supportMonth.supportMonthSignature != null)
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Patient Signature'),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(6.0),
+                              child: Image.memory(
+                                supportMonth.supportMonthSignature!,
+                                width: 150.0,
+                                // height: 150.0,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                   dataRow('Month Year', supportMonth.monthYear),
                   dataRow('Support Received Date', supportMonth.date),
                   dataRow('Height', supportMonth.height.toString()),
