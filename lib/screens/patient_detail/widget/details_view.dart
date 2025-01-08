@@ -56,7 +56,7 @@ class PatientDetailsWidget extends StatelessWidget {
             dataRow('DRTB code', patient.drtbCode ?? ''),
             dataRow('SP code', patient.spCode ?? ''),
             dataRow('Treatment Start Date', patient.treatmentStartDate ?? ''),
-             const SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Add a title or label for the support months list
             if (supportMonths != null)
               const Text(

@@ -13,7 +13,7 @@ class _PatientSyncService implements PatientSyncService {
     this._dio, {
     this.baseUrl,
   }) {
-    baseUrl ??= 'https://412e-38-51-129-211.ngrok-free.app/api/v1/';
+    baseUrl ??= 'http://192.168.99.197:8000/api/v1/';
   }
 
   final Dio _dio;
