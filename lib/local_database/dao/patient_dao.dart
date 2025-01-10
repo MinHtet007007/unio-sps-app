@@ -17,6 +17,9 @@ abstract class PatientDao {
 
   @Query('SELECT * FROM ${LocalDataBase.patient_table} WHERE id = :id')
   Future<PatientEntity?> findLocalPatientById(int id);
+  
+  @Query('SELECT id FROM ${LocalDataBase.patient_table} WHERE remoteId = :id')
+  Future<int?> findPatientByRemoteId(int id);
 
   @Insert(onConflict: OnConflictStrategy.replace)
   Future<void> insertMany(List<PatientEntity> patients);

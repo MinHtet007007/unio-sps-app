@@ -11,7 +11,7 @@ class PatientEntity {
   final String? spsStartDate;
   final int townshipId;
   final String? rrCode;
-  final String drtbCode;
+  final String? drtbCode;
   final String? spCode;
   final String? uniqueId;
   final String name;
@@ -54,7 +54,7 @@ class PatientEntity {
       this.spsStartDate,
       required this.townshipId,
       this.rrCode,
-      required this.drtbCode,
+      this.drtbCode,
       this.spCode,
       this.uniqueId,
       required this.name,

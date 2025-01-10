@@ -21,7 +21,7 @@ class _PatientSyncService implements PatientSyncService {
   String? baseUrl;
 
   @override
-  Future<RemotePatientResponse> fetchRemotePatients({
+  Future<RemoteLimitedPatientResponse> fetchRemotePatients({
     String? alreadySyncedIds,
     DateTime? last_sync_date,
   }) async {
@@ -34,7 +34,7 @@ class _PatientSyncService implements PatientSyncService {
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<RemotePatientResponse>(Options(
+        _setStreamType<RemoteLimitedPatientResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
@@ -50,7 +50,7 @@ class _PatientSyncService implements PatientSyncService {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    final value = RemotePatientResponse.fromJson(_result.data!);
+    final value = RemoteLimitedPatientResponse.fromJson(_result.data!);
     return value;
   }
 
