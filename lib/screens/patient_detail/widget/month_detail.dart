@@ -63,28 +63,29 @@ class MonthDetail extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () async {
-                            context.push(
-                                '${RouteName.packageEdit}/${patient.id}/${supportMonth.id}');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ColorTheme.primary,
+                  if (!supportMonth.isSynced)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              context.push(
+                                  '${RouteName.packageEdit}/${patient.id}/${supportMonth.id}');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorTheme.primary,
+                            ),
+                            child: const Text(
+                              'Edit Package',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
-                          child: const Text(
-                            'Edit Package',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
+                          const SizedBox(width: 10),
+                        ],
+                      ),
                     ),
-                  ),
                   if (supportMonth.supportMonthSignature != null)
                     Column(
                       children: [

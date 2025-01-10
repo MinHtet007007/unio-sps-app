@@ -36,6 +36,7 @@ class CustomDateInput extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: TextFormField(
+        onTap: pickDate,
         controller: dateController,
         readOnly: true,
         decoration: InputDecoration(
@@ -46,11 +47,7 @@ class CustomDateInput extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            prefixIcon: IconButton(
-                onPressed: pickDate,
-                icon: const Icon(
-                  Icons.calendar_month_rounded,
-                ))),
+            prefixIcon: const Icon(Icons.calendar_month_rounded)),
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
         validator: (val) {
