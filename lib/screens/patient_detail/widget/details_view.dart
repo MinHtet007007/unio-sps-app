@@ -51,11 +51,64 @@ class PatientDetailsWidget extends StatelessWidget {
             dataRow('Name', patient.name),
             dataRow('Address', patient.patientAddress),
             dataRow('Phone', patient.patientPhoneNo),
+            dataRow('Gender', patient.sex),
             dataRow('SPS Start Date', patient.spsStartDate ?? ''),
             dataRow('RR code', patient.rrCode ?? ''),
             dataRow('DRTB code', patient.drtbCode ?? ''),
             dataRow('SP code', patient.spCode ?? ''),
             dataRow('Treatment Start Date', patient.treatmentStartDate ?? ''),
+            Card(
+              // margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFB2EBF2), // Light Cyan
+                      Color(0xFF81D4FA), // Light Blue
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: ExpansionTile(
+                  collapsedShape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                    side: BorderSide(color: Colors.transparent),
+                  ),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                    side: BorderSide(color: Colors.transparent),
+                  ),
+                  title: const Text(
+                    'Patient Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          dataRow('Died Before Treatment Enrollment',
+                              patient.diedBeforeTreatmentEnrollment ?? ''),
+                          dataRow('treatmentRegimen', patient.treatmentRegimen),
+                          dataRow('contactInfo', patient.contactInfo),
+                          dataRow('contactPhoneNo', patient.contactPhoneNo),
+                          dataRow('primaryLanguage', patient.primaryLanguage),
+                          dataRow('secondaryLanguage',
+                              patient.secondaryLanguage ?? ''),
+                          dataRow('height', '${patient.height}'),
+                          dataRow('weight', '${patient.weight}'),
+                          dataRow('bmi', '${patient.bmi}'),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             // Add a title or label for the support months list
             if (supportMonths != null)
@@ -74,7 +127,6 @@ class PatientDetailsWidget extends StatelessWidget {
                 return MonthDetail(
                   supportMonth: supportMonth,
                   patient: patient,
-                  index: index,
                   alreadyReceivedPackagesByPatientId:
                       alreadyReceivedPackagesByPatientId,
                 );

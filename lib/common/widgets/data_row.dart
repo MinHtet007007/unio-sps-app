@@ -15,7 +15,7 @@ Padding dataRow(String label, String data) {
           child: CustomLabelWidget(
             text: label,
             style: const TextStyle(
-              fontSize: 16.0,
+              fontSize: 14.0,
             ),
             align: TextAlign.left,
           ),
@@ -26,7 +26,7 @@ Padding dataRow(String label, String data) {
         Flexible(
           child: CustomLabelWidget(
             text: data,
-            style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
             align: TextAlign.right,
           ),
         ),
