@@ -11,14 +11,12 @@ import 'package:sps/screens/patient_detail/widget/month_detail_reimbursement_tab
 class MonthDetail extends StatelessWidget {
   final SupportMonthEntity supportMonth;
   final PatientEntity patient;
-  final int index;
   final List<ReceivePackageEntity> alreadyReceivedPackagesByPatientId;
 
   MonthDetail({
     super.key,
     required this.supportMonth,
     required this.patient,
-    required this.index,
     required this.alreadyReceivedPackagesByPatientId,
   });
 
@@ -46,7 +44,6 @@ class MonthDetail extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: ExpansionTile(
-          initiallyExpanded: index == 0,
           collapsedShape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.zero,
             side: BorderSide(color: Colors.transparent),
