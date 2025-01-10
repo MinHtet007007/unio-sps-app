@@ -8,7 +8,7 @@ class Patient {
   final String? spsStartDate;
   final Township township;
   final String? rrCode;
-  final String drtbCode;
+  final String? drtbCode;
   final String? spCode;
   final String uniqueId;
   final String name;

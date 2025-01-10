@@ -29,6 +29,45 @@ class _HomeState extends ConsumerState<Home> {
     await homeSyncNotifier.insertRemotePatients();
   }
 
+  void _confirmToSyncMore() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.redAccent,
+            title: const Text(
+              'Please confirm',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'လူနာ data update များကျန်ပါသေးသည် ထပ်ဆွဲပါမည်လား',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                },
+                child: const Text(
+                  'No',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              TextButton(
+                onPressed: () => {
+                                    Navigator.of(context).pop(),
+                  _fetchRemotePatients()
+                },
+                child: const Text(
+                  'Yes',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final homeSyncNotifier = ref.watch(homePatientSyncProvider);
@@ -38,6 +77,9 @@ class _HomeState extends ConsumerState<Home> {
       }
       if (state is HomePatientsSyncSuccessState) {
         SnackbarUtils.showSuccessToast(context, 'Success');
+      }
+      if (state is HomePatientsSyncSuccessHasMoreState) {
+        _confirmToSyncMore();
       }
     });
 

@@ -36,6 +36,10 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
         }
         await Cache.saveLastSyncedTime();
       }
+      if(response.hasMore) {
+        state = HomePatientsSyncSuccessHasMoreState();
+        return;
+      }
       state = HomePatientsSyncSuccessState();
     } catch (error, stackTrace) {
       print(error);

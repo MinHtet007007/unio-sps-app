@@ -45,6 +45,19 @@ abstract class AppDatabase extends FloorDatabase {
       final PatientEntity patientEntity =
           PatientEntity.mapRemotePatientToLocalEntity(remotePatient);
 
+      final existingPatientId =
+          await patientDao.findPatientByRemoteId(remotePatient.id);
+      if (existingPatientId != null) {
+        // Delete the existing patient and all related records
+        await receivePackageDao.deleteByPatientIds([existingPatientId]);
+        await supportMonthDao.deleteByPatientIds([existingPatientId]);
+        await patientPackageDao.deleteByPatientIds([existingPatientId]);
+        await patientDao.deletePatientsByIds([existingPatientId]);
+
+        print(
+            "Deleted existing patient with ID $existingPatientId before re-inserting.");
+      }
+
       final int patientId = await patientDao.insertLocalPatient(patientEntity);
 
       final List<PatientPackageEntity> patientPackages = remotePatient

@@ -13,7 +13,7 @@ class LocalPatientWithRelations {
   final String? spsStartDate;
   final int townshipId;
   final String? rrCode;
-  final String drtbCode;
+  final String? drtbCode;
   final String? spCode;
   final String? uniqueId;
   final String name;

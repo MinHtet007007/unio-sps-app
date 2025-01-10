@@ -104,7 +104,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT NOT NULL, `spCode` TEXT, `uniqueId` TEXT, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `patients` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `year` TEXT NOT NULL, `spsStartDate` TEXT, `townshipId` INTEGER NOT NULL, `rrCode` TEXT, `drtbCode` TEXT, `spCode` TEXT, `uniqueId` TEXT, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `sex` TEXT NOT NULL, `diedBeforeTreatmentEnrollment` TEXT, `treatmentStartDate` TEXT, `treatmentRegimen` TEXT NOT NULL, `treatmentRegimenOther` TEXT, `patientAddress` TEXT NOT NULL, `patientPhoneNo` TEXT NOT NULL, `contactInfo` TEXT NOT NULL, `contactPhoneNo` TEXT NOT NULL, `primaryLanguage` TEXT NOT NULL, `secondaryLanguage` TEXT, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `toStatus` TEXT, `toYear` INTEGER, `toDate` TEXT, `toRrCode` TEXT, `toDrtbCode` TEXT, `toUniqueId` TEXT, `toTownshipId` INTEGER, `outcome` TEXT, `remark` TEXT, `treatmentFinished` TEXT, `treatmentFinishedDate` TEXT, `outcomeDate` TEXT, `isReported` TEXT, `reportPeriod` TEXT, `currentTownshipId` INTEGER NOT NULL, `isSynced` INTEGER NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `patient_support_months` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `remoteId` INTEGER, `localPatientId` INTEGER NOT NULL, `remotePatientId` INTEGER, `patientName` TEXT NOT NULL, `townshipId` INTEGER NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `monthYear` TEXT NOT NULL, `height` INTEGER NOT NULL, `weight` INTEGER NOT NULL, `bmi` INTEGER NOT NULL, `planPackages` TEXT NOT NULL, `receivePackageStatus` TEXT NOT NULL, `reimbursementStatus` TEXT NOT NULL, `amount` INTEGER, `remark` TEXT, `supportMonthSignature` BLOB, `isSynced` INTEGER NOT NULL)');
         await database.execute(
@@ -221,7 +221,7 @@ class _$PatientDao extends PatientDao {
             spsStartDate: row['spsStartDate'] as String?,
             townshipId: row['townshipId'] as int,
             rrCode: row['rrCode'] as String?,
-            drtbCode: row['drtbCode'] as String,
+            drtbCode: row['drtbCode'] as String?,
             spCode: row['spCode'] as String?,
             uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
@@ -277,7 +277,7 @@ class _$PatientDao extends PatientDao {
             spsStartDate: row['spsStartDate'] as String?,
             townshipId: row['townshipId'] as int,
             rrCode: row['rrCode'] as String?,
-            drtbCode: row['drtbCode'] as String,
+            drtbCode: row['drtbCode'] as String?,
             spCode: row['spCode'] as String?,
             uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
@@ -325,7 +325,7 @@ class _$PatientDao extends PatientDao {
             spsStartDate: row['spsStartDate'] as String?,
             townshipId: row['townshipId'] as int,
             rrCode: row['rrCode'] as String?,
-            drtbCode: row['drtbCode'] as String,
+            drtbCode: row['drtbCode'] as String?,
             spCode: row['spCode'] as String?,
             uniqueId: row['uniqueId'] as String?,
             name: row['name'] as String,
@@ -361,6 +361,13 @@ class _$PatientDao extends PatientDao {
             reportPeriod: row['reportPeriod'] as String?,
             currentTownshipId: row['currentTownshipId'] as int,
             isSynced: (row['isSynced'] as int) != 0),
+        arguments: [id]);
+  }
+
+  @override
+  Future<int?> findPatientByRemoteId(int id) async {
+    return _queryAdapter.query('SELECT id FROM patients WHERE remoteId = ?1',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
         arguments: [id]);
   }
 
