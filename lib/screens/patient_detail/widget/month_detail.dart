@@ -129,6 +129,8 @@ class MonthDetail extends StatelessWidget {
                   dataRow(
                       'Grand Total',
                       alreadyReceivedPackagesByPatientId
+                          .where((d) =>
+                              d.localPatientSupportMonthId == supportMonth.id)
                           .fold(0, (total, item) => total + (item.amount))
                           .toString()),
                   dataRow('Remark',
