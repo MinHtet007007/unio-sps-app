@@ -69,27 +69,34 @@ abstract class AppDatabase extends FloorDatabase {
 
       await patientPackageDao.insertMany(patientPackages);
 
-      final List<SupportMonthEntity> supportMonths = remotePatient.supportMonths
-          .map((supportMonth) =>
-              SupportMonthEntity.mapRemoteSupportMonthToLocalEntity(
-                  supportMonth, patientId))
-          .toList();
+     for (final remoteSupportMonth
+          in remotePatient.supportMonths as List<dynamic>) {
+        // Map the remote support month to a local entity
+        final SupportMonthEntity supportMonthEntity =
+            SupportMonthEntity.mapRemoteSupportMonthToLocalEntity(
+                remoteSupportMonth, patientId);
 
-      for (var supportMonthEntity in supportMonths) {
+        // Insert the support month and retrieve its ID
         final int supportMonthId =
             await supportMonthDao.insertSupportMonth(supportMonthEntity);
 
-        List<ReceivePackageEntity> receivePackages = (remotePatient
-                .supportMonths as List<dynamic>)
-            .expand((supportMonth) => (supportMonth.receivePackages
-                    as List<dynamic>)
-                .map((receivePackage) =>
-                    ReceivePackageEntity.mapRemoteReceivePackageToLocalEntity(
-                        receivePackage, supportMonthId)))
-            .toList();
+        // Map the receive packages for the current support month
+        final List<dynamic> remoteReceivePackages =
+            remoteSupportMonth.receivePackages as List<dynamic>? ?? [];
+        final List<ReceivePackageEntity> receivePackages =
+            remoteReceivePackages.map(
+          (receivePackage) {
+            return ReceivePackageEntity.mapRemoteReceivePackageToLocalEntity(
+                receivePackage, supportMonthId);
+          },
+        ).toList();
 
-        await receivePackageDao.insertMany(receivePackages);
+        // Insert the receive packages in batch, if any
+        if (receivePackages.isNotEmpty) {
+          await receivePackageDao.insertMany(receivePackages);
+        }
       }
+
     } catch (e) {
       // Handle exceptions and ensure rollback
       throw Exception("Transaction failed: $e");
