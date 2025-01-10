@@ -353,7 +353,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
 
         // Construct the form data
         final formData = SupportMonthEntity(
-           id: widget.existingSupportMonth.id,
+          id: widget.existingSupportMonth.id,
           remoteId: widget.existingSupportMonth.remoteId,
           localPatientId: widget.patientDetails.id!,
           remotePatientId: widget.patientDetails.remoteId,
@@ -388,7 +388,6 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
       }
     }
   }
-
 
   @override
   void initState() {
@@ -1424,10 +1423,13 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
                       const SizedBox(
                         height: 20,
                       ),
-                      Signature(
-                        controller: signatureController,
-                        width: double.infinity,
-                        height: 200.0,
+                      AbsorbPointer(
+                        absorbing: sign != null,
+                        child: Signature(
+                          controller: signatureController,
+                          width: double.infinity,
+                          height: 200.0,
+                        ),
                       ),
                       const SizedBox(height: 10.0),
                       Row(
@@ -1456,9 +1458,21 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
                               child: CustomSubmitButton(
                                   buttonText: 'သိမ်းမည်',
                                   onSubmit: () async {
-                                    sign =
+                                    // Wait for the signature to be captured as a PNG byte array
+                                    final Uint8List? pngBytes =
                                         await signatureController.toPngBytes();
-                                    setState(() {});
+
+                                    if (pngBytes != null) {
+                                      // Successfully obtained the signature, store it
+                                      setState(() {
+                                        sign = pngBytes;
+                                      });
+                                      // Optionally clear the controller after storing the signature
+                                      signatureController.clear();
+                                    } else {
+                                      // Handle the case where signature was not obtained (maybe show an error)
+                                      print('Failed to capture the signature');
+                                    }
                                   }),
                             ),
                           ),
