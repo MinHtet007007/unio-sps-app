@@ -44,3 +44,7 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+#ignore generated files
+# Ignore all files ending with .g
+*.g.dart
