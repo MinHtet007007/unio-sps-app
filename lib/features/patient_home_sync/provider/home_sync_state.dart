@@ -9,6 +9,10 @@ class HomePatientsSyncSuccessState extends HomePatientsSyncState {
   HomePatientsSyncSuccessState();
 }
 
+class HomePatientsSyncSuccessHasMoreState extends HomePatientsSyncState {
+  HomePatientsSyncSuccessHasMoreState();
+}
+
 class HomePatientsSyncFailedState extends HomePatientsSyncState {
   final String errorMessage;
   HomePatientsSyncFailedState(this.errorMessage);

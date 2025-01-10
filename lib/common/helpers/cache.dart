@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 const tokenName = 'SPS-FY24-Secret-Token';
 const userName = 'SPS-FY24-User-Name';
@@ -14,12 +15,21 @@ class Cache {
     await prefs.setString(tokenName, token);
   }
 
-  // Save the current time as the last synced time
   static Future<void> saveLastSyncedTime() async {
     final prefs = await SharedPreferences.getInstance();
-    final now = DateTime.now().toIso8601String();
-    
-    await prefs.setString(lastSyncedTimeKey, now);
+
+    // Get the current time in UTC
+    final nowUtc = DateTime.now().toUtc();
+
+    // Convert to Bangkok timezone (UTC+7)
+    final bangkokTime = nowUtc.add(Duration(hours: 7));
+
+    // Format as ISO8601 string
+    final formattedBangkokTime =
+        DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(bangkokTime);
+
+    // Save to SharedPreferences
+    await prefs.setString(lastSyncedTimeKey, formattedBangkokTime);
   }
 
   static saveUserName(String username) async {

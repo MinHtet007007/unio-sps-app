@@ -20,7 +20,7 @@ class CustomListView extends StatelessWidget {
           return CustomItem(
             id: patient.id as int,
             name: patient.name,
-            code: patient.rrCode ?? patient.drtbCode,
+            code: patient.rrCode ?? patient.drtbCode ?? '',
             isSynced: patient.isSynced
           );
         });
