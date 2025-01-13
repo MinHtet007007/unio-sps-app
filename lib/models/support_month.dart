@@ -56,11 +56,11 @@ class SupportMonth {
       townshipId: json['township_id'] as int,
       township: Township.fromJson(json['township'] as Map<String, dynamic>),
       date: json['date'] as String,
-      month: json['month'],
+      month: int.tryParse(json['month'].toString()) ?? 0,
       monthYear: json['month_year'] as String,
       height: json['height'] as int,
       weight: json['weight'] as int,
-      bmi: json['BMI'] as int,
+      bmi: int.tryParse(json['BMI'].toString()) ?? 0,
       planPackages: json['plan_packages'] as String,
       receivePackageStatus: json['receive_package_status'] as String,
       receivePackages: (json['receive_packages'] as List<dynamic>)
