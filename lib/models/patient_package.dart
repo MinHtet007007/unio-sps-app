@@ -22,7 +22,9 @@ class PatientPackage {
       patientId: json['patient_id'],
       packageName: json['package_name'],
       eligibleAmount: int.parse(json['eligible_amount']),
-      updatedEligibleAmount: json['updated_eligible_amount'],
+      updatedEligibleAmount: json['updated_eligible_amount'] is String
+          ? int.tryParse(json['updated_eligible_amount'] as String)
+          : json['updated_eligible_amount'] as int?,
       remainingAmount: json['remaining_amount'],
     );
   }
