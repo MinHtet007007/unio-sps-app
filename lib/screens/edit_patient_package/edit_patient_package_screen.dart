@@ -62,7 +62,7 @@ class _EditPatientPackageScreenState
                 context, 'Support Month Update Success');
             context.pop();
             context.pushReplacement(
-                "${RouteName.patientDetail}/${widget.patientId}");
+                "${RouteName.patientDetail}/${widget.patientId}/false");
           });
         } else if (current is LocalUpdateSupportMonthFailedState) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

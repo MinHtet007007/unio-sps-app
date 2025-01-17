@@ -20,7 +20,7 @@ class CustomItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        context.push('${RouteName.patientDetail}/$id/false');
+        context.push('${RouteName.patientDetail}/$id/true');
       },
       child: Card(
           color: isSynced ? Colors.white : Colors.redAccent,

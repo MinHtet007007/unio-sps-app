@@ -11,16 +11,18 @@ import 'package:sps/features/local_patients_sync/provider/local_patients_sync_pr
 import 'package:sps/features/local_patients_sync/state/local_patients_sync_state.dart';
 import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 import 'package:sps/features/patient_list/provider/local_patients_state/local_patients_state.dart';
-import 'package:sps/screens/patients_list/widget/list_view.dart';
+import 'package:sps/screens/unsuccess_sync_patients_list/widget/list_view.dart';
 
-class PatientListScreen extends ConsumerStatefulWidget {
-  const PatientListScreen({super.key});
+class UnsuccessSyncPatientsListScreen extends ConsumerStatefulWidget {
+  const UnsuccessSyncPatientsListScreen({super.key});
 
   @override
-  ConsumerState<PatientListScreen> createState() => _PatientListScreenState();
+  ConsumerState<UnsuccessSyncPatientsListScreen> createState() =>
+      _UnsuccessSyncPatientsListScreenState();
 }
 
-class _PatientListScreenState extends ConsumerState<PatientListScreen> {
+class _UnsuccessSyncPatientsListScreenState
+    extends ConsumerState<UnsuccessSyncPatientsListScreen> {
   @override
   void initState() {
     super.initState();
@@ -36,7 +38,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     await Future.delayed(Duration.zero);
 
     final patientNotifier = ref.read(localPatientsProvider.notifier);
-    patientNotifier.fetchPatients();
+    patientNotifier.fetchUnSyncedPatients();
   }
 
   void _sendLocalPatients() async {
@@ -74,7 +76,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
                 isLoading:
                     localPatientsSyncState is LocalPatientsSyncLoadingState,
                 onPressed: _sendLocalPatients,
-                backgroundColor: ColorTheme.success),
+                backgroundColor: ColorTheme.success)
         ],
       ),
       body: _patientListWidget(localState),
@@ -98,7 +100,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
         return state.localPatients.isNotEmpty
             ? CustomListView(patients: state.localPatients)
             : const NoDataStateWidget(
-                message: "There is no patient data. \nPlease sync data.",
+                message: "All patients was successfully sync.",
               );
     }
   }

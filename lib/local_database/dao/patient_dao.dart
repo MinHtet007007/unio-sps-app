@@ -7,6 +7,12 @@ abstract class PatientDao {
   @Query('SELECT * FROM ${LocalDataBase.patient_table}')
   Future<List<PatientEntity>> findAllLocalPatients();
 
+  @Query('SELECT * FROM ${LocalDataBase.patient_table}  WHERE isSynced = 1')
+  Future<List<PatientEntity>> findAllSyncedLocalPatients();
+
+  @Query('SELECT * FROM ${LocalDataBase.patient_table}  WHERE isSynced = 0')
+  Future<List<PatientEntity>> findAllUnSyncedLocalPatients();
+
   @Query(
       'SELECT remoteId FROM ${LocalDataBase.patient_table} WHERE remoteId IS NOT NULL')
   Future<List<int>> getRemoteIds();
@@ -17,7 +23,7 @@ abstract class PatientDao {
 
   @Query('SELECT * FROM ${LocalDataBase.patient_table} WHERE id = :id')
   Future<PatientEntity?> findLocalPatientById(int id);
-  
+
   @Query('SELECT id FROM ${LocalDataBase.patient_table} WHERE remoteId = :id')
   Future<int?> findPatientByRemoteId(int id);
 

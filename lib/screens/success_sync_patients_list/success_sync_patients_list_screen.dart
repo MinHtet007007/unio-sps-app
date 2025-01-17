@@ -6,21 +6,22 @@ import 'package:sps/common/widgets/loading_widget.dart';
 import 'package:sps/common/widgets/no_data_state.dart';
 import 'package:sps/common/widgets/refresh_when_failed_widget.dart';
 import 'package:sps/common/widgets/snack_bar_utils.dart';
-import 'package:sps/common/widgets/sync_button.dart';
 import 'package:sps/features/local_patients_sync/provider/local_patients_sync_provider.dart';
 import 'package:sps/features/local_patients_sync/state/local_patients_sync_state.dart';
 import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 import 'package:sps/features/patient_list/provider/local_patients_state/local_patients_state.dart';
-import 'package:sps/screens/patients_list/widget/list_view.dart';
+import 'package:sps/screens/success_sync_patients_list/widget/list_view.dart';
 
-class PatientListScreen extends ConsumerStatefulWidget {
-  const PatientListScreen({super.key});
+class SuccessSyncPatientsListScreen extends ConsumerStatefulWidget {
+  const SuccessSyncPatientsListScreen({super.key});
 
   @override
-  ConsumerState<PatientListScreen> createState() => _PatientListScreenState();
+  ConsumerState<SuccessSyncPatientsListScreen> createState() =>
+      _SuccessSyncPatientsListScreenState();
 }
 
-class _PatientListScreenState extends ConsumerState<PatientListScreen> {
+class _SuccessSyncPatientsListScreenState
+    extends ConsumerState<SuccessSyncPatientsListScreen> {
   @override
   void initState() {
     super.initState();
@@ -36,7 +37,7 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
     await Future.delayed(Duration.zero);
 
     final patientNotifier = ref.read(localPatientsProvider.notifier);
-    patientNotifier.fetchPatients();
+    patientNotifier.fetchSyncedPatients();
   }
 
   void _sendLocalPatients() async {
@@ -66,16 +67,14 @@ class _PatientListScreenState extends ConsumerState<PatientListScreen> {
         ),
         backgroundColor: ColorTheme.primary,
         iconTheme: const IconThemeData(color: ColorTheme.white),
-        actions: [
-          if (localState is LocalPatientsSuccessState &&
-              localState.localPatients.isNotEmpty)
-            SyncButton(
-                title: "Sync (Send patient data)",
-                isLoading:
-                    localPatientsSyncState is LocalPatientsSyncLoadingState,
-                onPressed: _sendLocalPatients,
-                backgroundColor: ColorTheme.success),
-        ],
+        // actions: [
+        //   SyncButton(
+        //       title: "Sync (Send patient data)",
+        //       isLoading:
+        //           localPatientsSyncState is LocalPatientsSyncLoadingState,
+        //       onPressed: _sendLocalPatients,
+        //       backgroundColor: ColorTheme.success)
+        // ],
       ),
       body: _patientListWidget(localState),
     );

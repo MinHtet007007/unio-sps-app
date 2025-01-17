@@ -11,6 +11,8 @@ import 'package:sps/features/settings/ui/screen/font_change_screen.dart';
 import 'package:sps/features/settings/ui/screen/setting_screen.dart';
 import 'package:sps/screens/splash_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sps/screens/success_sync_patients_list/success_sync_patients_list_screen.dart';
+import 'package:sps/screens/unsuccess_sync_patients_list/unsuccess_sync_patients_list_screen.dart';
 
 class RouteList {
   static final routeList = [
@@ -47,14 +49,26 @@ class RouteList {
       builder: (context, state) => const PatientListScreen(),
     ),
     GoRoute(
+      path: RouteName.successPatientList,
+      builder: (context, state) => const SuccessSyncPatientsListScreen(),
+    ),
+    GoRoute(
+      path: RouteName.unSuccessPatientList,
+      builder: (context, state) => const UnsuccessSyncPatientsListScreen(),
+    ),
+    GoRoute(
       path: RouteName.patientCreate,
       builder: (context, state) => const NewPatientScreen(),
     ),
     GoRoute(
-      path: '${RouteName.patientDetail}/:id',
+      path: '${RouteName.patientDetail}/:id/:isReadOnly',
       builder: (context, state) {
         final patientId = state.pathParameters['id']!;
-        return PatientDetailScreen(patientId: int.parse(patientId));
+        final isReadOnly = state.pathParameters['isReadOnly']!;
+        return PatientDetailScreen(
+          patientId: int.parse(patientId),
+          isReadOnly: isReadOnly.toLowerCase() == "false",
+        );
       },
     ),
     GoRoute(
@@ -89,4 +103,6 @@ class RouteName {
   static const String patientCreate = '/patient-create';
   static const String packageCreate = '/package-create';
   static const String packageEdit = '/package-edit';
+  static const String successPatientList = '/success-patient-list';
+  static const String unSuccessPatientList = '/unsuccess-patient-list';
 }

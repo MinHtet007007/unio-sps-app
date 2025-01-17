@@ -6,10 +6,14 @@ import 'package:sps/common/widgets/loading_widget.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
 import 'package:sps/screens/patient_detail/widget/details_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sps/common/constants/route_list.dart';
 
 class PatientDetailScreen extends ConsumerStatefulWidget {
   final int patientId;
-  const PatientDetailScreen({super.key, required this.patientId});
+  final bool isReadOnly;
+  const PatientDetailScreen(
+      {super.key, required this.patientId, required this.isReadOnly});
 
   @override
   ConsumerState<PatientDetailScreen> createState() =>
@@ -38,10 +42,26 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
     return Scaffold(
         appBar: AppBar(
           title: CustomLabelWidget(
-            text: "လူနာ အချက်အလက်",
+            text: "Patient Details",
             style: AppBarTextStyle,
           ),
           backgroundColor: ColorTheme.primary,
+          actions: [
+            if (widget.isReadOnly)
+              ElevatedButton(
+                onPressed: () async {
+                  context
+                      .push('${RouteName.packageCreate}/${widget.patientId}');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorTheme.success,
+                ),
+                child: const Text(
+                  'Add New Package',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+          ],
         ),
         body: _patientListWidget(localState));
   }
@@ -62,6 +82,7 @@ class _PatientDetailScreenState extends ConsumerState<PatientDetailScreen> {
           supportMonths: state.localSupportMonths,
           alreadyReceivedPackagesByPatientId:
               state.localReceivedPackagesByPatientId!,
+          isReadOnly: widget.isReadOnly,
         );
     }
   }

@@ -29,6 +29,38 @@ class LocalPatientsProvider extends StateNotifier<LocalPatientsState> {
       state = LocalPatientsFailedState(error.toString());
     }
   }
+
+  Future<void> fetchSyncedPatients() async {
+    try {
+      state = LocalPatientsLoadingState();
+
+      final database = await localDatabase.database;
+
+      final patientDao = database.patientDao;
+      final List<PatientEntity> patients =
+          await patientDao.findAllSyncedLocalPatients();
+      state = LocalPatientsSuccessState(patients);
+      return;
+    } catch (error) {
+      state = LocalPatientsFailedState(error.toString());
+    }
+  }
+
+  Future<void> fetchUnSyncedPatients() async {
+    try {
+      state = LocalPatientsLoadingState();
+
+      final database = await localDatabase.database;
+
+      final patientDao = database.patientDao;
+      final List<PatientEntity> patients =
+          await patientDao.findAllUnSyncedLocalPatients();
+      state = LocalPatientsSuccessState(patients);
+      return;
+    } catch (error) {
+      state = LocalPatientsFailedState(error.toString());
+    }
+  }
 }
 
 final localPatientsProvider =

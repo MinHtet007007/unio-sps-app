@@ -54,10 +54,8 @@ class _HomeState extends ConsumerState<Home> {
                 ),
               ),
               TextButton(
-                onPressed: () => {
-                                    Navigator.of(context).pop(),
-                  _fetchRemotePatients()
-                },
+                onPressed: () =>
+                    {Navigator.of(context).pop(), _fetchRemotePatients()},
                 child: const Text(
                   'Yes',
                   style: TextStyle(color: Colors.white),
@@ -129,34 +127,50 @@ class _HomeState extends ConsumerState<Home> {
                   children: [
                     if (homeSyncNotifier is! HomePatientsSyncLoadingState)
                       SyncButton(
-                          title: "server data ဆွဲမည်",
+                          title: "Sync (Get dashboard data)",
                           isLoading:
                               homeSyncNotifier is HomePatientsSyncLoadingState,
                           onPressed: _fetchRemotePatients),
+                    CardButton(
+                      color: ColorTheme.success,
+                      press: () {
+                        context.push(RouteName.patientCreate);
+                      },
+                      title: "To add new Patient",
+                      image: "plus.png",
+                    ),
                     CardButton(
                       color: ColorTheme.primary,
                       press: () {
                         context.push(RouteName.patient);
                       },
-                      title: "လူနာစာရင်း",
+                      title: "Patient List",
                       image: "all_patient.png",
                     ),
                     CardButton(
-                      color: ColorTheme.primary,
+                      color: ColorTheme.gray,
                       press: () {
-                        context.push(RouteName.patientCreate);
+                        context.push(RouteName.successPatientList);
                       },
-                      title: "လူနာအသစ် ထည့်ရန်",
-                      image: "summary.png",
+                      title: "Successful Syncs",
+                      image: "checked.png",
                     ),
-                    // CardButton(
-                    //   color: ColorTheme.primary,
-                    //   press: () {
-                    //     context.push(RouteName.note);
-                    //   },
-                    //   title: "မှတ်စု",
-                    //   image: "handout.png",
-                    // )
+                    CardButton(
+                      color: ColorTheme.danger,
+                      press: () {
+                        context.push(RouteName.unSuccessPatientList);
+                      },
+                      title: "Unsuccessful Syncs",
+                      image: "cancel.png",
+                    ),
+                    CardButton(
+                      color: ColorTheme.success,
+                      press: () {
+                        context.push(RouteName.note);
+                      },
+                      title: "SOP and Manual",
+                      image: "handout.png",
+                    ),
                   ],
                 ),
               ));
