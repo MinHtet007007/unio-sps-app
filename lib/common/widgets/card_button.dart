@@ -24,7 +24,7 @@ class CardButton extends StatelessWidget {
       child: Container(
           margin: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: ColorTheme.primary,
+            color: color,
             borderRadius: BorderRadius.circular(20),
             boxShadow: const [
               BoxShadow(

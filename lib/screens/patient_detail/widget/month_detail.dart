@@ -12,12 +12,14 @@ class MonthDetail extends StatelessWidget {
   final SupportMonthEntity supportMonth;
   final PatientEntity patient;
   final List<ReceivePackageEntity> alreadyReceivedPackagesByPatientId;
+  final bool isReadOnly;
 
   MonthDetail({
     super.key,
     required this.supportMonth,
     required this.patient,
     required this.alreadyReceivedPackagesByPatientId,
+    required this.isReadOnly,
   });
 
   @override
@@ -33,11 +35,16 @@ class MonthDetail extends StatelessWidget {
       // margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFFB2EBF2), // Light Cyan
-              Color(0xFF81D4FA), // Light Blue
-            ],
+          gradient: LinearGradient(
+            colors: supportMonth.isSynced
+                ? [
+                    const Color(0xFFB2EBF2), // Light Cyan
+                    const Color(0xFF81D4FA), // Light Blue
+                  ]
+                : [
+                    const Color(0xFFFF8A80), // Light Red for Not Synced
+                    const Color(0xFFFF5252), // Red Shade for Not Synced
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -63,7 +70,7 @@ class MonthDetail extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  if (!supportMonth.isSynced)
+                  if (!supportMonth.isSynced && isReadOnly)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 15.0),
                       child: Row(

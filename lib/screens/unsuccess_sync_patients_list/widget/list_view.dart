@@ -1,6 +1,6 @@
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:sps/screens/patients_list/widget/list_item.dart';
+import 'package:sps/screens/unsuccess_sync_patients_list/widget/list_item.dart';
 
 class CustomListView extends StatelessWidget {
   final List<PatientEntity>? patients;

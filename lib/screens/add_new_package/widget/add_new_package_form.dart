@@ -18,6 +18,7 @@ import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/add_new_package/widget/reimbursement_table.dart';
 import 'package:sps/screens/add_new_package/widget/support_package_table.dart';
+import 'package:sps/utils/package_utils.dart';
 
 class AddNewPackageForm extends StatefulWidget {
   final PatientEntity patientDetails;
@@ -111,22 +112,6 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
             ? reimbursementBMI = 0.0
             : BMI = 0.0; // Reset BMI if empty
       });
-    }
-  }
-
-  String calculateBMIInText(double value) {
-    if (value <= 0) {
-      return '';
-    } else if (value > 0 && value <= 18.5) {
-      return '(Underweight)';
-    } else if (value >= 18.5 && value <= 24.5) {
-      return '(Healthy)';
-    } else if (value > 24.5 && value <= 29.5) {
-      return '(Overweight)';
-    } else if (value > 29.5 && value <= 39.5) {
-      return '(Obese)';
-    } else {
-      return '(Extremely Obese)';
     }
   }
 

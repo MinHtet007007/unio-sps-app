@@ -57,7 +57,7 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
                 context, 'Support Month Create Success');
             context.pop();
             context.pushReplacement(
-                "${RouteName.patientDetail}/${widget.patientId}");
+                "${RouteName.patientDetail}/${widget.patientId}/false");
           });
         } else if (current is LocalNewSupportMonthFailedState) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
