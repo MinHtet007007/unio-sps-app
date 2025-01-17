@@ -149,14 +149,14 @@ class _HomeState extends ConsumerState<Home> {
                       title: "လူနာအသစ် ထည့်ရန်",
                       image: "summary.png",
                     ),
-                    // CardButton(
-                    //   color: ColorTheme.primary,
-                    //   press: () {
-                    //     context.push(RouteName.note);
-                    //   },
-                    //   title: "မှတ်စု",
-                    //   image: "handout.png",
-                    // )
+                    CardButton(
+                      color: ColorTheme.primary,
+                      press: () {
+                        context.push(RouteName.note);
+                      },
+                      title: "မှတ်စု",
+                      image: "handout.png",
+                    )
                   ],
                 ),
               ));

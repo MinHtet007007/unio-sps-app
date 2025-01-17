@@ -54,23 +54,28 @@ class Cache {
     return prefsToken;
   }
 
-  // Retrieve the last synced time
-  static Future<DateTime> getLastSyncedTime() async {
+  static Future<String> getLastSyncedTimeInBangkok() async {
     final prefs = await SharedPreferences.getInstance();
     final lastSynced = prefs.getString(lastSyncedTimeKey);
 
+    DateTime dateTime;
+
     if (lastSynced == null) {
-      // Default to Unix epoch if no value is stored
-      return DateTime.fromMillisecondsSinceEpoch(0);
+      return "";
+    } else {
+      try {
+        dateTime = DateTime.parse(lastSynced);
+      } catch (e) {
+        dateTime =
+            DateTime.fromMillisecondsSinceEpoch(0); // Handle invalid format
+      }
     }
 
-    try {
-      // Attempt to parse the stored value
-      return DateTime.parse(lastSynced);
-    } catch (e) {
-      // Handle invalid format by returning Unix epoch
-      return DateTime.fromMillisecondsSinceEpoch(0);
-    }
+    // Convert UTC to Bangkok time (UTC+7)
+    final bangkokTime = dateTime.toUtc().add(Duration(hours: 6, minutes: 30));
+
+    // Format for displaying
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(bangkokTime);
   }
 
   static Future<String?> getUserName() async {

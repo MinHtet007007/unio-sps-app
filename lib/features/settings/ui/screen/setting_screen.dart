@@ -1,5 +1,6 @@
 import 'package:sps/common/constants/route_list.dart';
 import 'package:sps/common/constants/theme.dart';
+import 'package:sps/common/widgets/last_synced_time_widget.dart';
 import 'package:sps/features/auth/provider/auth_provider.dart';
 import 'package:sps/features/user/provider/user_provider.dart';
 import 'package:sps/common/widgets/custom_label_widget.dart';
@@ -73,6 +74,8 @@ class SettingScreen extends ConsumerWidget {
                             color: Colors.white,
                           ),
                         ),
+                        const SizedBox(height: 10),
+                        const LastSyncedTimeWidget()
                       ],
                     ),
                   )
@@ -90,14 +93,14 @@ class SettingScreen extends ConsumerWidget {
                     Icons.font_download_outlined,
                     color: ColorTheme.black,
                   ),
-                  title:  CustomLabelWidget(text: 'Font Change'),
+                  title: CustomLabelWidget(text: 'Font Change'),
                 ),
               ),
             ),
             Card(
               child: ListTile(
                 leading: const Icon(Icons.logout, color: ColorTheme.danger),
-                title:  CustomLabelWidget(text: 'Logout'),
+                title: CustomLabelWidget(text: 'Logout'),
                 onTap: () {
                   showDialog(
                     context: context,
