@@ -12,6 +12,6 @@ abstract class PatientSyncService {
   @GET(ApiConst.patientEndPoint)
   Future<RemoteLimitedPatientResponse> fetchRemotePatients({
     @Query("already_synced_ids") String? alreadySyncedIds,
-    @Query("last_sync_date") DateTime? last_sync_date,
+    @Query("last_sync_date") String? last_sync_date,
   });
 }

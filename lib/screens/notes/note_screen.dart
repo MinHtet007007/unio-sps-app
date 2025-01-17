@@ -21,12 +21,7 @@ class NoteScreen extends StatelessWidget {
           child: Column(
             children: [
               Image.asset(
-                'assets/images/mgn_clinic_app_note1.png',
-                fit: BoxFit.scaleDown,
-              ),
-              const SizedBox(height: 20),
-              Image.asset(
-                'assets/images/mgn_clinic_app_note2.png',
+                'assets/images/note.png',
                 fit: BoxFit.scaleDown,
               ),
             ],

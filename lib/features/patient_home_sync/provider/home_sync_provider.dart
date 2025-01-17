@@ -18,7 +18,7 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
     try {
       state = HomePatientsSyncLoadingState();
       final patientService = PatientSyncService(_dio);
-      final lastSyncedTime = await Cache.getLastSyncedTime();
+      final lastSyncedTime = await Cache.getLastSyncedTimeInBangkok();
 
       final database = await localDatabase.database;
 
@@ -36,7 +36,7 @@ class HomePatientSyncProvider extends StateNotifier<HomePatientsSyncState> {
         }
         await Cache.saveLastSyncedTime();
       }
-      if(response.hasMore) {
+      if (response.hasMore) {
         state = HomePatientsSyncSuccessHasMoreState();
         return;
       }
