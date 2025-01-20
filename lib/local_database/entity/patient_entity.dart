@@ -19,7 +19,7 @@ class PatientEntity {
   final String sex;
   final String? diedBeforeTreatmentEnrollment;
   final String? treatmentStartDate;
-  final String treatmentRegimen;
+  final String? treatmentRegimen;
   final String? treatmentRegimenOther;
   final String patientAddress;
   final String patientPhoneNo;
@@ -27,9 +27,9 @@ class PatientEntity {
   final String contactPhoneNo;
   final String primaryLanguage;
   final String? secondaryLanguage;
-  final int height;
-  final int weight;
-  final int bmi;
+  final double height;
+  final double weight;
+  final double bmi;
   final String? toStatus;
   final int? toYear;
   final String? toDate;

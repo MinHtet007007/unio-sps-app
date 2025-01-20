@@ -78,7 +78,11 @@ class PatientDetailsWidget extends StatelessWidget {
                               patient.treatmentStartDate ?? ''),
                           dataRow('Died Before Treatment Enrollment',
                               patient.diedBeforeTreatmentEnrollment ?? ''),
-                          dataRow('treatmentRegimen', patient.treatmentRegimen),
+                          dataRow('treatmentRegimen',
+                              patient.treatmentRegimen ?? ''),
+                          if (patient.treatmentRegimenOther != '')
+                            dataRow('treatmentRegimenOther',
+                                patient.treatmentRegimenOther ?? ''),
                           dataRow('contactInfo', patient.contactInfo),
                           dataRow('contactPhoneNo', patient.contactPhoneNo),
                           dataRow('primaryLanguage', patient.primaryLanguage),

@@ -63,7 +63,7 @@ class _UnsuccessSyncPatientsListScreenState
     return Scaffold(
       appBar: AppBar(
         title: CustomLabelWidget(
-          text: "Patients List",
+          text: "Unsynced Patients List",
           style: AppBarTextStyle,
         ),
         backgroundColor: ColorTheme.primary,

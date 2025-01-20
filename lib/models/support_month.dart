@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:sps/models/support_package.dart';
 import 'package:sps/models/remote_township.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -14,9 +15,9 @@ class SupportMonth {
   final String date;
   final int month;
   final String monthYear;
-  final int height;
-  final int weight;
-  final int bmi;
+  final double height;
+  final double weight;
+  final double bmi;
   final String planPackages;
   final String receivePackageStatus;
   final List<SupportPackage> receivePackages;
@@ -58,9 +59,9 @@ class SupportMonth {
       date: json['date'] as String,
       month: int.tryParse(json['month'].toString()) ?? 0,
       monthYear: json['month_year'] as String,
-      height: json['height'] as int,
-      weight: json['weight'] as int,
-      bmi: int.tryParse(json['BMI'].toString()) ?? 0,
+      height: (json['height'] as num).toDouble(),
+      weight: (json['weight'] as num).toDouble(),
+      bmi: (json['BMI'] as num).toDouble(),
       planPackages: json['plan_packages'] as String,
       receivePackageStatus: json['receive_package_status'] as String,
       receivePackages: (json['receive_packages'] as List<dynamic>)
