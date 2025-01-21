@@ -10,6 +10,7 @@ import 'package:sps/features/local_support_month_update/provider/local_update_su
 import 'package:sps/features/local_support_month_update/provider/local_update_support_month_state/local_update_support_month_state.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
+import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/edit_patient_package/widget/edit_patient_package_form.dart';
@@ -41,6 +42,9 @@ class _EditPatientPackageScreenState
         ref.read(localUpdateSupportMonthProvider.notifier);
     await localSupportMonthUpdateNotifier.updateSupportMonth(
         formData, receivedPackages);
+    _fetchPatient();
+    final patientNotifier = ref.read(localPatientsProvider.notifier);
+    await patientNotifier.fetchPatients();
   }
 
   @override
@@ -60,9 +64,6 @@ class _EditPatientPackageScreenState
           WidgetsBinding.instance.addPostFrameCallback((_) {
             SnackbarUtils.showSuccessToast(
                 context, 'Support Month Update Success');
-            context.pop();
-            context.pushReplacement(
-                "${RouteName.patientDetail}/${widget.patientId}/false");
           });
         } else if (current is LocalUpdateSupportMonthFailedState) {
           WidgetsBinding.instance.addPostFrameCallback((_) {

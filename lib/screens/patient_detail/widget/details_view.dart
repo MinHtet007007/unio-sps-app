@@ -70,8 +70,8 @@ class PatientDetailsWidget extends StatelessWidget {
                       child: Column(
                         children: [
                           if ((patient.spCode == null ||
-                                  patient.spCode == "" ||
-                                  !patient.isSynced) &&
+                                  patient.spCode == "") &&
+                              !patient.isSynced &&
                               isReadOnly)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 15.0),

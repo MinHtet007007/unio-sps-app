@@ -104,7 +104,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
         'sex': selectedSex,
         'townshipId': selectedTownship,
         'diedBeforeTreatmentEnrollment': selectedDiedBeforeTreatmentEnrollment,
-        'treatmentRegimen': selectedTreatmentRegimen,
+         'treatmentRegimen': selectedDiedBeforeTreatmentEnrollment == 'No'
+            ? selectedTreatmentRegimen
+            : '',
         'bmi': bmi
       };
 
@@ -118,6 +120,10 @@ class _EditPatientFormState extends State<EditPatientForm> {
       final Map<String, dynamic> formData = {
         ...selectedValues,
         ...inputValues,
+         'weight': double.parse(
+            double.parse(controllers['weight']!.text).toStringAsFixed(2)),
+        'height': double.parse(
+            double.parse(controllers['height']!.text).toStringAsFixed(2)),
       };
 
       // Example: Save or print the collected data
@@ -179,10 +185,6 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         labelText: 'DRTB code',
                         isRequired: controllers['rrCode']!.text.isEmpty),
                     const SizedBox(height: 10),
-                    // CustomTextInput(
-                    //     inputController:
-                    //         controllers['spCode'] as TextEditingController,
-                    //     labelText: 'SP code'),
                     const SizedBox(height: 10),
                     CustomTextInput(
                         inputController:
@@ -235,36 +237,43 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         });
                       }),
                     ),
+                   if (selectedDiedBeforeTreatmentEnrollment == 'No')
+                      Column(
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          CustomDropDown(
+                            title: 'Treatment Regimen',
+                            items: treatmentRegimenOptions,
+                            selectedData: selectedTreatmentRegimen,
+                            hintText: 'Treatment Regimen',
+                            onChanged: ((value) {
+                              setState(() {
+                                selectedTreatmentRegimen = value;
+                              });
+                            }),
+                          ),
+                          const SizedBox(height: 10),
+                          if (selectedTreatmentRegimen == treatmentRegimenOther)
+                            CustomTextInput(
+                                inputController:
+                                    controllers['treatmentRegimenOther']
+                                        as TextEditingController,
+                                labelText: 'Treatment Regimen Other',
+                                type: 'text'),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 10),
                     CustomDateInput(
                       dateController: controllers['treatmentStartDate']
                           as TextEditingController,
                       labelText: 'Treatment start date',
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CustomDropDown(
-                      title: 'Treatment Regimen',
-                      items: treatmentRegimenOptions,
-                      selectedData: selectedTreatmentRegimen,
-                      hintText: 'Treatment Regimen',
-                      onChanged: ((value) {
-                        setState(() {
-                          selectedTreatmentRegimen = value;
-                        });
-                      }),
-                    ),
                     const SizedBox(height: 10),
-                    if (selectedTreatmentRegimen == treatmentRegimenOther)
-                      CustomTextInput(
-                          inputController: controllers['treatmentRegimenOther']
-                              as TextEditingController,
-                          labelText: 'Treatment Regimen Other',
-                          type: 'text'),
-                    const SizedBox(
-                      height: 10,
-                    ),
                     CustomTextInput(
                         inputController:
                             controllers['address'] as TextEditingController,
@@ -345,11 +354,17 @@ class _EditPatientFormState extends State<EditPatientForm> {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
                                 context, 'Height is required');
-                          } else if (int.parse(value) > 251) {
-                            return CustomText.getText(
-                                context, 'Height must be less than 251');
+                           } else {
+                            double? height = double.tryParse(value);
+                            if (height == null) {
+                              return CustomText.getText(
+                                  context, 'Invalid height');
+                            } else if (height > 251) {
+                              return CustomText.getText(context,
+                                  'Height must be less than or equal to 251');
+                            }
+                            return null;
                           }
-                          return null;
                         }),
                     const SizedBox(
                       height: 10,
@@ -363,11 +378,17 @@ class _EditPatientFormState extends State<EditPatientForm> {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
                                 context, 'Weight is required');
-                          } else if (int.parse(value) > 635) {
-                            return CustomText.getText(
-                                context, 'Weight must be less than 635');
+                        } else {
+                            double? weight = double.tryParse(value);
+                            if (weight == null) {
+                              return CustomText.getText(
+                                  context, 'Invalid weight');
+                            } else if (weight > 635) {
+                              return CustomText.getText(context,
+                                  'Weight must be less than or equal to 635');
+                            }
+                            return null;
                           }
-                          return null;
                         }),
                     const SizedBox(
                       height: 10,

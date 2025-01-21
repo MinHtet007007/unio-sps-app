@@ -28,7 +28,6 @@ class _BMIState extends State<BMI> {
 
       if (height > 0 && weight > 0) {
         final calculatedBMI = weight / (height * height);
-        print(calculatedBMI);
         final bmi = double.parse(calculatedBMI.toStringAsFixed(1));
 
         widget.onBMIChange(bmi);

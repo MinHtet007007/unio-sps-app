@@ -10,6 +10,7 @@ import 'package:sps/features/local_patient_edit/provider/local_edit_patient_prov
 import 'package:sps/features/local_patient_edit/provider/local_edit_patient_state/local_edit_patient_state.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
+import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 import 'package:sps/features/user/provider/user_provider.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/user_township_entity.dart';
@@ -66,9 +67,9 @@ class _EditPatientScreenState extends ConsumerState<EditPatientScreen> {
         contactPhoneNo: formData['contactPhone']?.toString() ?? '',
         primaryLanguage: formData['primaryLanguage']?.toString() ?? '',
         secondaryLanguage: formData['secondaryLanguage']?.toString() ?? '',
-        height: int.tryParse(formData['height']?.toString() ?? '0') ?? 0,
-        weight: int.tryParse(formData['weight']?.toString() ?? '0') ?? 0,
-        bmi: int.tryParse(formData['bmi']?.toString() ?? '0') ?? 0,
+        height: formData['height'] ?? 0,
+        weight: formData['weight'] ?? 0,
+        bmi: formData['bmi'] ?? 0,
         currentTownshipId:
             int.tryParse(formData['townshipId']?.toString() ?? '0') ?? 0,
         isSynced: false,
@@ -77,6 +78,9 @@ class _EditPatientScreenState extends ConsumerState<EditPatientScreen> {
       final localPatientEditNotifier =
           ref.read(localEditPatientProvider.notifier);
       await localPatientEditNotifier.updatePatient(updatedPatient);
+      _fetchPatient();
+      final patientNotifier = ref.read(localPatientsProvider.notifier);
+      await patientNotifier.fetchPatients();
     } catch (e, stackTrace) {
       print('Error $e');
       print('stackTrace $stackTrace');
@@ -91,7 +95,7 @@ class _EditPatientScreenState extends ConsumerState<EditPatientScreen> {
     ref.listen(localEditPatientProvider, (state, _) {
       if (state is LocalEditPatientSuccessState) {
         SnackbarUtils.showSuccessToast(context, 'Patient Edit Success');
-        context.pop();
+        // context.pop();
       }
       if (state is LocalEditPatientFailedState) {
         SnackbarUtils.showError(context, 'Patient Cannot be Updated');

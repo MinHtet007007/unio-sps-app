@@ -99,7 +99,8 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
     if (weightText.isNotEmpty) {
       final weight = double.tryParse(weightText) ?? 0.0;
       if (weight > 0 && height > 0) {
-        final bmi = weight / (height * height);
+        final calculateBmi = weight / (height * height);
+        final bmi = double.parse(calculateBmi.toStringAsFixed(1));
         setState(() {
           isReimbursement ? reimbursementBMI = bmi : BMI = bmi;
         });
@@ -118,7 +119,6 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
       });
     }
   }
-
 
   void _handleAddReimbursement() {
     // Calculate the given amount
