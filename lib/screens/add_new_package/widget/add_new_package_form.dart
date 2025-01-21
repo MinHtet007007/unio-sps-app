@@ -358,8 +358,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
           month: selectedMonth != null ? int.parse(selectedMonth!) : 0,
           monthYear: _monthYearController.text,
           height: widget.patientDetails.height,
-          weight: int.parse(_weightController.text),
-          bmi: BMI.toInt(),
+          weight: double.parse(
+              double.parse(_weightController.text).toStringAsFixed(2)),
+          bmi: BMI,
           planPackages: formattedPlanPackages,
           receivePackageStatus: selectedReceivedPackageStatus!,
           reimbursementStatus: reimbursementStatus!,

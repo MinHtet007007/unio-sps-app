@@ -16,9 +16,9 @@ class SupportMonthEntity {
   final String date;
   final int month;
   final String monthYear;
-  final int height;
-  final int weight;
-  final int bmi;
+  final double height;
+  final double weight;
+  final double bmi;
   final String planPackages;
   final String receivePackageStatus;
   final String reimbursementStatus;

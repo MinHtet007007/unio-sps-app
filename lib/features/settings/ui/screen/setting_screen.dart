@@ -82,21 +82,21 @@ class SettingScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 10.0),
-            GestureDetector(
-              onTap: () {
-                context.go(RouteName.fontChange);
-              },
-              child: Card(
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.font_download_outlined,
-                    color: ColorTheme.black,
-                  ),
-                  title: CustomLabelWidget(text: 'Font Change'),
-                ),
-              ),
-            ),
+            // const SizedBox(height: 10.0),
+            // GestureDetector(
+            //   onTap: () {
+            //     context.go(RouteName.fontChange);
+            //   },
+            //   child: Card(
+            //     child: ListTile(
+            //       leading: const Icon(
+            //         Icons.font_download_outlined,
+            //         color: ColorTheme.black,
+            //       ),
+            //       title: CustomLabelWidget(text: 'Font Change'),
+            //     ),
+            //   ),
+            // ),
             Card(
               child: ListTile(
                 leading: const Icon(Icons.logout, color: ColorTheme.danger),

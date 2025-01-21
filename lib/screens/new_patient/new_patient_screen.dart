@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:sps/common/constants/form_options.dart';
 import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/error_screen.dart';
@@ -47,9 +46,9 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
         contactPhoneNo: formData['contactPhone']?.toString() ?? '',
         primaryLanguage: formData['primaryLanguage']?.toString() ?? '',
         secondaryLanguage: formData['secondaryLanguage']?.toString() ?? '',
-        height: int.tryParse(formData['height']?.toString() ?? '0') ?? 0,
-        weight: int.tryParse(formData['weight']?.toString() ?? '0') ?? 0,
-        bmi: int.tryParse(formData['bmi']?.toString() ?? '0') ?? 0,
+        height: formData['height'] ?? 0,
+        weight: formData['weight'] ?? 0,
+        bmi: formData['bmi'] ?? 0,
         currentTownshipId:
             int.tryParse(formData['townshipId']?.toString() ?? '0') ?? 0,
         isSynced: false,
@@ -72,7 +71,9 @@ class _NewPatientScreenState extends ConsumerState<NewPatientScreen> {
     ref.listen(localNewPatientProvider, (state, _) {
       if (state is LocalNewPatientSuccessState) {
         SnackbarUtils.showSuccessToast(context, 'Patient Create Success');
-        context.pop();
+        // Future.delayed(Duration(seconds: 2), () {
+        //   context.pop();
+        // });
       }
       if (state is LocalNewPatientFailedState) {
         SnackbarUtils.showError(context, 'Patient Cannot be Created');
