@@ -10,6 +10,7 @@ import 'package:sps/features/local_support_month_create/provider/local_new_suppo
 import 'package:sps/features/local_support_month_create/provider/local_new_support_month_state/local_new_support_month_state.dart';
 import 'package:sps/features/patient_details/provider/local_patient_provider.dart';
 import 'package:sps/features/patient_details/provider/local_patient_state/local_patient_state.dart';
+import 'package:sps/features/patient_list/provider/local_patients_provider.dart';
 import 'package:sps/local_database/entity/support_month_entity.dart';
 import 'package:sps/models/received_package_request.dart';
 import 'package:sps/screens/add_new_package/widget/add_new_package_form.dart';
@@ -36,6 +37,9 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
         ref.read(localNewSupportMonthProvider.notifier);
     await localSupportMonthCreateNotifier.addSupportMonth(
         formData, receivedPackages);
+    _fetchPatient();
+    final patientNotifier = ref.read(localPatientsProvider.notifier);
+    await patientNotifier.fetchPatients();
   }
 
   @override
@@ -55,9 +59,9 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             SnackbarUtils.showSuccessToast(
                 context, 'Support Month Create Success');
-            context.pop();
-            context.pushReplacement(
-                "${RouteName.patientDetail}/${widget.patientId}/false");
+            // context.pop();
+            // context.pushReplacement(
+            //     "${RouteName.patientDetail}/${widget.patientId}/false");
           });
         } else if (current is LocalNewSupportMonthFailedState) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -91,7 +95,8 @@ class _AddNewPackageScreenState extends ConsumerState<AddNewPackageScreen> {
           patientPackages: state.localPatientPackages,
           patientSupportMonths: state.localSupportMonths,
           onSubmit: onSubmit,
-          alreadyReceivedPackagesByPatientId: state.localReceivedPackagesByPatientId!,
+          alreadyReceivedPackagesByPatientId:
+              state.localReceivedPackagesByPatientId!,
         );
     }
   }

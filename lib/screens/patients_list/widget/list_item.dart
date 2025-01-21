@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 class CustomItem extends StatelessWidget {
   final int id;
   final String name;
-  final String code;
+  final String? code;
   final bool isSynced;
   const CustomItem(
       {Key? key,
@@ -28,7 +28,7 @@ class CustomItem extends StatelessWidget {
           child: ListTile(
             trailing: const Icon(Icons.arrow_forward),
             title: CustomLabelWidget(
-                text: '$name ($code)',
+                text: '$name ${code != null ? "($code)" : ""} ',
                 style: TextStyle(
                     color: isSynced ? Colors.black : Colors.white,
                     fontSize: 16)),
