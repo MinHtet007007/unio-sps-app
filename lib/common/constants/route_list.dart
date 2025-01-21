@@ -1,3 +1,4 @@
+import 'package:sps/screens/edit_patient/edit_patient_screen.dart';
 import 'package:sps/screens/edit_patient_package/edit_patient_package_screen.dart';
 import 'package:sps/screens/home/home_screen.dart';
 import 'package:sps/screens/add_new_package/add_new_package_screen.dart';
@@ -72,6 +73,13 @@ class RouteList {
       },
     ),
     GoRoute(
+      path: '${RouteName.patientEdit}/:id',
+      builder: (context, state) {
+        final patientId = state.pathParameters['id']!;
+        return EditPatientScreen(patientId: int.parse(patientId));
+      },
+    ),
+    GoRoute(
       path: '${RouteName.packageCreate}/:patientId',
       builder: (context, state) {
         final patientId = state.pathParameters['patientId']!;
@@ -99,6 +107,7 @@ class RouteName {
   static const String report = '/report';
   static const String note = '/note';
   static const String patient = '/patient';
+  static const String patientEdit = '/patient-edit';
   static const String patientDetail = '/patient';
   static const String patientCreate = '/patient-create';
   static const String packageCreate = '/package-create';

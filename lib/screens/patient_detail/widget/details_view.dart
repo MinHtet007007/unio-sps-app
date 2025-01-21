@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sps/common/constants/route_list.dart';
+import 'package:sps/common/constants/theme.dart';
 import 'package:sps/common/widgets/data_row.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
 import 'package:sps/local_database/entity/receive_package_entity.dart';
@@ -66,6 +69,33 @@ class PatientDetailsWidget extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
+                          if ((patient.spCode == null ||
+                                  patient.spCode == "" ||
+                                  !patient.isSynced) &&
+                              isReadOnly)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 15.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      context.push(
+                                          '${RouteName.patientEdit}/${patient.id}');
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: ColorTheme.primary,
+                                    ),
+                                    child: const Text(
+                                      'Edit Patient',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                ],
+                              ),
+                            ),
                           dataRow('Name', patient.name),
                           dataRow('Address', patient.patientAddress),
                           dataRow('Phone', patient.patientPhoneNo),

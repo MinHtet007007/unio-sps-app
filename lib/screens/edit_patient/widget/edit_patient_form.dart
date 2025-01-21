@@ -1,0 +1,399 @@
+import 'package:flutter/material.dart';
+import 'package:sps/common/constants/form_options.dart';
+import 'package:sps/common/widgets/bmi.dart';
+import 'package:sps/common/widgets/custom_text.dart';
+import 'package:sps/common/widgets/form/custom_date_input.dart';
+import 'package:sps/common/widgets/form/custom_drop_down.dart';
+import 'package:sps/common/widgets/form/custom_submit_button.dart';
+import 'package:sps/common/widgets/form/custom_text_input.dart';
+import 'package:sps/common/widgets/form/custom_text_input_with_validation.dart';
+import 'package:sps/local_database/entity/patient_entity.dart';
+
+class EditPatientForm extends StatefulWidget {
+  Future<void> Function(Map<String, dynamic> formData) onSubmit;
+  final PatientEntity patient;
+  List<DropdownMenuItem<String>> townshipOptions;
+
+  EditPatientForm(
+      {super.key,
+      required this.onSubmit,
+      required this.townshipOptions,
+      required this.patient});
+  @override
+  State<EditPatientForm> createState() => _EditPatientFormState();
+}
+
+class _EditPatientFormState extends State<EditPatientForm> {
+  String? selectedYear;
+  String? selectedSex;
+  String? selectedTownship;
+  String? selectedDiedBeforeTreatmentEnrollment;
+  String? selectedTreatmentRegimen;
+  double? bmi;
+
+  // Controllers
+  final Map<String, TextEditingController> controllers = {
+    'name': TextEditingController(),
+    'age': TextEditingController(),
+    'phone': TextEditingController(),
+    'address': TextEditingController(),
+    'rrCode': TextEditingController(),
+    'drtbCode': TextEditingController(),
+    'spsStartDate': TextEditingController(),
+    'treatmentStartDate': TextEditingController(),
+    'treatmentRegimenOther': TextEditingController(),
+    'contactInfo': TextEditingController(),
+    'contactPhone': TextEditingController(),
+    'primaryLanguage': TextEditingController(),
+    'secondaryLanguage': TextEditingController(),
+    'height': TextEditingController(),
+    'weight': TextEditingController(),
+  };
+
+  final GlobalKey<FormState> _formKey = GlobalKey();
+
+  bool isValidate = true;
+
+  void isInvalidate() {
+    setState(() {
+      isValidate = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controllers['rrCode']!.addListener(_updateState);
+    controllers['drtbCode']!.addListener(_updateState);
+    selectedYear = widget.patient.year;
+    selectedTownship = widget.patient.townshipId.toString();
+    controllers['spsStartDate']!.text = widget.patient.spsStartDate ?? '';
+    controllers['rrCode']!.text = widget.patient.rrCode ?? '';
+    controllers['drtbCode']!.text = widget.patient.drtbCode ?? '';
+    controllers['name']!.text = widget.patient.name;
+    controllers['age']!.text = widget.patient.age.toString();
+    selectedSex = widget.patient.sex;
+    selectedDiedBeforeTreatmentEnrollment =
+        widget.patient.diedBeforeTreatmentEnrollment;
+    controllers['treatmentStartDate']!.text =
+        widget.patient.treatmentStartDate ?? '';
+    selectedTreatmentRegimen = widget.patient.treatmentRegimen;
+    controllers['treatmentRegimenOther']!.text =
+        widget.patient.treatmentRegimenOther ?? '';
+    controllers['address']!.text = widget.patient.patientAddress;
+    controllers['phone']!.text = widget.patient.patientPhoneNo;
+    controllers['contactInfo']!.text = widget.patient.contactInfo;
+    controllers['contactPhone']!.text = widget.patient.contactPhoneNo;
+    controllers['primaryLanguage']!.text = widget.patient.primaryLanguage;
+    controllers['secondaryLanguage']!.text =
+        widget.patient.secondaryLanguage ?? '';
+    controllers['height']!.text = widget.patient.height.toString();
+    controllers['weight']!.text = widget.patient.weight.toString();
+    bmi = widget.patient.bmi.toDouble();
+  }
+
+  void _updateState() {
+    setState(() {}); // Trigger a rebuild when either controller changes
+  }
+
+  void onSave() {
+    if (_formKey.currentState!.validate()) {
+      // Collect the dropdown-selected values
+      final Map<String, dynamic> selectedValues = {
+        'year': selectedYear,
+        'sex': selectedSex,
+        'townshipId': selectedTownship,
+        'diedBeforeTreatmentEnrollment': selectedDiedBeforeTreatmentEnrollment,
+        'treatmentRegimen': selectedTreatmentRegimen,
+        'bmi': bmi
+      };
+
+      // Collect the input field values
+      final Map<String, String> inputValues =
+          controllers.map((key, controller) {
+        return MapEntry(key, controller.text.trim());
+      });
+
+      // Combine the data
+      final Map<String, dynamic> formData = {
+        ...selectedValues,
+        ...inputValues,
+      };
+
+      // Example: Save or print the collected data
+      // print('Form Data: $formData');
+      widget.onSubmit(formData);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 13.0, vertical: 20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomDropDown(
+                      title: 'Year',
+                      items: years,
+                      selectedData: selectedYear,
+                      hintText: 'Year',
+                      onChanged: ((value) {
+                        setState(() {
+                          selectedYear = value;
+                        });
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomDropDown(
+                      title: 'Township',
+                      items: widget.townshipOptions,
+                      selectedData: selectedTownship,
+                      hintText: 'Township',
+                      onChanged: ((value) {
+                        setState(() {
+                          selectedTownship = value;
+                        });
+                      }),
+                    ),
+                    CustomDateInput(
+                      dateController:
+                          controllers['spsStartDate'] as TextEditingController,
+                      labelText: 'SPS start date',
+                    ),
+                    const SizedBox(height: 10),
+                    CustomTextInput(
+                      inputController:
+                          controllers['rrCode'] as TextEditingController,
+                      labelText: 'RR code',
+                      isRequired: controllers['drtbCode']!.text.isEmpty,
+                    ),
+                    const SizedBox(height: 10),
+                    CustomTextInput(
+                        inputController:
+                            controllers['drtbCode'] as TextEditingController,
+                        labelText: 'DRTB code',
+                        isRequired: controllers['rrCode']!.text.isEmpty),
+                    const SizedBox(height: 10),
+                    // CustomTextInput(
+                    //     inputController:
+                    //         controllers['spCode'] as TextEditingController,
+                    //     labelText: 'SP code'),
+                    const SizedBox(height: 10),
+                    CustomTextInput(
+                        inputController:
+                            controllers['name'] as TextEditingController,
+                        labelText: 'Name',
+                        type: 'text',
+                        isRequired: true),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInputWithValidation(
+                        inputController:
+                            controllers['age'] as TextEditingController,
+                        labelText: 'Age',
+                        type: 'number',
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return CustomText.getText(
+                                context, 'Age is required');
+                          } else if (int.parse(value) < 1 ||
+                              int.parse(value) > 120) {
+                            return CustomText.getText(
+                                context, 'Age must be between 1 and 120');
+                          }
+                          return null;
+                        }),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomDropDown(
+                      title: 'Gender',
+                      items: genders,
+                      selectedData: selectedSex,
+                      hintText: 'Gender',
+                      onChanged: ((value) {
+                        setState(() {
+                          selectedSex = value;
+                        });
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomDropDown(
+                      title: 'Died before treatment enrollment',
+                      items: yesOrNoOptions,
+                      selectedData: selectedDiedBeforeTreatmentEnrollment,
+                      hintText: 'died before treatment enrollment',
+                      onChanged: ((value) {
+                        setState(() {
+                          selectedDiedBeforeTreatmentEnrollment = value;
+                        });
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomDateInput(
+                      dateController: controllers['treatmentStartDate']
+                          as TextEditingController,
+                      labelText: 'Treatment start date',
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    CustomDropDown(
+                      title: 'Treatment Regimen',
+                      items: treatmentRegimenOptions,
+                      selectedData: selectedTreatmentRegimen,
+                      hintText: 'Treatment Regimen',
+                      onChanged: ((value) {
+                        setState(() {
+                          selectedTreatmentRegimen = value;
+                        });
+                      }),
+                    ),
+                    const SizedBox(height: 10),
+                    if (selectedTreatmentRegimen == treatmentRegimenOther)
+                      CustomTextInput(
+                          inputController: controllers['treatmentRegimenOther']
+                              as TextEditingController,
+                          labelText: 'Treatment Regimen Other',
+                          type: 'text'),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInput(
+                        inputController:
+                            controllers['address'] as TextEditingController,
+                        labelText: 'Address',
+                        type: 'text',
+                        isRequired: true),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInputWithValidation(
+                        inputController:
+                            controllers['phone'] as TextEditingController,
+                        labelText: 'Phone',
+                        type: 'number',
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return CustomText.getText(
+                                context, 'Phone is required');
+                          } else if (value.length < 8 || value.length > 11) {
+                            return CustomText.getText(
+                                context, 'Phone number is invalid');
+                          }
+                          return null;
+                        }),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInput(
+                        inputController:
+                            controllers['contactInfo'] as TextEditingController,
+                        labelText: 'Contact Info',
+                        type: 'text',
+                        isRequired: true),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInputWithValidation(
+                        inputController: controllers['contactPhone']
+                            as TextEditingController,
+                        labelText: 'Contact phone no',
+                        type: 'number',
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return CustomText.getText(
+                                context, 'Phone number is required');
+                          } else if (value.length < 8 || value.length > 11) {
+                            return CustomText.getText(
+                                context, 'Phone number is invalid');
+                          }
+                          return null;
+                        }),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInput(
+                        inputController: controllers['primaryLanguage']
+                            as TextEditingController,
+                        labelText: 'Primary language',
+                        type: 'text',
+                        isRequired: true),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInput(
+                        inputController: controllers['secondaryLanguage']
+                            as TextEditingController,
+                        labelText: 'Secondary language',
+                        type: 'text'),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInputWithValidation(
+                        inputController:
+                            controllers['height'] as TextEditingController,
+                        labelText: 'Height',
+                        type: 'number',
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return CustomText.getText(
+                                context, 'Height is required');
+                          } else if (int.parse(value) > 251) {
+                            return CustomText.getText(
+                                context, 'Height must be less than 251');
+                          }
+                          return null;
+                        }),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextInputWithValidation(
+                        inputController:
+                            controllers['weight'] as TextEditingController,
+                        labelText: 'Weight',
+                        type: 'number',
+                        validate: (value) {
+                          if (value == null || value.isEmpty) {
+                            return CustomText.getText(
+                                context, 'Weight is required');
+                          } else if (int.parse(value) > 635) {
+                            return CustomText.getText(
+                                context, 'Weight must be less than 635');
+                          }
+                          return null;
+                        }),
+                    const SizedBox(
+                      height: 10,
+                    ),
+
+                    BMI(
+                      heightController: controllers['height']!,
+                      weightController: controllers['weight']!,
+                      bmi: bmi,
+                      onBMIChange: (value) => {
+                        setState(() {
+                          bmi = value;
+                        })
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    CustomSubmitButton(
+                      buttonText: 'Save',
+                      onSubmit: onSave,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ]),
+            )));
+  }
+}

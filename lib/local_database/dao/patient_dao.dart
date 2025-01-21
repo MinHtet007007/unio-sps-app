@@ -13,6 +13,9 @@ abstract class PatientDao {
   @Query('SELECT * FROM ${LocalDataBase.patient_table}  WHERE isSynced = 0')
   Future<List<PatientEntity>> findAllUnSyncedLocalPatients();
 
+  @Update(onConflict: OnConflictStrategy.replace)
+  Future<int> updatePatient(PatientEntity patient);
+
   @Query(
       'SELECT remoteId FROM ${LocalDataBase.patient_table} WHERE remoteId IS NOT NULL')
   Future<List<int>> getRemoteIds();
