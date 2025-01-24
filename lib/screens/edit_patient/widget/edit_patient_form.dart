@@ -104,7 +104,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
         'sex': selectedSex,
         'townshipId': selectedTownship,
         'diedBeforeTreatmentEnrollment': selectedDiedBeforeTreatmentEnrollment,
-         'treatmentRegimen': selectedDiedBeforeTreatmentEnrollment == 'No'
+        'treatmentRegimen': selectedDiedBeforeTreatmentEnrollment == 'No'
             ? selectedTreatmentRegimen
             : '',
         'bmi': bmi
@@ -120,7 +120,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
       final Map<String, dynamic> formData = {
         ...selectedValues,
         ...inputValues,
-         'weight': double.parse(
+        'weight': double.parse(
             double.parse(controllers['weight']!.text).toStringAsFixed(2)),
         'height': double.parse(
             double.parse(controllers['height']!.text).toStringAsFixed(2)),
@@ -180,6 +180,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     ),
                     const SizedBox(height: 10),
                     CustomTextInput(
+                        type: "number",
                         inputController:
                             controllers['drtbCode'] as TextEditingController,
                         labelText: 'DRTB code',
@@ -237,13 +238,15 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         });
                       }),
                     ),
-                   if (selectedDiedBeforeTreatmentEnrollment == 'No')
+                    if (selectedDiedBeforeTreatmentEnrollment == 'No')
                       Column(
                         children: [
                           const SizedBox(
                             height: 10,
                           ),
                           CustomDropDown(
+                            isRequired:
+                                selectedDiedBeforeTreatmentEnrollment == 'No',
                             title: 'Treatment Regimen',
                             items: treatmentRegimenOptions,
                             selectedData: selectedTreatmentRegimen,
@@ -262,17 +265,13 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                         as TextEditingController,
                                 labelText: 'Treatment Regimen Other',
                                 type: 'text'),
-                          const SizedBox(
-                            height: 10,
+                          CustomDateInput(
+                            dateController: controllers['treatmentStartDate']
+                                as TextEditingController,
+                            labelText: 'Treatment start date',
                           ),
                         ],
                       ),
-                    const SizedBox(height: 10),
-                    CustomDateInput(
-                      dateController: controllers['treatmentStartDate']
-                          as TextEditingController,
-                      labelText: 'Treatment start date',
-                    ),
                     const SizedBox(height: 10),
                     CustomTextInput(
                         inputController:
@@ -348,13 +347,13 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     CustomTextInputWithValidation(
                         inputController:
                             controllers['height'] as TextEditingController,
-                        labelText: 'Height',
+                        labelText: 'Height (cm)',
                         type: 'number',
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
                                 context, 'Height is required');
-                           } else {
+                          } else {
                             double? height = double.tryParse(value);
                             if (height == null) {
                               return CustomText.getText(
@@ -372,13 +371,13 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     CustomTextInputWithValidation(
                         inputController:
                             controllers['weight'] as TextEditingController,
-                        labelText: 'Weight',
+                        labelText: 'Weight (kg)',
                         type: 'number',
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
                                 context, 'Weight is required');
-                        } else {
+                          } else {
                             double? weight = double.tryParse(value);
                             if (weight == null) {
                               return CustomText.getText(
@@ -393,7 +392,6 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     const SizedBox(
                       height: 10,
                     ),
-
                     BMI(
                       heightController: controllers['height']!,
                       weightController: controllers['weight']!,

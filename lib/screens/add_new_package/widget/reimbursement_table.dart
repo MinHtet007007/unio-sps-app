@@ -44,13 +44,10 @@ class _ReimbursementTableState extends State<ReimbursementTable> {
                 DataColumn(label: Text('Month Year')),
                 DataColumn(label: Text('Delete')),
               ],
-              rows: widget.selectedReimbursements
-                  .asMap()
-                  .entries
-                  .map((entry) {
+              rows: widget.selectedReimbursements.asMap().entries.map((entry) {
                 int index = entry.key;
                 var item = entry.value;
-        
+
                 return DataRow(cells: [
                   DataCell(Text('${index + 1}')),
                   DataCell(Text(
@@ -67,12 +64,14 @@ class _ReimbursementTableState extends State<ReimbursementTable> {
                       onPressed: () {
                         int packageId = int.parse(item['package_id']);
                         int givenAmount = item['given_amount'];
-        
+
                         final package = widget.editablePatientPackages
                             .firstWhere((p) => p.id == packageId);
-        
-                        package.remainingAmount += givenAmount;
-        
+
+                        if (package.packageName != "Package 8") {
+                          package.remainingAmount += givenAmount;
+                        }
+
                         widget.onDeleteReimbursement(index, givenAmount);
                       },
                     ),

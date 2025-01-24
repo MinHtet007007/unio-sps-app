@@ -60,10 +60,12 @@ class _SupportPackageTableState extends State<SupportPackageTable> {
                         int packageId = int.parse(item['package_id']);
                         int givenAmount = item['given_amount'];
 
-                        final package =
-                            widget.editablePatientPackages.firstWhere((p) => p.id == packageId);
+                        final package = widget.editablePatientPackages
+                            .firstWhere((p) => p.id == packageId);
 
-                        package.remainingAmount += givenAmount;
+                        if (package.packageName != "Package 8") {
+                          package.remainingAmount += givenAmount;
+                        }
                         widget.onDelete(index, item['given_amount']);
                       },
                     ),

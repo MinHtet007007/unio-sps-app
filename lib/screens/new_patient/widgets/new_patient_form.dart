@@ -23,7 +23,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
   String? selectedYear;
   String? selectedSex;
   String? selectedTownship;
-  String? selectedDiedBeforeTreatmentEnrollment;
+  String? selectedDiedBeforeTreatmentEnrollment = 'No';
   String? selectedTreatmentRegimen;
   double? bmi;
 
@@ -98,7 +98,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
       };
 
       // Example: Save or print the collected data
-      print('Form Data: $formData');
+      // print('Form Data: $formData');
       widget.onSubmit(formData);
     }
   }
@@ -151,6 +151,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
                     ),
                     const SizedBox(height: 10),
                     CustomTextInput(
+                        type: "number",
                         inputController:
                             controllers['drtbCode'] as TextEditingController,
                         labelText: 'DRTB code',
@@ -218,6 +219,8 @@ class _NewPatientFormState extends State<NewPatientForm> {
                             items: treatmentRegimenOptions,
                             selectedData: selectedTreatmentRegimen,
                             hintText: 'Treatment Regimen',
+                            isRequired:
+                                selectedDiedBeforeTreatmentEnrollment == 'No',
                             onChanged: ((value) {
                               setState(() {
                                 selectedTreatmentRegimen = value;
@@ -235,14 +238,16 @@ class _NewPatientFormState extends State<NewPatientForm> {
                           const SizedBox(
                             height: 10,
                           ),
+                          CustomDateInput(
+                            dateController: controllers['treatmentStartDate']
+                                as TextEditingController,
+                            labelText: 'Treatment start date',
+                            isRequired:
+                                selectedDiedBeforeTreatmentEnrollment == 'No',
+                            validateDate: "$selectedYear-01-01",
+                          ),
                         ],
                       ),
-                    const SizedBox(height: 10),
-                    CustomDateInput(
-                      dateController: controllers['treatmentStartDate']
-                          as TextEditingController,
-                      labelText: 'Treatment start date',
-                    ),
                     const SizedBox(height: 10),
                     CustomTextInput(
                         inputController:
@@ -318,7 +323,7 @@ class _NewPatientFormState extends State<NewPatientForm> {
                     CustomTextInputWithValidation(
                         inputController:
                             controllers['height'] as TextEditingController,
-                        labelText: 'Height',
+                        labelText: 'Height (cm)',
                         type: 'number',
                         validate: (value) {
                           if (value == null || value.isEmpty) {
@@ -342,13 +347,13 @@ class _NewPatientFormState extends State<NewPatientForm> {
                     CustomTextInputWithValidation(
                         inputController:
                             controllers['weight'] as TextEditingController,
-                        labelText: 'Weight',
+                        labelText: 'Weight (kg)',
                         type: 'number',
                         validate: (value) {
                           if (value == null || value.isEmpty) {
                             return CustomText.getText(
                                 context, 'Weight is required');
-                          } else  {
+                          } else {
                             double? weight = double.tryParse(value);
                             if (weight == null) {
                               return CustomText.getText(

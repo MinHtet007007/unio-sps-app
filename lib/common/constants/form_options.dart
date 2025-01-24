@@ -45,9 +45,10 @@ List<DropdownMenuItem<String>> get years {
 List<DropdownMenuItem<String>> get genders {
   List<DropdownMenuItem<String>> genders = [
     DropdownMenuItem(
-        value: "Male", child: CustomLabelWidget(style: style, text: "ကျား")),
+        value: "Male", child: CustomLabelWidget(style: style, text: "Male")),
     DropdownMenuItem(
-        value: "Female", child: CustomLabelWidget(style: style, text: "မ")),
+        value: "Female",
+        child: CustomLabelWidget(style: style, text: "Female")),
   ];
   return genders;
 }

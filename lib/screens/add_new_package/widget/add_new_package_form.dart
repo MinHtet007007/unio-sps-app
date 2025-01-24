@@ -7,6 +7,7 @@ import 'package:sps/common/constants/form_options.dart';
 import 'package:sps/common/helpers/is_every_element_include.dart';
 import 'package:sps/common/widgets/form/custom_date_input_with_validation.dart';
 import 'package:sps/common/widgets/form/custom_drop_down.dart';
+import 'package:sps/common/widgets/form/custom_month_year_date_input.dart';
 import 'package:sps/common/widgets/form/custom_multi_select_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
@@ -136,7 +137,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
         packageName: packageToUpdate.packageName,
         eligibleAmount: packageToUpdate.eligibleAmount, // Deduct given amount
         updatedEligibleAmount: packageToUpdate.updatedEligibleAmount,
-        remainingAmount: packageToUpdate.remainingAmount - givenAmount,
+        remainingAmount: packageToUpdate.packageName != "Package 8"
+            ? packageToUpdate.remainingAmount - givenAmount
+            : packageToUpdate.remainingAmount,
       );
 
       // Update the package in the list
@@ -200,7 +203,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
         packageName: packageToUpdate.packageName,
         eligibleAmount: packageToUpdate.eligibleAmount, // Deduct given amount
         updatedEligibleAmount: packageToUpdate.updatedEligibleAmount,
-        remainingAmount: packageToUpdate.remainingAmount - givenAmount,
+        remainingAmount: packageToUpdate.packageName != "Package 8"
+            ? packageToUpdate.remainingAmount - givenAmount
+            : packageToUpdate.remainingAmount,
       );
 
       // Update the package in the list
@@ -461,7 +466,9 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                       CustomDateInputWithValidation(
                         dateController: _dateController,
                         labelText: 'Support Received Date',
-                        date: '2000-01-01',
+                        date: DateTime(DateTime.now().year,
+                                DateTime.now().month - 1, 1)
+                            .toIso8601String(),
                         onDateChanged: (selectedDate) {
                           setState(() {
                             maxDate = selectedDate;
@@ -537,7 +544,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                           ],
                         ),
                       ),
-                      CustomDateInputWithValidation(
+                      CustomMonthYearDateInput(
                         dateController: _monthYearController,
                         labelText: 'Support Received Month',
                         date: '2000-01-01',
@@ -642,7 +649,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  BMI.toStringAsFixed(2),
+                                  BMI.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -846,7 +853,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        reimbursementBMI.toStringAsFixed(2),
+                                        reimbursementBMI.toStringAsFixed(1),
                                         style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
@@ -945,7 +952,7 @@ class _AddNewPackageFormState extends State<AddNewPackageForm> {
                                           ],
                                         ),
                                       ),
-                                      CustomDateInputWithValidation(
+                                      CustomMonthYearDateInput(
                                         dateController:
                                             _reimbursementMonthYearController,
                                         labelText: 'Support Received Month',

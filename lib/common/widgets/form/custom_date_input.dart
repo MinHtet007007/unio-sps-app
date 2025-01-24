@@ -5,11 +5,13 @@ class CustomDateInput extends StatelessWidget {
   final TextEditingController dateController;
   final String labelText;
   final String? validateDate;
+  final bool isRequired;
 
   const CustomDateInput(
       {Key? key,
       required this.dateController,
       required this.labelText,
+       this.isRequired = true,
       this.validateDate})
       : super(key: key);
 
@@ -51,7 +53,7 @@ class CustomDateInput extends StatelessWidget {
         keyboardType: TextInputType.text,
         textInputAction: TextInputAction.next,
         validator: (val) {
-          if (val!.isEmpty) {
+          if (val!.isEmpty && isRequired) {
             return "$labelText is required";
           }
           return null;
