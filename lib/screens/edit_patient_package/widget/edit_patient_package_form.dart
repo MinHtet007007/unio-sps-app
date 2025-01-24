@@ -7,6 +7,7 @@ import 'package:sps/common/constants/form_options.dart';
 import 'package:sps/common/helpers/is_every_element_include.dart';
 import 'package:sps/common/widgets/form/custom_date_input_with_validation.dart';
 import 'package:sps/common/widgets/form/custom_drop_down.dart';
+import 'package:sps/common/widgets/form/custom_month_year_date_input.dart';
 import 'package:sps/common/widgets/form/custom_multi_select_drop_down.dart';
 import 'package:sps/common/widgets/form/custom_submit_button.dart';
 import 'package:sps/common/widgets/form/custom_text_input.dart';
@@ -559,7 +560,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
                           ],
                         ),
                       ),
-                      CustomDateInputWithValidation(
+                      CustomMonthYearDateInput(
                         dateController: _monthYearController,
                         labelText: 'Support Received Month',
                         date: '2000-01-01',
@@ -664,7 +665,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  BMI.toStringAsFixed(2),
+                                  BMI.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -868,7 +869,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        reimbursementBMI.toStringAsFixed(2),
+                                        reimbursementBMI.toStringAsFixed(1),
                                         style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
@@ -960,7 +961,7 @@ class _EditPatientPackageFormState extends State<EditPatientPackageForm> {
                                     ],
                                   ),
                                 ),
-                                CustomDateInputWithValidation(
+                                CustomMonthYearDateInput(
                                   dateController:
                                       _reimbursementMonthYearController,
                                   labelText: 'Support Received Month',

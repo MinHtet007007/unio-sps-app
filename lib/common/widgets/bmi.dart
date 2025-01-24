@@ -29,6 +29,7 @@ class _BMIState extends State<BMI> {
       if (height > 0 && weight > 0) {
         final calculatedBMI = weight / (height * height);
         final bmi = double.parse(calculatedBMI.toStringAsFixed(1));
+        print(bmi);
 
         widget.onBMIChange(bmi);
       }
@@ -56,7 +57,7 @@ class _BMIState extends State<BMI> {
       children: [
         if (widget.bmi != null)
           Text(
-            'Your BMI: ${widget.bmi!.toStringAsFixed(2)}',
+            'Your BMI: ${widget.bmi!.toStringAsFixed(1)}',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
       ],
