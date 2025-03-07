@@ -5,6 +5,8 @@ import 'package:sps/features/patient_list/provider/local_patients_state/local_pa
 import 'package:sps/features/patient_list/provider/patient_service_provider.dart';
 import 'package:sps/features/patient_list/service/patient_service.dart';
 import 'package:sps/local_database/entity/patient_entity.dart';
+import 'package:sps/local_database/entity/patient_support_month.dart';
+import 'package:sps/local_database/entity/support_month_entity.dart';
 
 class LocalPatientsProvider extends StateNotifier<LocalPatientsState> {
   LocalPatientsState localPatientState = LocalPatientsLoadingState();
@@ -21,8 +23,31 @@ class LocalPatientsProvider extends StateNotifier<LocalPatientsState> {
       final database = await localDatabase.database;
 
       final patientDao = database.patientDao;
-      final List<PatientEntity> patients =
-          await patientDao.findAllLocalPatients();
+      final supportMonthDao = database.supportMonthDao;
+      final rawPatients = await patientDao.findAllLocalPatients();
+      final rawSupportMonths = await supportMonthDao.getAllSupportMonths();
+
+      // Group support months by patient ID
+      final supportMonthsByPatientId = <int, List<SupportMonthEntity>>{};
+      for (final supportMonth in rawSupportMonths) {
+        final patientId = supportMonth.localPatientId;
+        if (!supportMonthsByPatientId.containsKey(patientId)) {
+          supportMonthsByPatientId[patientId] = [];
+        }
+        supportMonthsByPatientId[patientId]!.add(supportMonth);
+      }
+
+      // Map patients to PatientSupportMonth objects
+      final patients = rawPatients.map((patient) {
+        final patientId = patient.id;
+        final patientSupportMonthsList =
+            supportMonthsByPatientId[patientId] ?? [];
+        return PatientSupportMonth(
+          patient: patient,
+          supportMonths: patientSupportMonthsList,
+        );
+      }).toList();
+
       state = LocalPatientsSuccessState(patients);
       return;
     } catch (error) {
@@ -37,8 +62,31 @@ class LocalPatientsProvider extends StateNotifier<LocalPatientsState> {
       final database = await localDatabase.database;
 
       final patientDao = database.patientDao;
-      final List<PatientEntity> patients =
-          await patientDao.findAllSyncedLocalPatients();
+      final supportMonthDao = database.supportMonthDao;
+      final rawPatients = await patientDao.findAllSyncedLocalPatients();
+      final rawSupportMonths = await supportMonthDao.getAllSupportMonths();
+
+      // Group support months by patient ID
+      final supportMonthsByPatientId = <int, List<SupportMonthEntity>>{};
+      for (final supportMonth in rawSupportMonths) {
+        final patientId = supportMonth.localPatientId;
+        if (!supportMonthsByPatientId.containsKey(patientId)) {
+          supportMonthsByPatientId[patientId] = [];
+        }
+        supportMonthsByPatientId[patientId]!.add(supportMonth);
+      }
+
+      // Map patients to PatientSupportMonth objects
+      final patients = rawPatients.map((patient) {
+        final patientId = patient.id;
+        final patientSupportMonthsList =
+            supportMonthsByPatientId[patientId] ?? [];
+        return PatientSupportMonth(
+          patient: patient,
+          supportMonths: patientSupportMonthsList,
+        );
+      }).toList();
+
       state = LocalPatientsSuccessState(patients);
       return;
     } catch (error) {
@@ -53,8 +101,31 @@ class LocalPatientsProvider extends StateNotifier<LocalPatientsState> {
       final database = await localDatabase.database;
 
       final patientDao = database.patientDao;
-      final List<PatientEntity> patients =
-          await patientDao.findAllUnSyncedLocalPatients();
+      final supportMonthDao = database.supportMonthDao;
+      final rawPatients = await patientDao.findAllUnSyncedLocalPatients();
+      final rawSupportMonths = await supportMonthDao.getAllSupportMonths();
+
+      // Group support months by patient ID
+      final supportMonthsByPatientId = <int, List<SupportMonthEntity>>{};
+      for (final supportMonth in rawSupportMonths) {
+        final patientId = supportMonth.localPatientId;
+        if (!supportMonthsByPatientId.containsKey(patientId)) {
+          supportMonthsByPatientId[patientId] = [];
+        }
+        supportMonthsByPatientId[patientId]!.add(supportMonth);
+      }
+
+      // Map patients to PatientSupportMonth objects
+      final patients = rawPatients.map((patient) {
+        final patientId = patient.id;
+        final patientSupportMonthsList =
+            supportMonthsByPatientId[patientId] ?? [];
+        return PatientSupportMonth(
+          patient: patient,
+          supportMonths: patientSupportMonthsList,
+        );
+      }).toList();
+
       state = LocalPatientsSuccessState(patients);
       return;
     } catch (error) {

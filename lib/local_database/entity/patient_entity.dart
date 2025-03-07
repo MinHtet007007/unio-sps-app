@@ -135,4 +135,50 @@ class PatientEntity {
         currentTownshipId: remotePatient.currentTownship.id, // Save the ID
         isSynced: true);
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'remoteId': remoteId,
+      'year': year,
+      'spsStartDate': spsStartDate,
+      'townshipId': townshipId,
+      'rrCode': rrCode,
+      'drtbCode': drtbCode,
+      'spCode': spCode,
+      'uniqueId': uniqueId,
+      'name': name,
+      'age': age,
+      'sex': sex,
+      'diedBeforeTreatmentEnrollment': diedBeforeTreatmentEnrollment,
+      'treatmentStartDate': treatmentStartDate,
+      'treatmentRegimen': treatmentRegimen,
+      'treatmentRegimenOther': treatmentRegimenOther,
+      'patientAddress': patientAddress,
+      'patientPhoneNo': patientPhoneNo,
+      'contactInfo': contactInfo,
+      'contactPhoneNo': contactPhoneNo,
+      'primaryLanguage': primaryLanguage,
+      'secondaryLanguage': secondaryLanguage,
+      'height': height,
+      'weight': weight,
+      'bmi': bmi,
+      'toStatus': toStatus,
+      'toYear': toYear,
+      'toDate': toDate,
+      'toRrCode': toRrCode,
+      'toDrtbCode': toDrtbCode,
+      'toUniqueId': toUniqueId,
+      'toTownshipId': toTownshipId,
+      'outcome': outcome,
+      'remark': remark,
+      'treatmentFinished': treatmentFinished,
+      'treatmentFinishedDate': treatmentFinishedDate,
+      'outcomeDate': outcomeDate,
+      'isReported': isReported,
+      'reportPeriod': reportPeriod,
+      'currentTownshipId': currentTownshipId,
+      'isSynced': isSynced,
+    };
+  }
 }
