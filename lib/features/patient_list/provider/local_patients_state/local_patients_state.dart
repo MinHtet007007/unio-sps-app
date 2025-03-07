@@ -1,11 +1,11 @@
-import 'package:sps/local_database/entity/patient_entity.dart';
+import 'package:sps/local_database/entity/patient_support_month.dart';
 
 sealed class LocalPatientsState {}
 
 class LocalPatientsLoadingState extends LocalPatientsState {}
 
 class LocalPatientsSuccessState extends LocalPatientsState {
-  final List<PatientEntity> localPatients;
+  final List<PatientSupportMonth> localPatients;
   LocalPatientsSuccessState(this.localPatients);
 }
 

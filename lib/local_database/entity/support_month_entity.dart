@@ -71,4 +71,28 @@ class SupportMonthEntity {
         patientName: remoteSupportMonth.patientName,
         isSynced: true);
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'remoteId': remoteId,
+      'localPatientId': localPatientId,
+      'remotePatientId': remotePatientId,
+      'patientName': patientName,
+      'townshipId': townshipId,
+      'date': date,
+      'month': month,
+      'monthYear': monthYear,
+      'height': height,
+      'weight': weight,
+      'bmi': bmi,
+      'planPackages': planPackages,
+      'receivePackageStatus': receivePackageStatus,
+      'reimbursementStatus': reimbursementStatus,
+      'amount': amount,
+      'remark': remark,
+      'supportMonthSignature': supportMonthSignature,
+      'isSynced': isSynced,
+    };
+  }
 }
